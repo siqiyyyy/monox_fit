@@ -1,0 +1,6 @@
+(1) Example on how to run a signal region masked fit
+text2workspace.py monojet.txt --channel-masks
+combine -M FitDiagnostics monojet.root --saveShapes --saveWithUncertainties   --setParameters mask_monojet_signal=1
+combine -M AsymptoticLimits monojet.root  --setParameters mask_monojet_signal=1
+
+(2) If you want to run asimov dataset, add -t -1 to the above lines
