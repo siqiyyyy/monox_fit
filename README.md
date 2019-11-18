@@ -7,7 +7,7 @@ Start by setting up [combine in CMSSW 8](http://cms-analysis.github.io/HiggsAnal
 and then also set up [combineHarvester](http://cms-analysis.github.io/CombineHarvester/index.html):
 
 ```bash
-
+source /cvmfs/cms.cern.ch/cmsset_default.sh
 REL=$(lsb_release -r | awk '{print $2}')
  
 if [[ $REL == 6* ]]; then
