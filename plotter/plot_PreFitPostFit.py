@@ -3,6 +3,7 @@ from collections import defaultdict
 from array import array
 from tdrStyle import *
 import math
+import os
 setTDRStyle()
 
 blind = False
@@ -13,9 +14,9 @@ def plotPreFitPostFit(region,category,sb=False):
 
   datalab = {"singlemuon":"Wmn", "dimuon":"Zmm", "gjets":"gjets", "signal":"signal", "singleelectron":"Wen", "dielectron":"Zee"}
 
-  f_mlfit = TFile('../v3/monojet/fitDiagnostics_MASKED.root','READ')
+  f_mlfit = TFile('../monojet/fitDiagnostics_MASKED.root','READ')
 
-  f_data = TFile("../v3/monojet/mono-x.root","READ")
+  f_data = TFile("../monojet/mono-x.root","READ")
 
   f_data.cd("category_"+category)
   h_data = gDirectory.Get(datalab[region]+"_data")
@@ -556,7 +557,9 @@ def plotPreFitPostFit(region,category,sb=False):
 
   gPad.RedrawAxis()
 
-  folder = "/afs/cern.ch/user/z/zdemirag/www/monojet_fullrun2/v3/"
+  folder = "./output"
+  if not os.path.exists(folder):
+    os.makedirs(folder)
   c.SaveAs(folder+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".pdf")
   c.SaveAs(folder+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".png")
   c.SaveAs(folder+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".C")

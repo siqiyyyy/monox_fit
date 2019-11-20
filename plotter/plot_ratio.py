@@ -2,7 +2,7 @@ from ROOT import *
 from array import array
 from tdrStyle import *
 setTDRStyle()
-
+import os
 import math
 
 def plot_ratio(process,category):
@@ -11,7 +11,7 @@ def plot_ratio(process,category):
     highest2 = {}
     lowest = {}
 
-    f = TFile('../v3/monojet/combined_model.root','READ')
+    f = TFile('../monojet/combined_model.root','READ')
         
     if (process=='zmm'):
         dirname = "Z_constraints_category_"+category
@@ -201,7 +201,9 @@ def plot_ratio(process,category):
     
     gPad.RedrawAxis()
 
-    folder = "/afs/cern.ch/user/z/zdemirag/www/monojet_fullrun2/v3/"
+    folder = "./output/"
+    if not os.path.exists(folder):
+        os.makedirs(folder)
 
     c.SaveAs(folder+"/rfactor_"+category+"_"+process+".pdf")
     c.SaveAs(folder+"/rfactor_"+category+"_"+process+".png")
