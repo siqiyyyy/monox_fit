@@ -32,7 +32,7 @@ def main():
   outdir = os.path.dirname(args.out)
   if not os.path.exists(outdir):
     os.makedirs(outdir)
-  
+
   fin = ROOT.TFile(args.file,'READ')
   fdir = fin.Get("category_"+args.category)
 
@@ -41,32 +41,43 @@ def main():
 
   wsin_combine = ROOT.RooWorkspace("wspace_"+args.category,"wspace_"+args.category)
   wsin_combine._import = SafeWorkspaceImporter(wsin_combine)#getattr(wsin_combine,"import")
-  
+
   varl = ROOT.RooRealVar("met","met",0,100000);
 
-  # Keys in the fdir 
+  # Loop over all keys in the input file
+  # pick out the histograms, and add to
+  # the work space.
   keys_local = fdir.GetListOfKeys()
-  for key in keys_local: 
+  for key in keys_local:
     obj = key.ReadObj()
-    print obj.GetName(), obj.GetTitle(), type(obj)
-    if type(obj)!=type(ROOT.TH1D()): 
+    if type(obj)!=type(ROOT.TH1D()):
       continue
     title = obj.GetTitle()
     name = obj.GetName()
-    if not obj.Integral() > 0: 
-      obj.SetBinContent(1,0.0001) # otherwise Combine will complain!
-    print "Creating Data Hist for ", name 
+
+    # Ensure non-zero integral for combine
+    if not obj.Integral() > 0:
+      obj.SetBinContent(1,0.0001)
+
+    print "Creating Data Hist for ", name
     dhist = ROOT.RooDataHist("%s"%(name),"DataSet - %s, %s"%(args.category,name),ROOT.RooArgList(varl),obj)
     wsin_combine._import(dhist)
 
+    # Write the individual histograms
+    # for easy transfer factor calculation
+    # later on
+    obj.SetDirectory(0)
+    foutdir.cd()
+    foutdir.WriteTObject(obj)
 
+  # Write the workspace
   foutdir.cd()
   foutdir.WriteTObject(wsin_combine)
   foutdir.Write()
   fout.Write()
 
 
-  # For reasons unknown, if we do not return 
+  # For reasons unknown, if we do not return
   # the workspace from this function, it goes
   # out of scope and segfaults.
   # ????
