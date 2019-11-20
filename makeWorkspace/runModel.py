@@ -1,29 +1,15 @@
-#########################################################################################
-# Setup the basics ----> USER DEFINED SECTION HERE ------------------------------------//
-fOutName = "combined_model.root"  # --> Output file
-fName    = "mono-x.root"  # --> input file (i.e output from previous)
-categories=["monojet"]
-#categories = ["monojet","monov"] # --> Should be labeled as in original config 
-controlregions_def = ["Z_constraints","W_constraints"] # --> configuration configs for control region fits. 
-# Note if one conrol region def depends on another (i,e if setDependant() is called) it must come AFTER its 
-# the one it depends on in this list!
-#--------------------------------------------------------------------------------------//
-#########################################################################################
-
-# Leave the following alone!
-# Headers 
-#from combineControlRegions import *
+#!/usr/bin/env python
 from counting_experiment import *
-from convert import * 
-
+from convert import *
+import argparse
+import os
 from HiggsAnalysis.CombinedLimit.ModelTools import *
 
-import ROOT as r 
+import ROOT as r
 
 
 ROOT.gSystem.AddIncludePath("-I$CMSSW_BASE/src/ ");
 ROOT.gSystem.AddIncludePath("-I$ROOFITSYS/include");
-#ROOT.gSystem.AddIncludePath("-I$ROOSYS/include");
 
 ROOT.gSystem.Load("libRooFit.so")
 ROOT.gSystem.Load("libRooFitCore.so")
@@ -32,38 +18,76 @@ r.gROOT.SetBatch(1)
 r.gROOT.ProcessLine(".L diagonalizer.cc+")
 from ROOT import diagonalizer
 
-_fOut 	   = r.TFile(fOutName,"RECREATE") 
-_f 	   = r.TFile.Open(fName) 
-out_ws 	   = r.RooWorkspace("combinedws") 
+pjoin = os.path.join
 
-#out_ws._import = getattr(out_ws,"import")
-out_ws._import = SafeWorkspaceImporter(out_ws)
+def cli_args():
+    parser = argparse.ArgumentParser(prog='Construct fit model from RooWorkspace.')
+    parser.add_argument('file', type=str, help='Input file to use.')
+    parser.add_argument('--out', type=str, help='Path to save output under.', default='combined_model.root')
+    parser.add_argument('--categories', type=str, default=None, help='Analysis categories')
+    args = parser.parse_args()
 
-sampleType  = r.RooCategory("bin_number","Bin Number");
-obs         = r.RooRealVar("observed","Observed Events bin",1)
-out_ws._import(sampleType)  # Global variables for dataset
-out_ws._import(obs)
-diag_combined = diagonalizer(out_ws)
-obsargset   = r.RooArgSet(out_ws.var("observed"),out_ws.cat("bin_number"))
+    args.file = os.path.abspath(args.file)
+    args.out = os.path.abspath(args.out)
+    if not os.path.exists(args.file):
+      raise IOError("Input file not found: " + args.file)
+    if not args.file.endswith('.root'):
+      raise IOError("Input file is not a ROOT file: " + args.file)
+    if not args.categories:
+      raise IOError("Please specify the --category option.")
 
-cmb_categories = []
+    args.categories = args.categories.split(',')
+    return args
 
-for crd,crn in enumerate(controlregions_def):
-	x = __import__(crn)
-        for cid,cn in enumerate(categories): 
-		_fDir = _fOut.mkdir("%s_category_%s"%(crn,cn))
-		cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined))
+def main():
+    # Commandline arguments
+    args = cli_args()
 
-for cid,cn in enumerate(cmb_categories):
+    # Automatically determine CR settings from categories
+    if any(re.match('mono(jet|v).*',x) for x in args.categories):
+        controlregions_def = ["Z_constraints","W_constraints"]
+
+    # Create output path
+    outdir = os.path.dirname(args.out)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    _fOut   = r.TFile(args.out,"RECREATE")
+    _f      = r.TFile.Open(args.file)
+    out_ws  = r.RooWorkspace("combinedws")
+
+    #out_ws._import = getattr(out_ws,"import")
+    out_ws._import = SafeWorkspaceImporter(out_ws)
+
+    sampleType  = r.RooCategory("bin_number","Bin Number");
+    obs         = r.RooRealVar("observed","Observed Events bin",1)
+    out_ws._import(sampleType)  # Global variables for dataset
+    out_ws._import(obs)
+    diag_combined = diagonalizer(out_ws)
+    obsargset   = r.RooArgSet(out_ws.var("observed"),out_ws.cat("bin_number"))
+
+
+    # Loop over control region definitions, and load their model definitinos
+    cmb_categories = []
+    for crd,crn in enumerate(controlregions_def):
+        x = __import__(crn)
+        for cid,cn in enumerate(args.categories):
+            _fDir = _fOut.mkdir("%s_category_%s"%(crn,cn))
+            cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined))
+
+    for cid,cn in enumerate(cmb_categories):
         print "Run Model: cid, cn", cid,cn
-	cn.init_channels()
+        cn.init_channels()
         channels = cn.ret_channels()
 
-# Save a Pre-fit snapshot
-out_ws.saveSnapshot("PRE_EXT_FIT_Clean",out_ws.allVars()) 
-# Now convert workspace to combine friendly workspace
-#convertToCombineWorkspace(out_ws,_f,categories,cmb_categories,controlregions_def)
-convertToCombineWorkspace(out_ws,_f,categories,cmb_categories,controlregions_def)
-_fOut.WriteTObject(out_ws)
+    # Save a Pre-fit snapshot
+    out_ws.saveSnapshot("PRE_EXT_FIT_Clean",out_ws.allVars())
+    # Now convert workspace to combine friendly workspace
+    #convertToCombineWorkspace(out_ws,_f,categories,cmb_categories,controlregions_def)
+    convertToCombineWorkspace(out_ws,_f,args.categories,cmb_categories,controlregions_def)
+    _fOut.WriteTObject(out_ws)
 
-print "Produced constraints model in --> ", _fOut.GetName()
+    print "Produced constraints model in --> ", _fOut.GetName()
+
+if __name__ == "__main__":
+    main()
