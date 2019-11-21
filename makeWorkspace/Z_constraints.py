@@ -67,7 +67,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   # note, the code will LOOK for something called NOMINAL_name_Up and NOMINAL_name_Down, where NOMINAL=WScales.GetName()
   # these must be created and writted to the same dirctory as the nominal (fDir)
 
-  if cid is "monov":
+  if "monov" in cid:
     tag = "_monov"
   else:
     tag = ""
@@ -215,7 +215,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
 
   print "What is your cid?", nam
 
-  if nam is "monov":
+  if "monov" in nam:
     tag = "_monov"
   else:
     tag = ""

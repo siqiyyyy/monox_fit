@@ -67,7 +67,7 @@ def main():
     obsargset   = r.RooArgSet(out_ws.var("observed"),out_ws.cat("bin_number"))
 
 
-    # Loop over control region definitions, and load their model definitinos
+    # Loop over control region definitions, and load their model definitions
     cmb_categories = []
     for crd,crn in enumerate(controlregions_def):
         x = __import__(crn)

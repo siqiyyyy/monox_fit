@@ -91,7 +91,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
     CRs[1].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"singleelectronCR",b),_fOut)
 
 
-  if cid is "monov":
+  if "monov" in cid:
     tag = "_monov"
   else:
     tag = ""
