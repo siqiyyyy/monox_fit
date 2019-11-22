@@ -326,7 +326,6 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir):
 
         
 
-    outdir = "./output/"
     import os
     if not os.path.exists(outdir):
         os.makedirs(outdir)

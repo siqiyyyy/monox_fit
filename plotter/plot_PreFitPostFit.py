@@ -557,7 +557,6 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,sb=False):
 
   gPad.RedrawAxis()
 
-  outdir = "./output"
   if not os.path.exists(outdir):
     os.makedirs(outdir)
   c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".pdf")
