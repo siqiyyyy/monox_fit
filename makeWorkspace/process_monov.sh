@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INDIR=../input/2019-11-20_monov/
+INDIR=../input/2019-11-21_monov_newxs/
 OUTDIR='../monov/root'
 YEAR='2017'
 mkdir -p ${OUTDIR}
@@ -14,6 +14,8 @@ for TAGGER in nominal MD; do
     done;
 done
 
+./make_ws.py ${INDIR}/merged_legacy_limit_monov_tau21_${YEAR}.root --out ${OUTDIR}/ws_tau21_${YEAR}.root --category monov
+./runModel.py ${OUTDIR}/ws_tau21_${YEAR}.root --categories monov --out ${OUTDIR}/combined_model_monov_tau21_${YEAR}.root
 
 # hadd -f ${OUTDIR}/ws_nominal_monov.root ${OUTDIR}/ws_*nominal*2017.root
 # hadd -f ${OUTDIR}/ws_MD_monov.root ${OUTDIR}/ws_*MD*2017.root
