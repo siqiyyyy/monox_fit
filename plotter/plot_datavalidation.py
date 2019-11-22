@@ -334,6 +334,9 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir):
     c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.png")
     c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.C")
 
+    c.Close()
+    f_mlfit.Close()
+    f_data.Close()
 #dataValidation("dielectron","gjets","monojet")
 #dataValidation("dimuon"    ,"gjets","monojet")
 # ws_file="../monojet/root/ws_monojet_2017.root"

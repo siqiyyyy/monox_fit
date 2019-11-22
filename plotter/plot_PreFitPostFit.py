@@ -557,6 +557,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,sb=False):
 
   gPad.RedrawAxis()
 
+  import os
   if not os.path.exists(outdir):
     os.makedirs(outdir)
   c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".pdf")
@@ -564,7 +565,9 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,sb=False):
   c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".C")
   c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".root")
 
-
+  c.Close()
+  f_mlfit.Close()
+  f_data.Close()
 #plotPreFitPostFit("singlemuon","monov")
 #plotPreFitPostFit("dimuon","monov")
 #plotPreFitPostFit("gjets","monov")

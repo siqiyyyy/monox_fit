@@ -5,13 +5,14 @@ setTDRStyle()
 import os
 import math
 
-def plot_ratio(process,category):
+def plot_ratio(process,category, model_file, outdir):
 
     highest = {}
     highest2 = {}
     lowest = {}
 
-    f = TFile('../monojet/combined_model.root','READ')
+    print model_file
+    f = TFile(model_file,'READ')
         
     if (process=='zmm'):
         dirname = "Z_constraints_category_"+category
@@ -200,27 +201,12 @@ def plot_ratio(process,category):
     latex3.DrawLatex(0.20, 0.8, "Preliminary");
     
     gPad.RedrawAxis()
+    import os
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
-    folder = "./output/"
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
-    c.SaveAs(folder+"/rfactor_"+category+"_"+process+".pdf")
-    c.SaveAs(folder+"/rfactor_"+category+"_"+process+".png")
-    c.SaveAs(folder+"/rfactor_"+category+"_"+process+".C")
-
-    del c
- 
-plot_ratio('zmm','monojet')
-plot_ratio('zee','monojet')
-plot_ratio('w_weights','monojet')
-plot_ratio('photon','monojet')
-plot_ratio('wen','monojet')
-plot_ratio('wmn','monojet')
-
-#plot_ratio('zmm','monov')
-#plot_ratio('zee','monov')
-#plot_ratio('w_weights','monov')
-#plot_ratio('photon','monov')
-#plot_ratio('wen','monov')
-#plot_ratio('wmn','monov')
+    c.SaveAs(outdir+"/rfactor_"+category+"_"+process+".pdf")
+    c.SaveAs(outdir+"/rfactor_"+category+"_"+process+".png")
+    c.SaveAs(outdir+"/rfactor_"+category+"_"+process+".C")
+    f.Close()
+    c.Close()
