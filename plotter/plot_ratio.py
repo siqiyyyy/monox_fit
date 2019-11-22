@@ -5,7 +5,7 @@ setTDRStyle()
 import os
 import math
 
-def plot_ratio(process,category, model_file, outdir):
+def plot_ratio(process,category, model_file, outdir, lumi):
 
     highest = {}
     highest2 = {}
@@ -187,7 +187,7 @@ def plot_ratio(process,category, model_file, outdir):
     latex2.SetNDC()
     latex2.SetTextSize(0.035)
     latex2.SetTextAlign(31) # align right
-    latex2.DrawLatex(0.87, 0.95, "(13 TeV)");
+    latex2.DrawLatex(0.87, 0.95, "{LUMI:.1f} fb^{{-1}} (13 TeV)".format(LUMI=lumi))
 
     latex3 = TLatex()
     latex3.SetNDC()
@@ -199,7 +199,7 @@ def plot_ratio(process,category, model_file, outdir):
     latex3.SetTextFont(52)
     latex3.SetTextAlign(11)
     latex3.DrawLatex(0.20, 0.8, "Preliminary");
-    
+
     gPad.RedrawAxis()
     import os
     if not os.path.exists(outdir):

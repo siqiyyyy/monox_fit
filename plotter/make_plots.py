@@ -16,13 +16,13 @@ category='monovtight'
 
 outdir = './plots/monov/'
 for region in regions:
-    plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir)
+    plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, 41.3)
 for proc in procs:
-    plot_ratio(proc, category,'../monov/root/combined_model_monov_nominal_tight_2017.root', outdir)
+    plot_ratio(proc, category,'../monov/root/combined_model_monov_nominal_tight_2017.root', outdir, 41.3)
 
-dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir)
-dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir)
-dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir)
+dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir, 41.3)
+dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir, 41.3)
+dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir, 41.3)
 
 
 # # ### Monojet
@@ -31,9 +31,9 @@ fitdiag_file = '../monojet/fitDiagnostics.root'
 category='monojet'
 outdir = './plots/monojet/'
 for region in regions:
-    plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir)
+    plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, 41.3)
 for proc in procs:
-    plot_ratio(proc, category, '../monojet/root/combined_model_monojet_2017.root', outdir)
-dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir)
-dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir)
-dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir)
+    plot_ratio(proc, category, '../monojet/root/combined_model_monojet_2017.root', outdir, 41.3)
+dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir,41.3)
+dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir,41.3)
+dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir,41.3)

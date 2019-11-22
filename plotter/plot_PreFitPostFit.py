@@ -10,7 +10,7 @@ blind = False
 
 new_dic = defaultdict(dict)
 
-def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,sb=False):
+def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False):
 
   datalab = {"singlemuon":"Wmn", "dimuon":"Zmm", "gjets":"gjets", "signal":"signal", "singleelectron":"Wen", "dielectron":"Zee"}
 
@@ -242,7 +242,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,sb=False):
   latex2.SetTextSize(0.6*c.GetTopMargin())
   latex2.SetTextFont(42)
   latex2.SetTextAlign(31) # align right
-  latex2.DrawLatex(0.94, 0.95,"XX fb^{-1} (13 TeV)")
+  latex2.DrawLatex(0.94, 0.95,"{LUMI:.1f} fb^{{-1}} (13 TeV)".format(LUMI=lumi))
   latex2.SetTextSize(0.6*c.GetTopMargin())
   latex2.SetTextFont(62)
   latex2.SetTextAlign(11) # align right
