@@ -4,10 +4,11 @@ import math, os
 from math import sqrt, pow
 from array import array
 from tdrStyle import *
+import os
 setTDRStyle()
 
 
-def dataValidation(region1,region2,category):
+def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir):
 
     if region1 is "combined" and region2 is "gjets":
         name = "Z(ll)+jets / #gamma+jets"
@@ -36,7 +37,7 @@ def dataValidation(region1,region2,category):
 
     datalab = {"singlemuon":"Wmn", "dimuon":"Zmm", "gjets":"gjets", "signal":"signal", "singleelectron":"Wen", "dielectron":"Zee"}
   
-    f_data = TFile("../v3/monojet/mono-x.root","READ")
+    f_data = TFile(ws_file,"READ")
     f_data.cd("category_"+category)
 
     if region1 is "combined":
@@ -51,7 +52,7 @@ def dataValidation(region1,region2,category):
     else:
         h_data_1 = gDirectory.Get(datalab[region1]+"_data")
     h_data_1.Sumw2()
-    if not category is "monov":
+    if not "monov" in category:
         h_data_1.Rebin(2)
 
     if region2 is "combinedW":    
@@ -62,12 +63,12 @@ def dataValidation(region1,region2,category):
         h_data_2 = gDirectory.Get(datalab[region2]+"_data")
 
     h_data_2.Sumw2()
-    if not category is "monov":
+    if not "monov" in category:
         h_data_2.Rebin(2)
 
     h_data_1.Divide(h_data_2)
 
-    f_mlfit = TFile('../v3/monojet/fitDiagnostics.root','READ')
+    f_mlfit = TFile(fitdiag_file,'READ')
 
     channel = {"singlemuon":category+"_singlemu", "dimuon":category+"_dimuon", "gjets":category+"_photon", "signal":category+"_signal", "singleelectron":category+"_singleel", "dielectron":category+"_dielec"}
 
@@ -75,6 +76,7 @@ def dataValidation(region1,region2,category):
 
     if region1 is "combined":    
         h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+category+"_dimuon/total_background")
+        print f_mlfit, "shapes_prefit/"+category+"_dielec/total_background"
         h_mc_2 = f_mlfit.Get("shapes_prefit/"+category+"_dielec/total_background")
         h_prefit[region1].Add(h_mc_2)
     elif region1 is "combinedW":    
@@ -84,7 +86,7 @@ def dataValidation(region1,region2,category):
     else:
         h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+channel[region1]+"/total_background")
     h_prefit[region1].Sumw2()
-    if not category is "monov":
+    if not "monov" in category:
         h_prefit[region1].Rebin(2)
 
     if region2 is "combinedW":    
@@ -95,7 +97,7 @@ def dataValidation(region1,region2,category):
         h_prefit[region2] = f_mlfit.Get("shapes_prefit/"+channel[region2]+"/total_background")
 
     h_prefit[region2].Sumw2()
-    if not category is "monov":
+    if not "monov" in category:
         h_prefit[region2].Rebin(2)
     
     h_prefit[region1].Divide(h_prefit[region2])
@@ -245,7 +247,7 @@ def dataValidation(region1,region2,category):
     categoryLabel.SetTextSize(0.042);
     categoryLabel.SetTextFont(42);
     categoryLabel.SetTextAlign(11);
-    categoryLabel.DrawLatex(0.200,0.80,"monojet");
+    categoryLabel.DrawLatex(0.200,0.80,category);
     categoryLabel.Draw("same");
 
 
@@ -324,18 +326,24 @@ def dataValidation(region1,region2,category):
 
         
 
-    folder = "/afs/cern.ch/user/z/zdemirag/www/monojet_fullrun2/v3/"
+    outdir = "./output/"
+    import os
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
-    c.SaveAs(folder+region1+"_"+region2+"_cat_"+category+"_ratio.pdf")
-    c.SaveAs(folder+region1+"_"+region2+"_cat_"+category+"_ratio.png")
-    c.SaveAs(folder+region1+"_"+region2+"_cat_"+category+"_ratio.C")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.pdf")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.png")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.C")
 
 #dataValidation("dielectron","gjets","monojet")
 #dataValidation("dimuon"    ,"gjets","monojet")
+# ws_file="../monojet/root/ws_monojet_2017.root"
+# fitdiag_file = '../monojet/higgsCombineTest.FitDiagnostics.mH120.root'
+# dataValidation("combined"  ,  "gjets",  "monojet", ws_file, fitdiag_file)
+# dataValidation("combinedW", "gjets"    ,"monojet", ws_file, fitdiag_file)
+# dataValidation("combined" , "combinedW","monojet", ws_file, fitdiag_file)
 
-dataValidation("combined"  ,"gjets","monojet")
-dataValidation("combinedW","gjets"    ,"monojet")
-dataValidation("combined" ,"combinedW","monojet")
+
 
 #dataValidation("singlemuon","singleelectron","monojet")
 #dataValidation("dimuon","dielectron","monojet")
