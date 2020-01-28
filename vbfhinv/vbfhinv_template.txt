@@ -1,0 +1,184 @@
+imax * number of bins
+jmax * number of processes minus 1
+kmax * number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes *                         vbf_dielec    combined_model.root combinedws:vbf_Zee_$PROCESS combinedws:vbf_Zee_$PROCESS_$SYSTEMATIC
+shapes data_obs                  vbf_dielec    combined_model.root combinedws:vbf_Zee_data
+shapes qcd_zll                   vbf_dielec    combined_model.root combinedws:vbf_qcd_dielectron_qcd_zjets_model
+shapes ewk_zll                   vbf_dielec    combined_model.root combinedws:vbf_ewk_dielectron_ewk_zjets_model
+shapes *                         vbf_dimuon    combined_model.root combinedws:vbf_Zmm_$PROCESS combinedws:vbf_Zmm_$PROCESS_$SYSTEMATIC
+shapes data_obs                  vbf_dimuon    combined_model.root combinedws:vbf_Zmm_data
+shapes qcd_zll                   vbf_dimuon    combined_model.root combinedws:vbf_qcd_dimuon_qcd_zjets_model
+shapes ewk_zll                   vbf_dimuon    combined_model.root combinedws:vbf_ewk_dimuon_ewk_zjets_model
+shapes *                         vbf_singleel  combined_model.root combinedws:vbf_Wen_$PROCESS combinedws:vbf_Wen_$PROCESS_$SYSTEMATIC
+shapes data_obs                  vbf_singleel  combined_model.root combinedws:vbf_Wen_data
+shapes qcd_wjets                 vbf_singleel  combined_model.root combinedws:vbf_qcd_singleelectron_qcd_wjets_model
+shapes ewk_wjets                 vbf_singleel  combined_model.root combinedws:vbf_ewk_singleelectron_ewk_wjets_model
+shapes *                         vbf_singlemu  combined_model.root combinedws:vbf_Wmn_$PROCESS combinedws:vbf_Wmn_$PROCESS_$SYSTEMATIC
+shapes data_obs                  vbf_singlemu  combined_model.root combinedws:vbf_Wmn_data
+shapes qcd_wjets                 vbf_singlemu  combined_model.root combinedws:vbf_qcd_singlemuon_qcd_wjets_model
+shapes ewk_wjets                 vbf_singlemu  combined_model.root combinedws:vbf_ewk_singlemuon_ewk_wjets_model
+
+shapes *                         vbf_signal    combined_model.root combinedws:vbf_signal_$PROCESS combinedws:vbf_signal_$PROCESS_$SYSTEMATIC
+shapes data_obs                  vbf_signal    combined_model.root combinedws:vbf_Zee_data
+shapes qcd_wjets                 vbf_signal    combined_model.root combinedws:vbf_qcd_wjetssignal_qcd_zjets_model
+shapes qcd_zjets                 vbf_signal    combined_model.root combinedws:vbf_signal_qcd_zjets_model
+shapes ewk_wjets                 vbf_signal    combined_model.root combinedws:vbf_ewk_wjetssignal_ewk_zjets_model
+shapes ewk_zjets                 vbf_signal    combined_model.root combinedws:vbf_ewkqcd_signal_qcd_zjets_model
+----------------------------------------------------------------------------------------------------------------------------------
+bin              vbf_signal        vbf_dimuon        vbf_dielec        vbf_singlemu      vbf_singleel  
+observation        -1.0              -1.0               -1.0              -1.0              -1.0       
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                        vbf_signal     vbf_signal        vbf_signal            vbf_signal		vbf_signal	      vbf_signal       vbf_signal	    vbf_signal	         vbf_signal	   vbf_signal 	        vbf_signal		vbf_dimuon	    vbf_dimuon  	  vbf_dimuon		vbf_dimuon  	      vbf_dielec	   vbf_dielec 	        vbf_dielec             vbf_dielec	    vbf_singlemu	  vbf_singlemu  	vbf_singlemu	      vbf_singlemu	    vbf_singlemu	  vbf_singlemu 	        vbf_singlemu  	      vbf_singleel  	    vbf_singleel	  vbf_singleel  	    vbf_singleel	  vbf_singleel  	vbf_singleel	      vbf_singleel    
+process                                    vbf            ggh               diboson               qcdzll		ewkzll		      top	       ewk_wjets	    qcd_wjets		 qcd	           ewk_zjets		qcd_zjets		ewk_zll 	    qcd_zll		  top			diboson 	      ewk_zll		   qcd_zll		top		       diboson		    qcdzll  		  ewkzll		top		      diboson		    ewk_wjets	          qcd_wjets 		qcd		      qcdzll		    ewkzll 		  top			diboson 	     ewk_wjets  	   qcd_wjets		  qcd	       
+process                                    -1             -2                1                     2			2		      3 	       5		    6			 4		   7			8			9		    10  		   3			 1		      9 		   10			 3		       1		    2			  2			3		      1 		    5			  6			4		      2 		    2			  3			1			 5		       6		  4	     
+rate                                       -1             -1                -1                    -1			-1		      -1	       1.0000		    1.0000		 -1		   1.0000		1.0000  		1.0000  	    1.0000		  -1			-1		      1.0000		   1.0000		 -1		       -1		    -1  		  -1			-1		      -1		    1.0000		  1.0000		-1		      -1		    -1  		  -1			-1			 1.0000 	       1.0000		  -1	     
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ggH_QCDscale                  lnN          -              0.933/1.046       -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+QCDscale_ggH2in               lnN          -              1.4               -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+pdf_Higgs_gg                  lnN          -              1.032             -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+UEPS                          lnN          -              1.168             -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+qqH_QCDscale                  lnN          0.997/1.004    -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+QCDscale_qqH_ACCEPT           lnN          1.02           -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+pdf_Higgs_qq                  lnN          1.021          -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+pdf_Higgs_qq_ACCEPT           lnN          1.01           -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -		       -		     -  		   -			 -			  -			-		   -			
+CMS_eff2016_b                 lnN          -              -                 -                     -			-		      1.03	       -		    -			 -		   -			-			-		    -			  1.03  		-		      - 		   -			 1.03		       -		    -			  -			1.03		      - 		    -			  -			-		      - 		    -			  1.03  		-			 -		       -		  -	     
+CMS_fake_b                    lnN          1.01           1.01              1.01                  1.01  		1.01		      - 	       -		    -			 1.01		   -			-			-		    -			  -			1.01		      - 		   -			 -		       1.01		    1.01		  1.01  		-		      1.01		    -			  -			1.01		      1.01		    1.01		  -			1.01			 -		       -		  1.01       
+CMS_eff2016_e                 lnN          -              -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      1.03		   1.03 		 1.03		       1.03		    -			  -			-		      - 		    -			  -			-		      1.015		    1.015		  1.015 		1.015			 -		       -		  1.015      
+CMS_reco_e                    lnN          -              -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      1.02		   1.02 		 1.02		       1.02		    -			  -			-		      - 		    -			  -			-		      1.01		    1.01		  1.01  		1.01			 -		       -		  1.01       
+CMS_trigger2016_e             lnN          -              -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		    -			  -			-		      - 		    -			  -			-		      1.01		    1.01		  1.01  		1.01			 -		       -		  1.01       
+CMS_eff2016_m                 lnN          -              -                 -                     -			-		      - 	       -		    -			 -		   -			-			1.02		    1.02		  1.02  		1.02		      - 		   -			 -		       -		    1.01		  1.01  		1.01		      1.01		    1.01		  1.01  		1.01		      - 		    -			  -			-			 1.01		       1.01		  -	     
+CMS_reco_m                    lnN          -              -                 -                     -			-		      - 	       -		    -			 -		   -			-			1.02		    1.02		  1.02  		1.02		      - 		   -			 -		       -		    1.01		  1.01  		1.01		      1.01		    1.01		  1.01  		1.01		      - 		    -			  -			-			 1.01		       1.01		  -	     
+CMS_scale2016_j_vbf           lnN          1.10           1.10              1.10                  1.10  		1.10		      1.10	       -		    -			 1.10		   -			-			-		    -			  1.10  		1.10		      - 		   -			 1.10		       1.10		    1.10		  1.10  		1.10		      1.10		    -			  -			1.10		      1.10		    1.10		  1.10  		1.10			 -		       -		  1.10       
+CMS_trigger2016_met           lnN          1.02           1.02              1.02                  1.02  		1.02		      1.02	       -		    -			 -		   -			-			-		    -			  1.02  		1.02		      1.02		   1.02 		 -		       -		    1.02		  1.02  		1.02		      1.02		    -			  -			1.02		      - 		    -			  -			-			 -		       -		  -	     
+CMS_fake_e                    lnN          -              -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		    -			  -			-		      - 		    -			  -			-		      - 		    -			  -			-			 -		       -		  1.5	     
+CMS_fake_m                    lnN          -              -                 -                     -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		    -			  -			-		      - 		    -			  -			1.5		      - 		    -			  -			-			 -		       -		  -	     
+QCD_SR_vbf                    lnN          -              -                 -                     -			-		      - 	       -		    -			 1.5		   -			-			-		    -			  -			-		      - 		   -			 -		       -		    -			  -			-		      - 		    -			  -			-		      - 		    -			  -			-			 -		       -		  -	     
+lumi_13TeV                    lnN          1.025          1.025             1.025                 1.025 		1.025		      1.025	       -		    -			 1.025  	   -			-			-		    -			  1.025 		1.025		      - 		   -			 1.025  	       1.025		    1.025		  1.025 		1.025		      1.025		    -			  -			1.025		      1.025		    1.025		  1.025 		1.025			 -		       -		  1.025      
+l1prefire                     lnN          1.03           1.03              1.03                  1.03  		1.03		      1.03	       -		    -			 1.03		   -			-			-		    -			  1.03  		1.03		      - 		   -			 1.03		       1.03		    1.03		  1.03  		1.03		      1.03		    -			  -			1.03		      1.03		    1.03		  1.03  		1.03			 -		       -		  1.03       
+QCDscale_tt                   lnN          -              -                 -                     -			-		      1.1	       -		    -			 -		   -			-			-		    -			  1.1			-		      - 		   -			 1.1		       -		    -			  -			1.1		      - 		    -			  -			-		      - 		    -			  1.1			-			 -		       -		  -	     
+QCDscale_tt_ACCEPT            lnN          -              -                 -                     -			-		      1.1	       -		    -			 -		   -			-			-		    -			  1.1			-		      - 		   -			 1.1		       -		    -			  -			1.1		      - 		    -			  -			-		      - 		    -			  1.1			-			 -		       -		  -	     
+Top_Reweight13TeV             lnN          -              -                 -                     -			-		      1.1	       -		    -			 -		   -			-			-		    -			  1.1			-		      - 		   -			 1.1		       -		    -			  -			1.1		      - 		    -			  -			-		      - 		    -			  1.1			-			 -		       -		  -	     
+QCDscale_VV                   lnN          -              -                 1.15                  -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			1.15		      - 		   -			 -		       1.15		    -			  -			-		      1.15		    -			  -			-		      - 		    -			  -			1.15			 -		       -		  -	     
+QCDscale_VV_ACCEPT            lnN          -              -                 1.15                  -			-		      - 	       -		    -			 -		   -			-			-		    -			  -			1.15		      - 		   -			 -		       1.15		    -			  -			-		      1.15		    -			  -			-		      - 		    -			  -			1.15			 -		       -		  -	     
+ZJets_Norm13TeV               lnN          -              -                 -                     1.2			1.2		      - 	       -		    -			 -		   -			-			-		    -			  -			-		      - 		   -			 -		       -		    1.2 		  1.2			-		      - 		    -			  -			-		      1.2		    1.2 		  -			-			 -		       -		  -	     
+CMS_trigger2016_met param 0.0 1
+CMS_scale2016_j_vbf param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin0 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin1 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin2 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin3 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin4 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin5 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin6 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin7 param 0.0 1
+vbf_stat_error_qcd_dimuonCR_bin8 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin0 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin1 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin2 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin3 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin4 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin5 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin6 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin7 param 0.0 1
+vbf_stat_error_qcd_dielectronCR_bin8 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin0 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin1 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin2 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin3 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin4 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin5 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin6 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin7 param 0.0 1
+vbf_stat_error_qcd_wzCR_bin8 param 0.0 1
+ZnunuWJets_QCD_renscale_vbf param 0.0 1
+ZnunuWJets_QCD_facscale_vbf param 0.0 1
+ZnunuWJets_QCD_pdf_vbf param 0.0 1
+qcd_ewk_vbf_bin0 param 0.0 1
+qcd_ewk_vbf_bin1 param 0.0 1
+qcd_ewk_vbf_bin2 param 0.0 1
+qcd_ewk_vbf_bin3 param 0.0 1
+qcd_ewk_vbf_bin4 param 0.0 1
+qcd_ewk_vbf_bin5 param 0.0 1
+qcd_ewk_vbf_bin6 param 0.0 1
+qcd_ewk_vbf_bin7 param 0.0 1
+qcd_ewk_vbf_bin8 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin0 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin1 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin2 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin3 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin4 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin5 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin6 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin7 param 0.0 1
+vbf_stat_error_ewk_dimuonCR_bin8 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin0 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin1 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin2 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin3 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin4 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin5 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin6 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin7 param 0.0 1
+vbf_stat_error_ewk_dielectronCR_bin8 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin0 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin1 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin2 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin3 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin4 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin5 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin6 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin7 param 0.0 1
+vbf_stat_error_ewk_wzCR_bin8 param 0.0 1
+ZnunuWJets_EWK_renscale_vbf param 0.0 1
+ZnunuWJets_EWK_facscale_vbf param 0.0 1
+ZnunuWJets_EWK_pdf_vbf param 0.0 1
+ewk_ewk_vbf_bin0 param 0.0 1
+ewk_ewk_vbf_bin1 param 0.0 1
+ewk_ewk_vbf_bin2 param 0.0 1
+ewk_ewk_vbf_bin3 param 0.0 1
+ewk_ewk_vbf_bin4 param 0.0 1
+ewk_ewk_vbf_bin5 param 0.0 1
+ewk_ewk_vbf_bin6 param 0.0 1
+ewk_ewk_vbf_bin7 param 0.0 1
+ewk_ewk_vbf_bin8 param 0.0 1
+CMS_veto2016_t param 0.0 1
+CMS_veto2016_m param 0.0 1
+CMS_veto2016_e param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin1 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin2 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin3 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin4 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin5 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin6 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin7 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin8 param 0.0 1
+vbf_stat_error_qcd_singlemuon_bin9 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin1 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin2 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin3 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin4 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin5 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin6 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin7 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin8 param 0.0 1
+vbf_stat_error_qcd_singleelectron_bin9 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin1 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin2 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin3 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin4 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin5 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin6 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin7 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin8 param 0.0 1
+vbf_stat_error_ewk_singlemuon_bin9 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin1 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin2 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin3 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin4 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin5 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin6 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin7 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin8 param 0.0 1
+vbf_stat_error_ewk_singleelectron_bin9 param 0.0 1
+
