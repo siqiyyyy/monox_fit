@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INDIR=../input/2019-11-21_monov_newxs/
+INDIR=../input/2019-12-04_fix_hinv_xs_monov
 OUTDIR='../monov/root'
 YEAR='2017'
 mkdir -p ${OUTDIR}
