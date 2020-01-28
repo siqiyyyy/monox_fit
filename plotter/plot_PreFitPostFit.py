@@ -10,13 +10,13 @@ blind = False
 
 new_dic = defaultdict(dict)
 
-def plotPreFitPostFit(region,category,sb=False):
+def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False):
 
   datalab = {"singlemuon":"Wmn", "dimuon":"Zmm", "gjets":"gjets", "signal":"signal", "singleelectron":"Wen", "dielectron":"Zee"}
 
-  f_mlfit = TFile('../monojet/fitDiagnostics_MASKED.root','READ')
+  f_mlfit = TFile(fitdiag_file,'READ')
 
-  f_data = TFile("../monojet/mono-x.root","READ")
+  f_data = TFile(ws_file,"READ")
 
   f_data.cd("category_"+category)
   h_data = gDirectory.Get(datalab[region]+"_data")
@@ -242,7 +242,7 @@ def plotPreFitPostFit(region,category,sb=False):
   latex2.SetTextSize(0.6*c.GetTopMargin())
   latex2.SetTextFont(42)
   latex2.SetTextAlign(31) # align right
-  latex2.DrawLatex(0.94, 0.95,"XX fb^{-1} (13 TeV)")
+  latex2.DrawLatex(0.94, 0.95,"{LUMI:.1f} fb^{{-1}} (13 TeV)".format(LUMI=lumi))
   latex2.SetTextSize(0.6*c.GetTopMargin())
   latex2.SetTextFont(62)
   latex2.SetTextAlign(11) # align right
@@ -557,21 +557,17 @@ def plotPreFitPostFit(region,category,sb=False):
 
   gPad.RedrawAxis()
 
-  folder = "./output"
-  if not os.path.exists(folder):
-    os.makedirs(folder)
-  c.SaveAs(folder+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".pdf")
-  c.SaveAs(folder+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".png")
-  c.SaveAs(folder+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".C")
-  c.SaveAs(folder+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".root")
+  import os
+  if not os.path.exists(outdir):
+    os.makedirs(outdir)
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".pdf")
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".png")
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".C")
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".root")
 
-
-plotPreFitPostFit("singlemuon","monojet")
-plotPreFitPostFit("dimuon","monojet")
-plotPreFitPostFit("gjets","monojet")
-plotPreFitPostFit("singleelectron","monojet")
-plotPreFitPostFit("dielectron","monojet")
-
+  c.Close()
+  f_mlfit.Close()
+  f_data.Close()
 #plotPreFitPostFit("singlemuon","monov")
 #plotPreFitPostFit("dimuon","monov")
 #plotPreFitPostFit("gjets","monov")
