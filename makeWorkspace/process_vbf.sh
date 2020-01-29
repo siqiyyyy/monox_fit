@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
-INDIR=../input/2020-01-28_most_recent/
+INDIR=../input/2020-01-28_new_xs
 OUTDIR='../vbf/root'
 mkdir -p ${OUTDIR}
 
 ### Start by making workspaces split by working point and tagger type
 
 for YEAR in 2017 2018; do
-    WSFILE=${OUTDIR}/ws_monojet_${YEAR}.root
+    WSFILE=${OUTDIR}/ws_vbf_${YEAR}.root
     ./make_ws.py ${INDIR}/legacy_limit_${YEAR}.root --out ${WSFILE} --category vbf
     ./runModel.py ${WSFILE} --categories vbf --out ${OUTDIR}/combined_model_vbf_${YEAR}.root
 done;
