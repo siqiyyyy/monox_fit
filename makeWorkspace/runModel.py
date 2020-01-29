@@ -46,7 +46,7 @@ def main():
     # Automatically determine CR settings from categories
     if any(re.match('mono(jet|v).*',x) for x in args.categories):
         controlregions_def = ["Z_constraints","W_constraints"]
-    elif 'vbfhinv' in args.categories:
+    elif any(['vbf' in x for x in args.categories]):
          controlregions_def = ["Z_constraints_qcd","W_constraints_qcd","Z_constraints_ewk","W_constraints_ewk"]
 
     # Create output path
