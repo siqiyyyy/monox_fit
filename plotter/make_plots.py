@@ -45,10 +45,12 @@ ws_file="../vbf/root/ws_vbf_2017.root"
 fitdiag_file = '../vbf/diagnostics/fitDiagnostics_vbf_2017.root'
 category='vbf'
 outdir = './plots/vbf/'
-# for region in regions:
-#     plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, 41.3)
+regions = ['singlemuon','dimuon','singleelectron','dielectron']
+
+for region in regions:
+    plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, 41.3)
 # for proc in procs:
 #     plot_ratio(proc, category, '../vbf/root/combined_model_vbf_2017.root', outdir, 41.3)
 # dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir,41.3)
 # dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir,41.3)
-dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir,41.3)
+# dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir,41.3)

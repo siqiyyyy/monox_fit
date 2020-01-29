@@ -23,21 +23,52 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
 
   h_postfit_sig = f_mlfit.Get("shapes_fit_b/"+category+"_"+category+"_signal/total_background")
   h_prefit_sig = f_mlfit.Get("shapes_prefit/"+category+"_"+category+"_signal/total_background")
-  
+
   channel = {"singlemuon":category+"_singlemu", "dimuon":category+"_dimuon", "gjets":category+"_photon", "signal":category+"_signal", "singleelectron":category+"_singleel", "dielectron":category+"_dielec"}
-  mainbkg = {"singlemuon":"wjets", "dimuon":"zll", "gjets":"gjets", "signal":"zjets", "singleelectron":"wjets", "dielectron":"zll"}
-  
-  processes = [
-      'qcd',
-      'zll',
-      'gjets',
-      'top',
-      'diboson',  
-      'ewk',
-      'wjets',
-      'zjets'
-  ]
- 
+
+  if "mono" in category:
+    mainbkgs = {
+                "singlemuon":["wjets"],
+                "dimuon": ["zll"],
+                "gjets": ["gjets"],
+                "signal":["zjets"],
+                "singleelectron":["wjets"],
+                "dielectron":["zll"]
+                }
+    processes = [
+        'qcd',
+        'zll',
+        'gjets',
+        'top',
+        'diboson',
+        'ewk',
+        'wjets',
+        'zjets'
+    ]
+  else:
+    mainbkgs = {
+            "singlemuon":["ewk_wjets","qcd_wjets"],
+            "dimuon": ["ewk_zll","qcd_zll"],
+            "gjets": ["gjets"],
+            "signal":["qcd_zjets","ewk_zjets"],
+            "singleelectron":["ewk_wjets","qcd_wjets"],
+            "dielectron":["ewk_zll","qcd_zll"]
+            }
+    processes = [
+        'qcd',
+        'qcd_zll',
+        'qcdzll',
+        'ewkzll',
+        'ewk_zll',
+        'gjets',
+        'top',
+        'diboson',
+        'ewk',
+        'ewk_wjets',
+        'qcd_wjets',
+        'qcd_zjets',
+        'ewk_zjets'
+    ]
   colors = {
     'diboson':"#4897D8",
     'gjets'  :"#9A9EAB",
@@ -45,8 +76,16 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     'top'    :"#CF3721",
     'ewk'    :"#000000",
     'zll'    :"#9A9EAB",
+    'qcd_zll'    :"#9A9EAB",
+    'qcdzll'    :"#9A9EAB",
+    'ewk_zll'    :"#9A9EAB",
+    'ewkzll'    :"#9A9EAB",
     'wjets'  :"#FAAF08",
-    'zjets'  :"#258039"
+    'qcd_wjets'  :"#FAAF08",
+    'ewk_wjets'  :"#FAAF08",
+    'zjets'  :"#258039",
+    'ewk_zjets'  :"#258039",
+    'qcd_zjets'  :"#258039"
   }
 
   binLowE = []
@@ -58,10 +97,11 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   for i in range(1,h_prefit['total'].GetNbinsX()+2):
     binLowE.append(h_prefit['total'].GetBinLowEdge(i))
 
-  h_all_prefit = TH1F("h_all_prefit","h_all_prefit",len(binLowE)-1,array('d',binLowE))    
-  h_other_prefit = TH1F("h_other_prefit","h_other_prefit",len(binLowE)-1,array('d',binLowE))    
-  h_stack_prefit = THStack("h_stack_prefit","h_stack_prefit")    
+  h_all_prefit = TH1F("h_all_prefit","h_all_prefit",len(binLowE)-1,array('d',binLowE))
+  h_other_prefit = TH1F("h_other_prefit","h_other_prefit",len(binLowE)-1,array('d',binLowE))
+  h_stack_prefit = THStack("h_stack_prefit","h_stack_prefit")
 
+  # h_all_prefit = f_mlfit.Get("shapes_prefit/"+channel[region]+"/"+"total_background")
   for process in processes:
     h_prefit[process] = f_mlfit.Get("shapes_prefit/"+channel[region]+"/"+process)
     if (not h_prefit[process]): continue
@@ -73,20 +113,20 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     h_prefit[process].SetLineColor(TColor.GetColor(colors[process]))
     h_prefit[process].SetFillColor(TColor.GetColor(colors[process]))
     h_all_prefit.Add(h_prefit[process])
-    if (not process==mainbkg[region]): 
+    if (not process in mainbkgs[region]):
       h_other_prefit.Add(h_prefit[process])
     h_stack_prefit.Add(h_prefit[process])
-    
+
 
   # Post-Fit
   h_postfit = {}
   h_postfit['totalsig'] = f_mlfit.Get("shapes_fit_s/"+channel[region]+"/total")
   h_postfit['total'] = f_mlfit.Get("shapes_fit_b/"+channel[region]+"/total")
-  h_all_postfit = TH1F("h_all_postfit","h_all_postfit",len(binLowE)-1,array('d',binLowE))    
-  h_other_postfit = TH1F("h_other_postfit","h_other_postfit",len(binLowE)-1,array('d',binLowE))    
+  h_all_postfit = TH1F("h_all_postfit","h_all_postfit",len(binLowE)-1,array('d',binLowE))
+  h_other_postfit = TH1F("h_other_postfit","h_other_postfit",len(binLowE)-1,array('d',binLowE))
   h_minor_postfit = TH1F("h_minor_postfit","h_minor_postfit",len(binLowE)-1,array('d',binLowE))
 
-  h_stack_postfit = THStack("h_stack_postfit","h_stack_postfit")    
+  h_stack_postfit = THStack("h_stack_postfit","h_stack_postfit")
   h_postfit['totalv2'] = f_mlfit.Get("shapes_fit_b/"+channel[region]+"/total_background")
 
   for i in range(1, h_postfit['totalv2'].GetNbinsX()+1):
@@ -107,16 +147,16 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     h_postfit[process].SetLineColor(1)
     h_postfit[process].SetFillColor(TColor.GetColor(colors[process]))
     h_all_postfit.Add(h_postfit[process])
-    if (not process==mainbkg[region]):
+    if (not process in mainbkgs[region]):
       h_other_postfit.Add(h_postfit[process])
-    h_postfit[process].Scale(1,"width")    
+    h_postfit[process].Scale(1,"width")
 
     if region in 'signal':
       if process is 'gjets' or process is 'zll':
         h_postfit[process].SetFillColor(TColor.GetColor(colors['gjets']))
         h_postfit[process].SetLineColor(TColor.GetColor(colors['gjets']))
         h_minor_postfit.Add(h_postfit[process])
-        
+
       if process is 'gjets':
         h_postfit[process].SetLineColor(1)
 
@@ -129,13 +169,13 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     else:
       #if region is not 'signal':
       h_stack_postfit.Add(h_postfit[process])
-      
+
   h_all_postfit.Scale(1,"width")
   h_all_prefit.Scale(1,"width")
-           
+
   gStyle.SetOptStat(0)
 
-  c = TCanvas("c","c",600,800)  
+  c = TCanvas("c","c",600,800)
   SetOwnership(c,False)
   c.cd()
   c.SetLogy()
@@ -149,7 +189,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   dummy.SetLineColor(0)
   dummy.SetLineWidth(0)
   dummy.SetMarkerSize(0)
-  dummy.SetMarkerColor(0) 
+  dummy.SetMarkerColor(0)
   dummy.GetYaxis().SetTitle("Events / GeV")
   dummy.GetXaxis().SetTitle("")
   dummy.GetXaxis().SetTitleSize(0)
@@ -161,7 +201,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   dummy.SetMinimum(0.002)
   dummy.GetYaxis().SetTitleOffset(1.15)
   dummy.Draw()
-  
+
 
   h_other_prefit.SetLineColor(1)
   h_other_prefit.SetFillColor(33)
@@ -182,7 +222,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
       h_postfit['totalsig'].Draw("samehist")
 
     h_stack_postfit.Draw("histsame")
-    
+
   else:
     h_other_prefit.Draw("histsame")
     h_all_prefit.Draw("histsame")
@@ -208,13 +248,13 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   if region == "dielectron":
     legname = "Z #rightarrow ee"
 
-  
+
   #legend.SetTextSize(0.04)
   if region in 'signal' :
     legend = TLegend(0.50, 0.60, 0.92, .92);
     legend.SetFillStyle(0);
     legend.SetBorderSize(0);
-    legend.AddEntry(h_data, "Data", "elp")    
+    legend.AddEntry(h_data, "Data", "elp")
     legend.AddEntry(h_postfit['zjets'], "Z(#nu#nu)+jets", "f")
     legend.AddEntry(h_postfit['wjets'], "W(l#nu)+jets", "f")
     legend.AddEntry(h_postfit['diboson'], "WW/ZZ/WZ", "f")
@@ -230,7 +270,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     legend.AddEntry(h_data,"Data","elp")
     legend.AddEntry(h_all_postfit, "Post-fit ("+legname+")", "l")
     legend.AddEntry(h_all_prefit, "Pre-fit ("+legname+")", "l")
-    legend.AddEntry(h_other_prefit, "Other Backgrounds", "f")    
+    legend.AddEntry(h_other_prefit, "Other Backgrounds", "f")
 
   legend.SetShadowColor(0);
   legend.SetFillColor(0);
@@ -250,12 +290,12 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     latex2.DrawLatex(0.200, 0.85, "CMS")
   else:
     latex2.DrawLatex(0.175, 0.85, "CMS")
-    
+
   latex2.SetTextSize(0.6*c.GetTopMargin())
   latex2.SetTextFont(52)
   latex2.SetTextAlign(11)
   offset = 0.005
-  #latex2.DrawLatex(0.28+offset, 0.85, "Preliminary")          
+  #latex2.DrawLatex(0.28+offset, 0.85, "Preliminary")
 
   categoryLabel = TLatex();
   categoryLabel.SetNDC();
@@ -289,7 +329,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   ratio_pre = []; ratio_pre_hi = []; ratio_pre_lo = [];
   ratio_post = []; ratio_post_hi = []; ratio_post_lo = [];
 
-  cutstring = "("
+  # cutstring = "("
 
   for i in range(1,h_all_prefit.GetNbinsX()+1):
 
@@ -301,16 +341,16 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     else:
       e_data_hi = 0.0
       e_data_lo = 0.0
-      
+
 
     n_all_pre = h_all_prefit.GetBinContent(i)
     n_other_pre = h_other_prefit.GetBinContent(i)
     n_all_post = h_all_postfit.GetBinContent(i)
 
-    
-    cutstring=cutstring+str((n_all_post-n_other_pre)/(n_all_pre-n_other_pre))+"*(met>"+str(h_all_prefit.GetBinLowEdge(i))+"&&met<="+str(h_all_prefit.GetBinLowEdge(i+1))+")"
-    if i<h_all_prefit.GetNbinsX():
-      cutstring+="+"
+
+    # cutstring=cutstring+str((n_all_post-n_other_pre)/(n_all_pre-n_other_pre))+"*(met>"+str(h_all_prefit.GetBinLowEdge(i))+"&&met<="+str(h_all_prefit.GetBinLowEdge(i+1))+")"
+    # if i<h_all_prefit.GetNbinsX():
+    #   cutstring+="+"
 
     met.append(h_all_prefit.GetBinCenter(i))
     dmet.append((h_all_prefit.GetBinLowEdge(i+1)-h_all_prefit.GetBinLowEdge(i))/2)
@@ -327,25 +367,25 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     if (n_all_post>0.0):
       ratio_post.append(ndata/n_all_post)
       ratio_post_hi.append(ndata*e_data_hi/n_all_post)
-      ratio_post_lo.append(ndata*e_data_lo/n_all_post)      
+      ratio_post_lo.append(ndata*e_data_lo/n_all_post)
     else:
       ratio_post.append(0.0)
       ratio_post_hi.append(0.0)
       ratio_post_lo.append(0.0)
 
-  cutstring+=")"
+  # cutstring+=")"
   #print 'cutstring for',region,cutstring
 
   a_met = array("d", met)
   v_met = TVectorD(len(a_met),a_met)
-          
+
   a_dmet = array("d", dmet)
   v_dmet = TVectorD(len(a_dmet),a_dmet)
-    
+
   a_ratio_pre = array("d", ratio_pre)
   a_ratio_pre_hi = array("d", ratio_pre_hi)
   a_ratio_pre_lo = array("d", ratio_pre_lo)
-  
+
   v_ratio_pre = TVectorD(len(a_ratio_pre),a_ratio_pre)
   v_ratio_pre_hi = TVectorD(len(a_ratio_pre_hi),a_ratio_pre_hi)
   v_ratio_pre_lo = TVectorD(len(a_ratio_pre_lo),a_ratio_pre_lo)
@@ -369,16 +409,16 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   #g_ratio_post.SetMarkerColor(4)
   g_ratio_post.SetMarkerColor(kAzure-4)
   g_ratio_post.SetMarkerStyle(20)
-  
+
   ratiosys = h_postfit['totalv2'].Clone();
-  for hbin in range(0,ratiosys.GetNbinsX()+1): 
-        
+  for hbin in range(0,ratiosys.GetNbinsX()+1):
+
     ratiosys.SetBinContent(hbin+1,1.0)
     if (h_postfit['totalv2'].GetBinContent(hbin+1)>0):
       ratiosys.SetBinError(hbin+1,h_postfit['totalv2'].GetBinError(hbin+1)/h_postfit['totalv2'].GetBinContent(hbin+1))
 
       #print hbin+1, h_data.GetBinContent(hbin+1), h_postfit['totalv2'].GetBinContent(hbin+1),h_postfit['totalv2'].GetBinError(hbin+1)
-      
+
     else:
       ratiosys.SetBinError(hbin+1,0)
 
@@ -389,7 +429,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   dummy2.GetYaxis().SetTitle("Data / Pred.")
       #dummy2.GetXaxis().SetTitle("E_{T}^{miss} [GeV]")
   dummy2.GetXaxis().SetTitle("")
-  
+
   dummy2.SetLineColor(0)
   dummy2.SetMarkerColor(0)
   dummy2.SetLineWidth(0)
@@ -404,15 +444,15 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   dummy2.GetYaxis().SetTitleOffset(1.6)
 
   if region is 'signal':
-    dummy2.SetMaximum(1.20)                                                                        
-    dummy2.SetMinimum(0.80) 
+    dummy2.SetMaximum(1.20)
+    dummy2.SetMinimum(0.80)
 
   else:
-    dummy2.SetMaximum(1.20)                                                                        
-    dummy2.SetMinimum(0.80) 
+    dummy2.SetMaximum(1.20)
+    dummy2.SetMinimum(0.80)
 
-  dummy2.SetMaximum(1.3)                                                                        
-  dummy2.SetMinimum(0.7) 
+  dummy2.SetMaximum(1.3)
+  dummy2.SetMinimum(0.7)
   dummy2.Draw("hist")
 
   ratiosys.SetFillColor(kGray) #SetFillColor(ROOT.kYellow)
@@ -435,10 +475,10 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
 
   legend2.AddEntry(g_ratio_post, "Background (post-fit)", "ple")
   legend2.AddEntry(g_ratio_pre, "Background (pre-fit)", "ple")
-  
+
   legend2.SetNColumns(2)
 
-  legend2.SetShadowColor(0);  
+  legend2.SetShadowColor(0);
   legend2.SetFillColor(0);
   legend2.SetLineColor(0);
   #legend2.Draw("same")
@@ -463,7 +503,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   mean = 0
   sigma = 0
   chi2 = 0
-  TH1.StatOverflows(1) 
+  TH1.StatOverflows(1)
 
   dummy_pull = TH1F("dummy33","dummy33",len(binLowE)-1,array('d',binLowE))
 
@@ -484,7 +524,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
 
 
   data_pull.SaveAs("test.root")
-      
+
   #print "MEAN: ", mean
   #print "CHI2: ", math.sqrt(chi2)/data_pull.GetNbinsX()
 
@@ -503,7 +543,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
       #print "bin",hbin,"data pull diff", data_pull_sig.GetBinContent(hbin), "sys", h_postfit['totalv2'].GetBinError(hbin)
       data_pull_sig.SetBinContent(hbin,data_pull_sig.GetBinContent(hbin)/h_postfit['totalv2'].GetBinError(hbin))
       data_pull_sig.SetBinError(hbin,0)
-      
+
   data_pull_sig.SetLineColor(2)
   data_pull_sig.SetFillColor(2)
   data_pull_sig.SetFillStyle(3004)
@@ -513,7 +553,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   legend3 = TLegend(0.20,0.21,0.60,0.23,"","brNDC");
   legend3.AddEntry(data_pull    , "Background only", "f")
   legend3.SetNColumns(2)
-  legend3.SetShadowColor(0);  
+  legend3.SetShadowColor(0);
   legend3.SetFillColor(0);
   legend3.SetLineColor(0);
 
@@ -524,7 +564,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   if region in 'signal':
       dummy3.GetXaxis().SetTitle("E_{T}^{miss} [GeV]")
   else:
-    dummy3.GetXaxis().SetTitle("Recoil [GeV]")
+    dummy3.GetXaxis().SetTitle("Recoil [GeV]" if 'mono' in category else "M_{jj} [GeV]")
   dummy3.SetLineColor(0)
   dummy3.SetMarkerColor(0)
   dummy3.SetLineWidth(0)
