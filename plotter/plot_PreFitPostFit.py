@@ -10,7 +10,7 @@ blind = False
 
 new_dic = defaultdict(dict)
 
-def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False):
+def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=False):
 
   datalab = {"singlemuon":"Wmn", "dimuon":"Zmm", "gjets":"gjets", "signal":"signal", "singleelectron":"Wen", "dielectron":"Zee"}
 
@@ -49,7 +49,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     mainbkgs = {
             "singlemuon":["ewk_wjets","qcd_wjets"],
             "dimuon": ["ewk_zll","qcd_zll"],
-            "gjets": ["gjets"],
+            "gjets": ["ewk_gjets","qcd_gjets"],
             "signal":["qcd_zjets","ewk_zjets"],
             "singleelectron":["ewk_wjets","qcd_wjets"],
             "dielectron":["ewk_zll","qcd_zll"]
@@ -60,7 +60,8 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
         'qcdzll',
         'ewkzll',
         'ewk_zll',
-        'gjets',
+        'ewk_gjets',
+        'qcd_gjets',
         'top',
         'diboson',
         'ewk',
@@ -72,6 +73,8 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   colors = {
     'diboson':"#4897D8",
     'gjets'  :"#9A9EAB",
+    'qcd_gjets'  :"#9A9EAB",
+    'ewk_gjets'  :"#9A9EAB",
     'qcd'    :"#F1F1F2",
     'top'    :"#CF3721",
     'ewk'    :"#000000",
@@ -562,7 +565,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
     dummy3.SetBinContent(i,1.0)
   dummy3.GetYaxis().SetTitle("#frac{(Data-Pred.)}{#sigma}")
   if region in 'signal':
-      dummy3.GetXaxis().SetTitle("E_{T}^{miss} [GeV]")
+      dummy3.GetXaxis().SetTitle("E_{T}^{miss} [GeV]"  if 'mono' in category else "M_{jj} [GeV]")
   else:
     dummy3.GetXaxis().SetTitle("Recoil [GeV]" if 'mono' in category else "M_{jj} [GeV]")
   dummy3.SetLineColor(0)
@@ -600,10 +603,10 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,sb=False
   import os
   if not os.path.exists(outdir):
     os.makedirs(outdir)
-  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".pdf")
-  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".png")
-  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".C")
-  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+".root")
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+"_" + str(year) + ".pdf")
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+"_" + str(year) + ".png")
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+"_" + str(year) + ".C")
+  c.SaveAs(outdir+"/"+category+"_PULLS_MASKED_prefit_postfit_"+region+"_" + str(year) + ".root")
 
   c.Close()
   f_mlfit.Close()

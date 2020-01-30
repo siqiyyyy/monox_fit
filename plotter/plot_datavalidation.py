@@ -8,7 +8,7 @@ import os
 setTDRStyle()
 
 
-def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi):
+def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi, year):
 
     if region1 is "combined" and region2 is "gjets":
         name = "Z(ll)+jets / #gamma+jets"
@@ -115,6 +115,13 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
         h_qcd_prefit[region2].Add(get_shape("singleel", "qcd_wjets"))
         h_ewk_prefit[region2] = get_shape("singlemu", "ewk_wjets")
         h_ewk_prefit[region2].Add(get_shape("singleel", "ewk_wjets"))
+    elif region2 == 'gjets':
+        h_prefit[region2] = get_shape("photon", "total_background")
+
+        h_qcd_prefit[region2] = get_shape("photon", "qcd_gjets")
+        h_qcd_prefit[region2].Add(get_shape("photon", "qcd_gjets"))
+        h_ewk_prefit[region2] = get_shape("photon", "ewk_gjets")
+        h_ewk_prefit[region2].Add(get_shape("photon", "ewk_gjets"))
     else:
         h_prefit[region2] = f_mlfit.Get("shapes_prefit/"+channel[region2]+"/total_background")
 
@@ -193,7 +200,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
             else:
                 for proc in ['qcd','ewk']:
                     for direction in 'up','down':
-                        hname = "uncertainty_ratio_z_{PROC}_mjj_unc_{UNC}_{DIR}_2017".format(PROC=proc, UNC=uncert, DIR=direction)
+                        hname = "uncertainty_ratio_z_{PROC}_mjj_unc_{UNC}_{DIR}_{YEAR}".format(PROC=proc, UNC=uncert, DIR=direction, YEAR=year)
                         # print(hname)
                         hist_unc = uncFile.Get(hname)
                         findbin = hist_unc.FindBin(h_prefit[region1].GetBinCenter(iBin))
@@ -326,7 +333,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
             ratiosys.SetBinError(hbin+1,h_clone.GetBinError(hbin+1)/h_clone.GetBinContent(hbin+1))
 
     dummy2.GetYaxis().SetTitle("Data / Pred.")
-    dummy2.GetXaxis().SetTitle("Hadronic recoil p_{T} [GeV]")
+    dummy2.GetXaxis().SetTitle("Hadronic recoil p_{T} [GeV]" if "mono" in category else  "M_{jj} [GeV]")
     dummy2.GetXaxis().SetTitleOffset(1.15)
     dummy2.GetXaxis().SetTitleSize(0.05)
     dummy2.GetXaxis().SetLabelSize(0.04)
@@ -377,9 +384,9 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
-    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.pdf")
-    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.png")
-    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.C")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_"+str(year)+"ratio.pdf")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_"+str(year)+"ratio.png")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_"+str(year)+"ratio.C")
 
     c.Close()
     f_mlfit.Close()
