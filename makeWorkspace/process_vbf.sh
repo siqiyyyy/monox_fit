@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-INDIR=../input/2020-01-29_noeletrig
+INDIR=../input/2020-02-05_master_dpfcalo
 OUTDIR='../vbf/root'
 mkdir -p ${OUTDIR}
 
