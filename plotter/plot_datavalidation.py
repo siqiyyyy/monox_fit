@@ -79,51 +79,56 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
     h_prefit = {}
     h_qcd_prefit = {}
     h_ewk_prefit = {}
-    if region1 is "combined":
-        h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+category+"_dimuon/total_background")
-        print f_mlfit, "shapes_prefit/"+category+"_dielec/total_background"
-        h_mc_2 = f_mlfit.Get("shapes_prefit/"+category+"_dielec/total_background")
-        h_prefit[region1].Add(h_mc_2)
 
-        h_qcd_prefit[region1] = get_shape("dimuon", "qcd_zll")
-        h_qcd_prefit[region1].Add(get_shape("dielec", "qcd_zll"))
-        h_ewk_prefit[region1] = get_shape("dimuon", "ewk_zll")
-        h_ewk_prefit[region1].Add(get_shape("dielec", "ewk_zll"))
+    if region1 is "combined":
+        h_prefit[region1] = get_shape("dimuon","total_background")
+        h_prefit[region1].Add(get_shape("dielec","total_background"))
+
+        if "vbf" in category:
+            h_qcd_prefit[region1] = get_shape("dimuon", "qcd_zll")
+            h_qcd_prefit[region1].Add(get_shape("dielec", "qcd_zll"))
+            h_ewk_prefit[region1] = get_shape("dimuon", "ewk_zll")
+            h_ewk_prefit[region1].Add(get_shape("dielec", "ewk_zll"))
+        else:
+            h_prefit[region1] = get_shape("dimuon","zll")
+            h_prefit[region1].Add(get_shape("dielec","zll"))
 
     elif region1 is "combinedW":
-        h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+category+"_singlemu/total_background")
-        h_mc_2 = f_mlfit.Get("shapes_prefit/"+category+"_singleel/total_background")
-        h_prefit[region1].Add(h_mc_2)
+        h_prefit[region1] = get_shape("singlemu","total_background")
+        h_prefit[region1].Add(get_shape("singleel","total_background"))
 
-        h_qcd_prefit[region1] = get_shape("singlemu", "qcd_wjets")
-        h_qcd_prefit[region1].Add(get_shape("singleel", "qcd_wjets"))
-        h_ewk_prefit[region1] = get_shape("singlemu", "ewk_wjets")
-        h_ewk_prefit[region1].Add(get_shape("singleel", "ewk_wjets"))
-
+        if "vbf" in category:
+            h_qcd_prefit[region1] = get_shape("singlemu", "qcd_wjets")
+            h_qcd_prefit[region1].Add(get_shape("singleel", "qcd_wjets"))
+            h_ewk_prefit[region1] = get_shape("singlemu", "ewk_wjets")
+            h_ewk_prefit[region1].Add(get_shape("singleel", "ewk_wjets"))
     else:
-        h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+channel[region1]+"/total_background")
+        h_prefit[region1] = get_shape(channel[region1],"total_background")
+
     h_prefit[region1].Sumw2()
+
     if "monojet" in category:
         h_prefit[region1].Rebin(2)
 
     if region2 is "combinedW":
-        h_prefit[region2] = f_mlfit.Get("shapes_prefit/"+category+"_singlemu/total_background")
-        h_mc2_2 = f_mlfit.Get("shapes_prefit/"+category+"_singleel/total_background")
-        h_prefit[region2].Add(h_mc2_2)
+        h_prefit[region2] = get_shape("singlemu","total_background")
+        h_prefit[region2].Add(get_shape("singleel","total_background"))
 
-        h_qcd_prefit[region2] = get_shape("singlemu", "qcd_wjets")
-        h_qcd_prefit[region2].Add(get_shape("singleel", "qcd_wjets"))
-        h_ewk_prefit[region2] = get_shape("singlemu", "ewk_wjets")
-        h_ewk_prefit[region2].Add(get_shape("singleel", "ewk_wjets"))
+        if "vbf" in category:
+            h_qcd_prefit[region2] = get_shape("singlemu", "qcd_wjets")
+            h_qcd_prefit[region2].Add(get_shape("singleel", "qcd_wjets"))
+            h_ewk_prefit[region2] = get_shape("singlemu", "ewk_wjets")
+            h_ewk_prefit[region2].Add(get_shape("singleel", "ewk_wjets"))
     elif region2 == 'gjets':
         h_prefit[region2] = get_shape("photon", "total_background")
 
-        h_qcd_prefit[region2] = get_shape("photon", "qcd_gjets")
-        h_qcd_prefit[region2].Add(get_shape("photon", "qcd_gjets"))
-        h_ewk_prefit[region2] = get_shape("photon", "ewk_gjets")
-        h_ewk_prefit[region2].Add(get_shape("photon", "ewk_gjets"))
+        if "vbf" in category:
+            h_qcd_prefit[region2] = get_shape("photon", "qcd_gjets")
+            h_qcd_prefit[region2].Add(get_shape("photon", "qcd_gjets"))
+            h_ewk_prefit[region2] = get_shape("photon", "ewk_gjets")
+            h_ewk_prefit[region2].Add(get_shape("photon", "ewk_gjets"))
     else:
-        h_prefit[region2] = f_mlfit.Get("shapes_prefit/"+channel[region2]+"/total_background")
+        h_prefit[region2] = get_shape(channel[region2],"total_background")
 
     h_prefit[region2].Sumw2()
     if "monojet" in category:
@@ -176,12 +181,11 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
         if iBin == 0:
             continue
 
-        #sumw2 = math.pow((h_prefit[region1].GetBinError(iBin)),2)
+        # Bare minimum is the prefit stat unc.
         sumw2 = pow((h_prefit[region1].GetBinError(iBin)),2)
-        print region1, region2, "staterror", sqrt(sumw2)
 
+        # Systematic uncertainties
         for uncert in uncertainties:
-            #print uncert
             if 'mono' in category:
                 if region2 is not "gjets" and type(uncert) == str :#uncert.startswith("SF"):
                     if "reco" in uncert:
@@ -200,25 +204,26 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
             else:
                 for proc in ['qcd','ewk']:
                     for direction in 'up','down':
+                        # Uncertainties are stored in histogram form
                         hname = "uncertainty_ratio_z_{PROC}_mjj_unc_{UNC}_{DIR}_{YEAR}".format(PROC=proc, UNC=uncert, DIR=direction, YEAR=year)
-                        # print(hname)
                         hist_unc = uncFile.Get(hname)
+
+                        # Find the right bin to read uncertainty from
                         findbin = hist_unc.FindBin(h_prefit[region1].GetBinCenter(iBin))
 
+                        # Nominal QCD / EWK V value
                         nom = (h_qcd_prefit if proc=='qcd' else h_ewk_prefit)[region1].GetBinContent(iBin)
+
+                        # Total nominal value
                         nom_tot = h_prefit[region1].GetBinContent(iBin)
+
                         # Total unc = relative uncertainty * nominal
                         # factor of 0.5 accounts for symmetrizing up/down
                         width = h_prefit[region1].GetBinWidth(iBin)
                         old_sumw2 = sumw2
                         sumw2 += pow( 0.5 * hist_unc.GetBinContent(findbin) * nom / width, 2)
-                        # print('{0} {1} {2} {3} {4:.2f} {5:.2f} {6:.2f}'.format(iBin, uncert,proc, direction, hist_unc.GetBinContent(findbin),nom, nom_tot))
-                        print(iBin, proc, nom_tot/nom)
-
-        print region1, region2, iBin, "total", sqrt(sumw2)
 
         h_prefit[region1].SetBinError(iBin,sqrt(sumw2))
-        #h_prefit[region1].SetBinError(iBin,math.sqrt(sumw2))
 
 
     c = TCanvas("c","c",600,650)
