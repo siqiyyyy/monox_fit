@@ -451,11 +451,11 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
     dummy2.SetMinimum(0.80)
 
   else:
-    dummy2.SetMaximum(1.20)
-    dummy2.SetMinimum(0.80)
+    dummy2.SetMaximum(1.40)
+    dummy2.SetMinimum(0.6)
 
-  dummy2.SetMaximum(1.3)
-  dummy2.SetMinimum(0.7)
+  dummy2.SetMaximum(1.5)
+  dummy2.SetMinimum(0.5)
   dummy2.Draw("hist")
 
   ratiosys.SetFillColor(kGray) #SetFillColor(ROOT.kYellow)
