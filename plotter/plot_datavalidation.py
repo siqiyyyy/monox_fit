@@ -157,6 +157,8 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
             "zoverw_nlo_mur",
             "zoverw_nlo_pdf",
         ]
+        if region2 is not "gjets":
+            uncertainties += ["SFreco"]
     #print uncertainties
 
     for iBin in range(h_prefit[region1].GetNbinsX()):
@@ -184,6 +186,18 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                     findbin =  uncert.FindBin(h_prefit[region1].GetBinCenter(iBin))
                     sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (uncert.GetBinContent(findbin))),2)
             else:
+                if "SF" in uncert:
+                    # Experimental uncertainty
+                    if "reco" in uncert:
+                            value = 0.01
+                    else:
+                        value = 0.02
+
+                    if region2.startswith("single"):
+                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value) ),2)
+                    else:
+                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
+                    continue
                 # For VBF, we calculate the uncertainty separately for EWK and QCD
                 # the uncertainty calculated in each iteration is the absolute
                 # uncertainty on the absolute spectrum, i.e. not on the ratio!
@@ -205,9 +219,9 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                         nom_tot = h_prefit[region1].GetBinContent(iBin)
 
                         # Total unc = relative uncertainty * nominal
-                        # factor of 0.5 accounts for symmetrizing up/down
+                        # factor of 0.5 accounts for symmetrizing up/down                        
                         theory_sumw2 += pow( 0.5 * hist_unc.GetBinContent(findbin) * nom, 2)
-
+                
                 # After QCD and EWK have been summed over, we divide by the denominator
                 theory_sumw2 /= pow(h_prefit[region2].GetBinContent(iBin),2)
 
