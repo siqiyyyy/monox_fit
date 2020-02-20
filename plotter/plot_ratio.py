@@ -13,10 +13,11 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
 
     if 'mono' in category:
         bgtypes = ['']
+        tag = ''
     else:
         bgtypes = ['qcd_' ,'ewk_']
+        tag = "withphoton_"
 
-    tag = "withphoton_"
     for bgtype in bgtypes:
         assert(os.path.exists(model_file))
         f = TFile(model_file,'READ')
