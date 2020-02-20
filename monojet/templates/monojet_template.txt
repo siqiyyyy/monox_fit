@@ -1,0 +1,210 @@
+Combination of monojet.txt
+imax 6 number of bins
+jmax 10 number of processes minus 1
+kmax 177 number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes *                         monojet_dielec    root/combined_model.root combinedws:monojet_Zee_$PROCESS
+shapes data_obs                  monojet_dielec    root/combined_model.root combinedws:monojet_Zee_data
+shapes zll                       monojet_dielec    root/combined_model.root combinedws:monojet_dielectron_zjets_model
+shapes *                         monojet_dimuon    root/combined_model.root combinedws:monojet_Zmm_$PROCESS
+shapes data_obs                  monojet_dimuon    root/combined_model.root combinedws:monojet_Zmm_data
+shapes zll                       monojet_dimuon    root/combined_model.root combinedws:monojet_dimuon_zjets_model
+shapes *                         monojet_photon    root/combined_model.root combinedws:monojet_gjets_$PROCESS
+shapes data_obs                  monojet_photon    root/combined_model.root combinedws:monojet_gjets_data
+shapes gjets                     monojet_photon    root/combined_model.root combinedws:monojet_photon_zjets_model
+shapes *                         monojet_signal    root/combined_model.root combinedws:monojet_signal_$PROCESS
+shapes data_obs                  monojet_signal    root/combined_model.root combinedws:monojet_signal_data
+shapes wjets                     monojet_signal    root/combined_model.root combinedws:monojet_wjetssignal_zjets_model
+shapes zjets                     monojet_signal    root/combined_model.root combinedws:monojet_signal_zjets_model
+shapes *                         monojet_singleel  root/combined_model.root combinedws:monojet_Wen_$PROCESS
+shapes data_obs                  monojet_singleel  root/combined_model.root combinedws:monojet_Wen_data
+shapes wjets                     monojet_singleel  root/combined_model.root combinedws:monojet_singleelectron_wjets_model
+shapes *                         monojet_singlemu  root/combined_model.root combinedws:monojet_Wmn_$PROCESS
+shapes data_obs                  monojet_singlemu  root/combined_model.root combinedws:monojet_Wmn_data
+shapes wjets                     monojet_singlemu  root/combined_model.root combinedws:monojet_singlemuon_wjets_model
+----------------------------------------------------------------------------------------------------------------------------------
+bin              monojet_signal        monojet_dimuon        monojet_dielec        monojet_photon        monojet_singlemu      monojet_singleel
+observation  -1                    -1                    -1                    -1                    -1                    -1                  
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                  monojet_signal        monojet_signal        monojet_signal        monojet_signal        monojet_signal        monojet_signal        monojet_signal        monojet_signal        monojet_signal        monojet_dimuon        monojet_dimuon        monojet_dimuon        monojet_dielec        monojet_dielec        monojet_dielec        monojet_photon        monojet_photon        monojet_singlemu      monojet_singlemu      monojet_singlemu      monojet_singlemu      monojet_singlemu      monojet_singleel      monojet_singleel      monojet_singleel      monojet_singleel      monojet_singleel
+process                              zh                    vbf                   wh                    ggh                   diboson               top                   wjets                 qcd                   zjets                 zll                   top                   diboson               zll                   top                   diboson               gjets                 qcd                   zll                   top                   diboson               wjets                 qcd                   zll                   top                   diboson               wjets                 qcd                 
+process                              -3                    -2                    -1                    0                     1                     2                     3                     4                     5                     6                     2                     1                     6                     2                     1                     7                     4                     6                     2                     1                     3                     4                     6                     2                     1                     3                     4                   
+rate                                 -1                    -1                    -1                    -1                    -1                    -1                    1                     -1                    1                     1                     -1                    -1                    1                     -1                    -1                    1                     -1                    -1                    -1                    -1                    1                     -1                    -1                    -1                    -1                    1                     -1                  
+----------------------------------------------------------------------------------------------------------------------------------
+CMS_eff_btag            lnN          1.02                  1.02                  1.02                  1.02                  1.02                  1.06                  -                     1.02                  -                     -                     1.06                  1.02                  -                     1.06                  1.02                  -                     -                     1.02                  1.06                  1.02                  -                     1.02                  1.02                  1.06                  1.02                  -                     1.02                
+CMS_eff_e               lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.04                  1.04                  1.04                  -                     -                     -                     -                     -                     -                     -                     1.02                  1.02                  1.02                  1.02                  1.02                
+CMS_eff_e_reco          lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.02                  1.02                  1.02                  -                     -                     -                     -                     -                     -                     -                     1.01                  1.01                  1.01                  1.01                  1.01                
+CMS_eff_eletrig         lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.01                  1.01                  1.01                  -                     -                     -                     -                     -                     -                     -                     1.02                  1.02                  1.02                  1.02                  1.02                
+CMS_eff_m               lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     1.02                  1.02                  1.02                  -                     -                     -                     -                     -                     1.01                  1.01                  1.01                  1.01                  1.01                  -                     -                     -                     -                     -                   
+CMS_eff_m_reco          lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     1.02                  1.02                  1.02                  -                     -                     -                     -                     -                     1.01                  1.01                  1.01                  1.01                  1.01                  -                     -                     -                     -                     -                   
+CMS_eff_pho             lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.05                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+CMS_eff_photrig         lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.02                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+CMS_scale_j             lnN          1.04                  1.04                  1.04                  1.04                  1.04                  1.04                  -                     1.04                  -                     -                     1.04                  1.04                  -                     1.04                  1.04                  -                     -                     1.04                  1.04                  1.04                  -                     1.04                  1.04                  1.04                  1.04                  -                     1.04                
+QCD_NormEleR            lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.75                
+QCD_NormMuonR           lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.75                  -                     -                     -                     -                     -                   
+QCD_NormPurity          lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.25                   -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+QCD_NormSignal          lnN          -                     -                     -                     -                     -                     -                     -                     1.75                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+lumi_13TeV              lnN          1.026                 1.026                 1.026                 1.026                 1.026                 1.026                 -                     1.026                 -                     -                     1.026                 1.026                 -                     1.026                 1.026                 -                     -                     1.026                 1.026                 1.026                 -                     1.026                 1.026                 1.026                 1.026                 -                     1.026               
+top_Norm13TeV           lnN          -                     -                     -                     -                     -                     1.1                   -                     -                     -                     -                     1.1                   -                     -                     1.1                   -                     -                     -                     -                     1.1                   -                     -                     -                     -                     1.1                   -                     -                     -                   
+top_Reweight13TeV       lnN          -                     -                     -                     -                     -                     1.1                   -                     -                     -                     -                     1.1                   -                     -                     1.1                   -                     -                     -                     -                     1.1                   -                     -                     -                     -                     1.1                   -                     -                     -                   
+vv_Norm13TeV            lnN          -                     -                     -                     -                     1.2                   -                     -                     -                     -                     -                     -                     1.2                   -                     -                     1.2                   -                     -                     -                     -                     1.2                   -                     -                     -                     -                     1.2                   -                     -                   
+zll_Norm13TeV           lnN          -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     1.2                   -                     -                     -                     -                     1.2                   -                     -                     -                     -                   
+vbf_Norm13TeV           lnN          -                     1.05                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+zh_Norm13TeV            lnN          1.05                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+ggh_Norm13TeV           lnN          -                     -                     -                     1.05                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+wh_Norm13TeV            lnN          -                     -                     1.05                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                   
+wewk          param  0.0 1
+wqcdshape     param  0.0 1
+monojet_stat_error_singleelectronCR_bin17  param  0.0 1
+monojet_stat_error_photonCR_bin21  param  0.0 1
+monojet_stat_error_photonCR_bin20  param  0.0 1
+monojet_stat_error_dielectronCR_bin17  param  0.0 1
+monojet_stat_error_dielectronCR_bin16  param  0.0 1
+monojet_stat_error_dielectronCR_bin15  param  0.0 1
+monojet_stat_error_dielectronCR_bin14  param  0.0 1
+monojet_stat_error_dielectronCR_bin13  param  0.0 1
+monojet_stat_error_dielectronCR_bin12  param  0.0 1
+monojet_stat_error_dielectronCR_bin11  param  0.0 1
+monojet_stat_error_dielectronCR_bin10  param  0.0 1
+monojet_stat_error_dielectronCR_bin19  param  0.0 1
+monojet_stat_error_dielectronCR_bin18  param  0.0 1
+wpdf          param  0.0 1
+monojet_stat_error_wzCR_bin20  param  0.0 1
+monojet_stat_error_wzCR_bin21  param  0.0 1
+monojet_stat_error_wzCR_bin9  param  0.0 1
+monojet_stat_error_wzCR_bin8  param  0.0 1
+monojet_stat_error_wzCR_bin3  param  0.0 1
+monojet_stat_error_wzCR_bin2  param  0.0 1
+monojet_stat_error_wzCR_bin1  param  0.0 1
+monojet_stat_error_wzCR_bin0  param  0.0 1
+monojet_stat_error_wzCR_bin7  param  0.0 1
+monojet_stat_error_wzCR_bin6  param  0.0 1
+monojet_stat_error_wzCR_bin5  param  0.0 1
+monojet_stat_error_wzCR_bin4  param  0.0 1
+monojet_stat_error_singlemuonCR_bin19  param  0.0 1
+monojet_stat_error_singlemuonCR_bin18  param  0.0 1
+monojet_stat_error_dimuonCR_bin8  param  0.0 1
+monojet_stat_error_dimuonCR_bin9  param  0.0 1
+monojet_stat_error_dimuonCR_bin2  param  0.0 1
+monojet_stat_error_dimuonCR_bin3  param  0.0 1
+monojet_stat_error_dimuonCR_bin0  param  0.0 1
+monojet_stat_error_dimuonCR_bin1  param  0.0 1
+monojet_stat_error_dimuonCR_bin6  param  0.0 1
+monojet_stat_error_dimuonCR_bin7  param  0.0 1
+monojet_stat_error_dimuonCR_bin4  param  0.0 1
+monojet_stat_error_dimuonCR_bin5  param  0.0 1
+monojet_stat_error_wzCR_bin19  param  0.0 1
+monojet_stat_error_wzCR_bin18  param  0.0 1
+monojet_stat_error_wzCR_bin17  param  0.0 1
+monojet_stat_error_wzCR_bin16  param  0.0 1
+monojet_stat_error_wzCR_bin15  param  0.0 1
+monojet_stat_error_wzCR_bin14  param  0.0 1
+monojet_stat_error_wzCR_bin13  param  0.0 1
+monojet_stat_error_wzCR_bin12  param  0.0 1
+monojet_stat_error_wzCR_bin11  param  0.0 1
+monojet_stat_error_wzCR_bin10  param  0.0 1
+monojet_stat_error_photonCR_bin0  param  0.0 1
+monojet_stat_error_photonCR_bin1  param  0.0 1
+monojet_stat_error_photonCR_bin2  param  0.0 1
+monojet_stat_error_photonCR_bin3  param  0.0 1
+monojet_stat_error_photonCR_bin4  param  0.0 1
+monojet_stat_error_photonCR_bin5  param  0.0 1
+monojet_stat_error_photonCR_bin6  param  0.0 1
+monojet_stat_error_photonCR_bin7  param  0.0 1
+monojet_stat_error_photonCR_bin8  param  0.0 1
+monojet_stat_error_photonCR_bin9  param  0.0 1
+wcross        param  0.0 1
+monojet_stat_error_dielectronCR_bin3  param  0.0 1
+monojet_stat_error_dielectronCR_bin2  param  0.0 1
+monojet_stat_error_dielectronCR_bin1  param  0.0 1
+monojet_stat_error_dielectronCR_bin0  param  0.0 1
+monojet_stat_error_dielectronCR_bin7  param  0.0 1
+monojet_stat_error_dielectronCR_bin6  param  0.0 1
+monojet_stat_error_dielectronCR_bin5  param  0.0 1
+monojet_stat_error_dielectronCR_bin4  param  0.0 1
+monojet_stat_error_dielectronCR_bin9  param  0.0 1
+monojet_stat_error_dielectronCR_bin8  param  0.0 1
+monojet_stat_error_dimuonCR_bin10  param  0.0 1
+monojet_stat_error_dimuonCR_bin11  param  0.0 1
+monojet_stat_error_dimuonCR_bin12  param  0.0 1
+monojet_stat_error_dimuonCR_bin13  param  0.0 1
+monojet_stat_error_dimuonCR_bin14  param  0.0 1
+monojet_stat_error_dimuonCR_bin15  param  0.0 1
+monojet_stat_error_dimuonCR_bin16  param  0.0 1
+monojet_stat_error_dimuonCR_bin17  param  0.0 1
+monojet_stat_error_dimuonCR_bin18  param  0.0 1
+monojet_stat_error_dimuonCR_bin19  param  0.0 1
+eveto         param  0.0 1
+wtowpdf       param  0.0 1
+wqcdprocess   param  0.0 1
+pdf           param  0.0 1
+sudakovG      param  0.0 1
+monojet_stat_error_singlemuonCR_bin1  param  0.0 1
+monojet_stat_error_singlemuonCR_bin0  param  0.0 1
+monojet_stat_error_singlemuonCR_bin3  param  0.0 1
+monojet_stat_error_singlemuonCR_bin2  param  0.0 1
+monojet_stat_error_singlemuonCR_bin5  param  0.0 1
+monojet_stat_error_singlemuonCR_bin4  param  0.0 1
+monojet_stat_error_singlemuonCR_bin7  param  0.0 1
+monojet_stat_error_singlemuonCR_bin6  param  0.0 1
+monojet_stat_error_singlemuonCR_bin9  param  0.0 1
+monojet_stat_error_singlemuonCR_bin8  param  0.0 1
+monojet_stat_error_singleelectronCR_bin3  param  0.0 1
+monojet_stat_error_singlemuonCR_bin11  param  0.0 1
+qcd           param  0.0 1
+monojet_stat_error_singlemuonCR_bin13  param  0.0 1
+monojet_stat_error_singlemuonCR_bin12  param  0.0 1
+monojet_stat_error_singlemuonCR_bin15  param  0.0 1
+monojet_stat_error_singlemuonCR_bin14  param  0.0 1
+monojet_stat_error_singlemuonCR_bin17  param  0.0 1
+monojet_stat_error_singlemuonCR_bin16  param  0.0 1
+nnlomissG     param  0.0 1
+monojet_stat_error_singlemuonCR_bin20  param  0.0 1
+monojet_stat_error_singlemuonCR_bin21  param  0.0 1
+nnlomissZ     param  0.0 1
+monojet_stat_error_singlemuonCR_bin10  param  0.0 1
+wqcd          param  0.0 1
+nnlomissW     param  0.0 1
+muveto        param  0.0 1
+ewk           param  0.0 1
+monojet_stat_error_singleelectronCR_bin18  param  0.0 1
+monojet_stat_error_singleelectronCR_bin19  param  0.0 1
+monojet_stat_error_singleelectronCR_bin12  param  0.0 1
+monojet_stat_error_singleelectronCR_bin13  param  0.0 1
+monojet_stat_error_singleelectronCR_bin10  param  0.0 1
+monojet_stat_error_singleelectronCR_bin11  param  0.0 1
+monojet_stat_error_singleelectronCR_bin16  param  0.0 1
+cross         param  0.0 1
+monojet_stat_error_singleelectronCR_bin14  param  0.0 1
+monojet_stat_error_singleelectronCR_bin15  param  0.0 1
+mettrig       param  0.0 1
+sudakovW      param  0.0 1
+sudakovZ      param  0.0 1
+monojet_stat_error_photonCR_bin12  param  0.0 1
+monojet_stat_error_photonCR_bin13  param  0.0 1
+monojet_stat_error_photonCR_bin10  param  0.0 1
+monojet_stat_error_photonCR_bin11  param  0.0 1
+monojet_stat_error_photonCR_bin16  param  0.0 1
+monojet_stat_error_photonCR_bin17  param  0.0 1
+monojet_stat_error_photonCR_bin14  param  0.0 1
+monojet_stat_error_photonCR_bin15  param  0.0 1
+monojet_stat_error_photonCR_bin18  param  0.0 1
+monojet_stat_error_photonCR_bin19  param  0.0 1
+monojet_stat_error_singleelectronCR_bin2  param  0.0 1
+qcdshape      param  0.0 1
+monojet_stat_error_dimuonCR_bin21  param  0.0 1
+monojet_stat_error_dimuonCR_bin20  param  0.0 1
+monojet_stat_error_singleelectronCR_bin21  param  0.0 1
+monojet_stat_error_singleelectronCR_bin20  param  0.0 1
+monojet_stat_error_singleelectronCR_bin8  param  0.0 1
+monojet_stat_error_singleelectronCR_bin9  param  0.0 1
+qcdprocess    param  0.0 1
+tauveto       param  0.0 1
+monojet_stat_error_singleelectronCR_bin0  param  0.0 1
+monojet_stat_error_singleelectronCR_bin1  param  0.0 1
+monojet_stat_error_dielectronCR_bin20  param  0.0 1
+monojet_stat_error_dielectronCR_bin21  param  0.0 1
+monojet_stat_error_singleelectronCR_bin4  param  0.0 1
+monojet_stat_error_singleelectronCR_bin5  param  0.0 1
+monojet_stat_error_singleelectronCR_bin6  param  0.0 1
+monojet_stat_error_singleelectronCR_bin7  param  0.0 1

@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-INDIR=../input/2020-02-05_master_dpfcalo
-OUTDIR='../vbf/root'
+# INDIR=../input/2020-02-05_vbf_noeletrig
+INDIR=../input/vbf/2020-02-13_sync_vbf_v2
+TAG='default'
+OUTDIR="../vbf/$(basename $INDIR)/${TAG}/root"
 mkdir -p ${OUTDIR}
-
-### Start by making workspaces split by working point and tagger type
 
 for YEAR in 2017 2018; do
     WSFILE=${OUTDIR}/ws_vbf_${YEAR}.root
@@ -12,11 +12,8 @@ for YEAR in 2017 2018; do
     ./runModel.py ${WSFILE} --categories vbf --out ${OUTDIR}/combined_model_vbf_${YEAR}.root
 done;
 
+ln -s $(readlink -e ../vbf/templates/Makefile) ${OUTDIR}/../Makefile
 
-# hadd -f ${OUTDIR}/ws_nominal_monov.root ${OUTDIR}/ws_*nominal*2017.root
-# hadd -f ${OUTDIR}/ws_MD_monov.root ${OUTDIR}/ws_*MD*2017.root
-
-
-# ./runModel.py ${OUTDIR}/ws_nominal_monov.root --categories monovtight,monovloose --out ${OUTDIR}/combined_model_monov_nominal.root
-# ./runModel.py ${OUTDIR}/ws_MD_monov.root --categories monovtight,monovloose --out ${OUTDIR}/combined_model_monov_MD.root
-
+pushd ${OUTDIR}/..
+make cards
+popd
