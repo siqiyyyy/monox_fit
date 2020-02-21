@@ -1,5 +1,8 @@
 import ROOT
 from counting_experiment import *
+from W_constraints import do_stat_unc
+ROOT.RooMsgService.instance().setSilentMode(True)
+
 # Define how a control region(s) transfer is made by defining *cmodel*, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard 
 model = "zjets"
@@ -72,20 +75,10 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   else:
     tag = ""
 
-  # Bin by bin nuisances to cover statistical uncertainties ...
-  for b in range(target.GetNbinsX()):
-    err = PhotonScales.GetBinError(b+1)
-    if not PhotonScales.GetBinContent(b+1)>0: continue 
-    relerr = err/PhotonScales.GetBinContent(b+1)
-    #if relerr<0.01: continue
-    byb_u = PhotonScales.Clone(); byb_u.SetName("photon_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"photonCR",b))
-    byb_u.SetBinContent(b+1,PhotonScales.GetBinContent(b+1)+err)
-    byb_d = PhotonScales.Clone(); byb_d.SetName("photon_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"photonCR",b))
-    byb_d.SetBinContent(b+1,PhotonScales.GetBinContent(b+1)-err)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err , "%s_stat_error_%s_bin%d"%(cid,"photonCR",b)
-    CRs[0].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"photonCR",b),_fOut)
+  do_stat_unc(PhotonScales, "photon", cid, "photonCR", CRs[0],_fOut)
+  do_stat_unc(ZmmScales, "zmm", cid, "dimuonCR", CRs[1],_fOut)
+  do_stat_unc(ZeeScales, "zee", cid, "dielectronCR", CRs[2],_fOut)
+  do_stat_unc(WZScales, "w", cid, "wzCR", CRs[3],_fOut)
 
   ## Here now adding the trigger uncertainty
   fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning 
@@ -102,23 +95,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
 
   CRs[0].add_nuisance_shape("mettrig",_fOut)
 
-  for b in range(target.GetNbinsX()):
-    err = ZmmScales.GetBinError(b+1)
-    if not ZmmScales.GetBinContent(b+1)>0: continue 
-    relerr = err/ZmmScales.GetBinContent(b+1)
-    #if relerr<0.01: continue
-    byb_u = ZmmScales.Clone(); byb_u.SetName("zmm_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"dimuonCR",b))
-    byb_u.SetBinContent(b+1,ZmmScales.GetBinContent(b+1)+err)
-    byb_d = ZmmScales.Clone(); byb_d.SetName("zmm_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"dimuonCR",b))
-    if (ZmmScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,ZmmScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[1].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"dimuonCR",b),_fOut)
-
   ztoz_trig_down = fztoz_trig.Get("trig_sys_down"+tag)
   ratio_ztoztrig_down = ZmmScales.Clone(); ratio_ztoztrig_down.SetName("zmm_weights_%s_mettrig_Down"%cid);
   ratio_ztoztrig_down.Multiply(ztoz_trig_down)
@@ -130,23 +106,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   _fOut.WriteTObject(ratio_ztoztrig_up)
 
   CRs[1].add_nuisance_shape("mettrig",_fOut)
-
-  for b in range(target.GetNbinsX()):
-    err = ZeeScales.GetBinError(b+1)
-    if not ZeeScales.GetBinContent(b+1)>0: continue 
-    relerr = err/ZeeScales.GetBinContent(b+1)
-    #if relerr<0.01: continue
-    byb_u = ZeeScales.Clone(); byb_u.SetName("zee_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"dielectronCR",b))
-    byb_u.SetBinContent(b+1,ZeeScales.GetBinContent(b+1)+err)
-    byb_d = ZeeScales.Clone(); byb_d.SetName("zee_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"dielectronCR",b))
-    if (ZeeScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,ZeeScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[2].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"dielectronCR",b),_fOut)
 
 
   ## Here now adding the trigger uncertainty
@@ -162,23 +121,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
 
   CRs[2].add_nuisance_shape("mettrig",_fOut)
 
-  for b in range(target.GetNbinsX()):
-    err = WZScales.GetBinError(b+1)
-    if not WZScales.GetBinContent(b+1)>0: continue 
-    relerr = err/WZScales.GetBinContent(b+1)
-    #if relerr<0.01: continue
-    byb_u = WZScales.Clone(); byb_u.SetName("w_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"wzCR",b))
-    byb_u.SetBinContent(b+1,WZScales.GetBinContent(b+1)+err)
-    byb_d = WZScales.Clone(); byb_d.SetName("w_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"wzCR",b))
-    if (WZScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,WZScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[3].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"wzCR",b),_fOut)
-  
 
   #######################################################################################################  
  
