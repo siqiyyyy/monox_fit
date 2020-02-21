@@ -35,6 +35,12 @@ def do_stat_unc(histogram, proc,cid, region, CR, outfile):
     CR.add_nuisance_shape("{CONSTRAINT}_stat_error_{REGION}_bin{BIN}".format(**replacement),outfile)
 
 
+def add_variation(histogram, unc_file, unc_name, new_name, outfile):
+  variation = histogram.Clone(new_name)
+  factor = unc_file.Get(unc_name)
+  variation.Multiply(factor)
+  outfile.WriteTObject(variation)
+
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard
 model = "wjets"
@@ -43,7 +49,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   # Some setup
   _fin    = _f.Get("category_%s"%cid)
   _wspace = _fin.Get("wspace_%s"%cid)
-
 
   # ############################ USER DEFINED ###########################################################
   # First define the nominal transfer factors (histograms of signal/control, usually MC
@@ -101,133 +106,57 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
     tag = ""
 
   fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning
-
-  ## Here now adding the trigger uncertainty
-  wtow_trig_down = fztoz_trig.Get("trig_sys_down"+tag)
-  ratio_wtowtrig_down = WScales.Clone(); ratio_wtowtrig_down.SetName("wmn_weights_%s_mettrig_Down"%cid);
-  ratio_wtowtrig_down.Multiply(wtow_trig_down)
-  _fOut.WriteTObject(ratio_wtowtrig_down)
-
-  wtow_trig_up = fztoz_trig.Get("trig_sys_up"+tag)
-  ratio_wtowtrig_up = WScales.Clone(); ratio_wtowtrig_up.SetName("wmn_weights_%s_mettrig_Up"%cid);
-  ratio_wtowtrig_up.Multiply(wtow_trig_up)
-  _fOut.WriteTObject(ratio_wtowtrig_up)
-
+  
+  # Trigger single muon
+  add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[0].add_nuisance_shape("mettrig",_fOut)
 
-  ## Here now adding the trigger uncertainty
-  ewtow_trig_down = fztoz_trig.Get("trig_sys_down"+tag)
-  eratio_wtowtrig_down = WScales_e.Clone(); eratio_wtowtrig_down.SetName("wen_weights_%s_mettrig_Down"%cid);
-  eratio_wtowtrig_down.Multiply(ewtow_trig_down)
-  _fOut.WriteTObject(eratio_wtowtrig_down)
-
-  ewtow_trig_up = fztoz_trig.Get("trig_sys_up"+tag)
-  eratio_wtowtrig_up = WScales_e.Clone(); eratio_wtowtrig_up.SetName("wen_weights_%s_mettrig_Up"%cid);
-  eratio_wtowtrig_up.Multiply(ewtow_trig_up)
-  _fOut.WriteTObject(eratio_wtowtrig_up)
-
+  # Trigger single electron
+  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[1].add_nuisance_shape("mettrig",_fOut)
 
-  fwtowpdf = r.TFile.Open("sys/wtow_pdf_sys.root") # 250 - 1400 binning
+  # PDF unc
+  fwtowpdf = r.TFile.Open("sys/wtow_pdf_sys.root")
 
-  wtow_pdf_down   = fwtowpdf.Get("ratio_Down"+tag)
-  ratio_wtowpdf_down = targetmc.Clone();  ratio_wtowpdf_down.SetName("wmn_weights_%s_wtowpdf_Down"%cid);
-  ratio_wtowpdf_down.Divide(controlmc)
-  ratio_wtowpdf_down.Multiply(wtow_pdf_down)
-  _fOut.WriteTObject(ratio_wtowpdf_down)
-
-  wtow_pdf_up   = fwtowpdf.Get("ratio"+tag)
-  ratio_wtowpdf_up = targetmc.Clone();  ratio_wtowpdf_up.SetName("wmn_weights_%s_wtowpdf_Up"%cid);
-  ratio_wtowpdf_up.Divide(controlmc)
-  ratio_wtowpdf_up.Multiply(wtow_pdf_up)
-  _fOut.WriteTObject(ratio_wtowpdf_up)
-
-  ewtow_pdf_down   = fwtowpdf.Get("ratio_Down"+tag)
-  eratio_wtowpdf_down = targetmc.Clone();  eratio_wtowpdf_down.SetName("wen_weights_%s_wtowpdf_Down"%cid);
-  eratio_wtowpdf_down.Divide(controlmc_e)
-  eratio_wtowpdf_down.Multiply(ewtow_pdf_down)
-  _fOut.WriteTObject(eratio_wtowpdf_down)
-
-  ewtow_pdf_up   = fwtowpdf.Get("ratio"+tag)
-  eratio_wtowpdf_up = targetmc.Clone();  eratio_wtowpdf_up.SetName("wen_weights_%s_wtowpdf_Up"%cid);
-  eratio_wtowpdf_up.Divide(controlmc_e)
-  eratio_wtowpdf_up.Multiply(ewtow_pdf_up)
-  _fOut.WriteTObject(eratio_wtowpdf_up)
-
+  # PDF single muon
+  add_variation(WScales, fwtowpdf, "ratio_Down"+tag, "wmn_weights_%s_wtowpdf_Down"%cid, _fOut)
+  add_variation(WScales, fwtowpdf, "ratio"+tag, "wmn_weights_%s_wtowpdf_Up"%cid, _fOut)
   CRs[0].add_nuisance_shape("wtowpdf",_fOut)
+
+  # PDF single electron
+  add_variation(WScales_e, fwtowpdf, "ratio_Down"+tag, "wen_weights_%s_wtowpdf_Down"%cid, _fOut)
+  add_variation(WScales_e, fwtowpdf, "ratio"+tag, "wen_weights_%s_wtowpdf_Up"%cid, _fOut)
   CRs[1].add_nuisance_shape("wtowpdf",_fOut)
 
   ## Veto uncertainties
   fwtowveto = r.TFile.Open("sys/veto_sys.root") # 250 - 1400 binning
 
   ## Wmuon CR first
-  veto_el_up       = fwtowveto.Get("eleveto"+tag)
-  ratio_veto_el_up = WScales.Clone(); ratio_veto_el_up.SetName("wmn_weights_%s_eveto_Up"%cid)
-  ratio_veto_el_up.Multiply(veto_el_up)
-  _fOut.WriteTObject(ratio_veto_el_up)
-
-  veto_el_down       = fwtowveto.Get("eleveto_Down"+tag)
-  ratio_veto_el_down = WScales.Clone(); ratio_veto_el_down.SetName("wmn_weights_%s_eveto_Down"%cid)
-  ratio_veto_el_down.Multiply(veto_el_down)
-  _fOut.WriteTObject(ratio_veto_el_down)
-
-  veto_mu_up       = fwtowveto.Get("muveto"+tag)
-  ratio_veto_mu_up = WScales.Clone(); ratio_veto_mu_up.SetName("wmn_weights_%s_muveto_Up"%cid)
-  ratio_veto_mu_up.Multiply(veto_mu_up)
-  _fOut.WriteTObject(ratio_veto_mu_up)
-
-  veto_mu_down       = fwtowveto.Get("muveto_Down"+tag)
-  ratio_veto_mu_down = WScales.Clone(); ratio_veto_mu_down.SetName("wmn_weights_%s_muveto_Down"%cid)
-  ratio_veto_mu_down.Multiply(veto_mu_down)
-  _fOut.WriteTObject(ratio_veto_mu_down)
-
-  veto_tau_up       = fwtowveto.Get("tauveto"+tag)
-  ratio_veto_tau_up = WScales.Clone(); ratio_veto_tau_up.SetName("wmn_weights_%s_tauveto_Up"%cid)
-  ratio_veto_tau_up.Multiply(veto_tau_up)
-  _fOut.WriteTObject(ratio_veto_tau_up)
-
-  veto_tau_down       = fwtowveto.Get("tauveto_Down"+tag)
-  ratio_veto_tau_down = WScales.Clone(); ratio_veto_tau_down.SetName("wmn_weights_%s_tauveto_Down"%cid)
-  ratio_veto_tau_down.Multiply(veto_tau_down)
-  _fOut.WriteTObject(ratio_veto_tau_down)
-
+  add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_Up"%cid, _fOut)
+  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_Down"%cid, _fOut)
   CRs[0].add_nuisance_shape("eveto",_fOut)
+
+  add_variation(WScales, fwtowveto, "muveto"+tag, "wmn_weights_%s_muveto_Up"%cid, _fOut)
+  add_variation(WScales, fwtowveto, "muveto_Down"+tag, "wmn_weights_%s_muveto_Down"%cid, _fOut)
   CRs[0].add_nuisance_shape("muveto",_fOut)
+
+  add_variation(WScales, fwtowveto, "tauveto"+tag, "wmn_weights_%s_tauveto_Up"%cid, _fOut)
+  add_variation(WScales, fwtowveto, "tauveto_Down"+tag, "wmn_weights_%s_tauveto_Down"%cid, _fOut)
   CRs[0].add_nuisance_shape("tauveto",_fOut)
 
   ## W electron CR first
-  eveto_el_up       = fwtowveto.Get("eleveto"+tag)
-  eratio_veto_el_up = WScales_e.Clone(); eratio_veto_el_up.SetName("wen_weights_%s_eveto_Up"%cid)
-  eratio_veto_el_up.Multiply(eveto_el_up)
-  _fOut.WriteTObject(eratio_veto_el_up)
-
-  eveto_el_down       = fwtowveto.Get("eleveto_Down"+tag)
-  eratio_veto_el_down = WScales_e.Clone(); eratio_veto_el_down.SetName("wen_weights_%s_eveto_Down"%cid)
-  eratio_veto_el_down.Multiply(eveto_el_down)
-  _fOut.WriteTObject(eratio_veto_el_down)
-
-  eveto_mu_up       = fwtowveto.Get("muveto"+tag)
-  eratio_veto_mu_up = WScales_e.Clone(); eratio_veto_mu_up.SetName("wen_weights_%s_muveto_Up"%cid)
-  eratio_veto_mu_up.Multiply(eveto_mu_up)
-  _fOut.WriteTObject(eratio_veto_mu_up)
-
-  eveto_mu_down       = fwtowveto.Get("muveto_Down"+tag)
-  eratio_veto_mu_down = WScales_e.Clone(); eratio_veto_mu_down.SetName("wen_weights_%s_muveto_Down"%cid)
-  eratio_veto_mu_down.Multiply(eveto_mu_down)
-  _fOut.WriteTObject(eratio_veto_mu_down)
-
-  eveto_tau_up       = fwtowveto.Get("tauveto"+tag)
-  eratio_veto_tau_up = WScales_e.Clone(); eratio_veto_tau_up.SetName("wen_weights_%s_tauveto_Up"%cid)
-  eratio_veto_tau_up.Multiply(eveto_tau_up)
-  _fOut.WriteTObject(eratio_veto_tau_up)
-
-  eveto_tau_down       = fwtowveto.Get("tauveto_Down"+tag)
-  eratio_veto_tau_down = WScales_e.Clone(); eratio_veto_tau_down.SetName("wen_weights_%s_tauveto_Down"%cid)
-  eratio_veto_tau_down.Multiply(eveto_tau_down)
-  _fOut.WriteTObject(eratio_veto_tau_down)
-
+  add_variation(WScales, fwtowveto, "eleveto"+tag, "wen_weights_%s_eveto_Up"%cid, _fOut)
+  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_Down"%cid, _fOut)
   CRs[1].add_nuisance_shape("eveto",_fOut)
+
+  add_variation(WScales, fwtowveto, "muveto"+tag, "wen_weights_%s_muveto_Up"%cid, _fOut)
+  add_variation(WScales, fwtowveto, "muveto_Down"+tag, "wen_weights_%s_muveto_Down"%cid, _fOut)
   CRs[1].add_nuisance_shape("muveto",_fOut)
+
+  add_variation(WScales, fwtowveto, "tauveto"+tag, "wen_weights_%s_tauveto_Up"%cid, _fOut)
+  add_variation(WScales, fwtowveto, "tauveto_Down"+tag, "wen_weights_%s_tauveto_Down"%cid, _fOut)
   CRs[1].add_nuisance_shape("tauveto",_fOut)
 
 
