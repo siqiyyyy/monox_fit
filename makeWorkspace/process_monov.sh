@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-02-21_monov
+INDIR=../input/2020-02-21_19Feb20_skim_monojet_monov
 TAG='default'
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
 mkdir -p ${OUTDIR}
@@ -21,7 +21,7 @@ for YEAR in 2017 2018; do
 ./runModel.py ${OUTDIR}/ws_tau21_${YEAR}.root --categories monov --out ${OUTDIR}/combined_model_monov_tau21_${YEAR}.root
 done
 
-ln -s $(readlink -e ../monov/templates/Makefile) ${OUTDIR}/../Makefile
+ln -fs $(readlink -e ../monov/templates/Makefile) ${OUTDIR}/../Makefile
 
 pushd ${OUTDIR}/..
 make cards

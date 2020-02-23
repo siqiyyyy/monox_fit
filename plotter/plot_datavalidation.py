@@ -5,6 +5,9 @@ from math import sqrt, pow
 from array import array
 from tdrStyle import *
 import os
+
+DIR=os.path.dirname(os.path.abspath(__file__))
+
 setTDRStyle()
 
 
@@ -119,7 +122,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
     h_prefit[region1].Divide(h_prefit[region2])
     if "mono" in category:
         if region2 is "gjets":
-            uncFile     = TFile('../makeWorkspace/sys/theory_unc_ZG.root')
+            uncFile     = TFile(os.path.join(DIR,'../makeWorkspace/sys/theory_unc_ZG.root'))
             uncertainties = [
                 uncFile.ZG_QCDScale_met,
                 uncFile.ZG_QCDShape_met,
@@ -135,7 +138,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
             #uncertainties += ["SFreco"]
 
         else:
-            uncFile     = TFile('../makeWorkspace/sys/theory_unc_ZW.root')
+            uncFile     = TFile(os.path.join(DIR,'../makeWorkspace/sys/theory_unc_ZW.root'))
             uncertainties = [
                 uncFile.ZW_QCDScale_met,
                 uncFile.ZW_QCDShape_met,
@@ -150,7 +153,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 ]
             uncertainties += ["SFreco"]
     else:
-        uncFile = TFile('../makeWorkspace/sys/vbf_z_w_theory_unc_ratio_unc.root')
+        uncFile = TFile(os.path.join(DIR,'../makeWorkspace/sys/vbf_z_w_theory_unc_ratio_unc.root'))
         uncertainties = [
             "w_ewkcorr_overz_common",
             "zoverw_nlo_muf",
@@ -390,7 +393,6 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
 
 
 
-    import os
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 

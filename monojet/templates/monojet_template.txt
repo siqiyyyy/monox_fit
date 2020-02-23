@@ -3,25 +3,25 @@ imax 6 number of bins
 jmax 10 number of processes minus 1
 kmax 177 number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
-shapes *                         monojet_dielec    root/combined_model.root combinedws:monojet_Zee_$PROCESS
-shapes data_obs                  monojet_dielec    root/combined_model.root combinedws:monojet_Zee_data
-shapes zll                       monojet_dielec    root/combined_model.root combinedws:monojet_dielectron_zjets_model
-shapes *                         monojet_dimuon    root/combined_model.root combinedws:monojet_Zmm_$PROCESS
-shapes data_obs                  monojet_dimuon    root/combined_model.root combinedws:monojet_Zmm_data
-shapes zll                       monojet_dimuon    root/combined_model.root combinedws:monojet_dimuon_zjets_model
-shapes *                         monojet_photon    root/combined_model.root combinedws:monojet_gjets_$PROCESS
-shapes data_obs                  monojet_photon    root/combined_model.root combinedws:monojet_gjets_data
-shapes gjets                     monojet_photon    root/combined_model.root combinedws:monojet_photon_zjets_model
-shapes *                         monojet_signal    root/combined_model.root combinedws:monojet_signal_$PROCESS
-shapes data_obs                  monojet_signal    root/combined_model.root combinedws:monojet_signal_data
-shapes wjets                     monojet_signal    root/combined_model.root combinedws:monojet_wjetssignal_zjets_model
-shapes zjets                     monojet_signal    root/combined_model.root combinedws:monojet_signal_zjets_model
-shapes *                         monojet_singleel  root/combined_model.root combinedws:monojet_Wen_$PROCESS
-shapes data_obs                  monojet_singleel  root/combined_model.root combinedws:monojet_Wen_data
-shapes wjets                     monojet_singleel  root/combined_model.root combinedws:monojet_singleelectron_wjets_model
-shapes *                         monojet_singlemu  root/combined_model.root combinedws:monojet_Wmn_$PROCESS
-shapes data_obs                  monojet_singlemu  root/combined_model.root combinedws:monojet_Wmn_data
-shapes wjets                     monojet_singlemu  root/combined_model.root combinedws:monojet_singlemuon_wjets_model
+shapes *                         monojet_dielec    combined_model.root combinedws:monojet_Zee_$PROCESS
+shapes data_obs                  monojet_dielec    combined_model.root combinedws:monojet_Zee_data
+shapes zll                       monojet_dielec    combined_model.root combinedws:monojet_dielectron_zjets_model
+shapes *                         monojet_dimuon    combined_model.root combinedws:monojet_Zmm_$PROCESS
+shapes data_obs                  monojet_dimuon    combined_model.root combinedws:monojet_Zmm_data
+shapes zll                       monojet_dimuon    combined_model.root combinedws:monojet_dimuon_zjets_model
+shapes *                         monojet_photon    combined_model.root combinedws:monojet_gjets_$PROCESS
+shapes data_obs                  monojet_photon    combined_model.root combinedws:monojet_gjets_data
+shapes gjets                     monojet_photon    combined_model.root combinedws:monojet_photon_zjets_model
+shapes *                         monojet_signal    combined_model.root combinedws:monojet_signal_$PROCESS
+shapes data_obs                  monojet_signal    combined_model.root combinedws:monojet_signal_data
+shapes wjets                     monojet_signal    combined_model.root combinedws:monojet_wjetssignal_zjets_model
+shapes zjets                     monojet_signal    combined_model.root combinedws:monojet_signal_zjets_model
+shapes *                         monojet_singleel  combined_model.root combinedws:monojet_Wen_$PROCESS
+shapes data_obs                  monojet_singleel  combined_model.root combinedws:monojet_Wen_data
+shapes wjets                     monojet_singleel  combined_model.root combinedws:monojet_singleelectron_wjets_model
+shapes *                         monojet_singlemu  combined_model.root combinedws:monojet_Wmn_$PROCESS
+shapes data_obs                  monojet_singlemu  combined_model.root combinedws:monojet_Wmn_data
+shapes wjets                     monojet_singlemu  combined_model.root combinedws:monojet_singlemuon_wjets_model
 ----------------------------------------------------------------------------------------------------------------------------------
 bin              monojet_signal        monojet_dimuon        monojet_dielec        monojet_photon        monojet_singlemu      monojet_singleel
 observation  -1                    -1                    -1                    -1                    -1                    -1                  
