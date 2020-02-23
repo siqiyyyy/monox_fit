@@ -1,6 +1,6 @@
 import ROOT
 from counting_experiment import *
-from W_constraints import do_stat_unc
+from W_constraints import do_stat_unc, add_variation
 ROOT.RooMsgService.instance().setSilentMode(True)
 
 # Define how a control region(s) transfer is made by defining *cmodel*, the calling pattern must be unchanged!
@@ -83,42 +83,17 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   ## Here now adding the trigger uncertainty
   fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning 
 
-  gztoz_trig_down = fztoz_trig.Get("trig_sys_down"+tag)
-  gratio_ztoztrig_down = PhotonScales.Clone(); gratio_ztoztrig_down.SetName("photon_weights_%s_mettrig_Down"%cid);
-  gratio_ztoztrig_down.Multiply(gztoz_trig_down)
-  _fOut.WriteTObject(gratio_ztoztrig_down)
-
-  gztoz_trig_up = fztoz_trig.Get("trig_sys_up"+tag)
-  gratio_ztoztrig_up = PhotonScales.Clone(); gratio_ztoztrig_up.SetName("photon_weights_%s_mettrig_Up"%cid);
-  gratio_ztoztrig_up.Multiply(gztoz_trig_up)
-  _fOut.WriteTObject(gratio_ztoztrig_up)
-
+  add_variation(PhotonScales,fztoz_trig,"trig_sys_down"+tag,"photon_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(PhotonScales,fztoz_trig,"trig_sys_up"+tag,"photon_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[0].add_nuisance_shape("mettrig",_fOut)
 
-  ztoz_trig_down = fztoz_trig.Get("trig_sys_down"+tag)
-  ratio_ztoztrig_down = ZmmScales.Clone(); ratio_ztoztrig_down.SetName("zmm_weights_%s_mettrig_Down"%cid);
-  ratio_ztoztrig_down.Multiply(ztoz_trig_down)
-  _fOut.WriteTObject(ratio_ztoztrig_down)
-
-  ztoz_trig_up = fztoz_trig.Get("trig_sys_up"+tag)
-  ratio_ztoztrig_up = ZmmScales.Clone(); ratio_ztoztrig_up.SetName("zmm_weights_%s_mettrig_Up"%cid);
-  ratio_ztoztrig_up.Multiply(ztoz_trig_up)
-  _fOut.WriteTObject(ratio_ztoztrig_up)
-
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_down"+tag,"zmm_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_up"+tag,"zmm_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[1].add_nuisance_shape("mettrig",_fOut)
 
-
   ## Here now adding the trigger uncertainty
-  eztoz_trig_down = fztoz_trig.Get("trig_sys_down"+tag)
-  eratio_ztoztrig_down = ZeeScales.Clone(); eratio_ztoztrig_down.SetName("zee_weights_%s_mettrig_Down"%cid);
-  eratio_ztoztrig_down.Multiply(eztoz_trig_down)
-  _fOut.WriteTObject(eratio_ztoztrig_down)
-
-  eztoz_trig_up = fztoz_trig.Get("trig_sys_up"+tag)
-  eratio_ztoztrig_up = ZeeScales.Clone(); eratio_ztoztrig_up.SetName("zee_weights_%s_mettrig_Up"%cid);
-  eratio_ztoztrig_up.Multiply(eztoz_trig_up)
-  _fOut.WriteTObject(eratio_ztoztrig_up)
-
+  add_variation(ZeeScales,fztoz_trig,"trig_sys_down"+tag,"zee_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[2].add_nuisance_shape("mettrig",_fOut)
 
 
