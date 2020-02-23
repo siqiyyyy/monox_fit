@@ -5,10 +5,13 @@ from math import sqrt, pow
 from array import array
 from tdrStyle import *
 import os
+
+DIR=os.path.dirname(os.path.abspath(__file__))
+
 setTDRStyle()
 
 
-def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi):
+def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi, year):
 
     if region1 is "combined" and region2 is "gjets":
         name = "Z(ll)+jets / #gamma+jets"
@@ -36,7 +39,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
         name = "W(mn)/W(en)"
 
     datalab = {"singlemuon":"Wmn", "dimuon":"Zmm", "gjets":"gjets", "signal":"signal", "singleelectron":"Wen", "dielectron":"Zee"}
-  
+
     f_data = TFile(ws_file,"READ")
     f_data.cd("category_"+category)
 
@@ -52,10 +55,10 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
     else:
         h_data_1 = gDirectory.Get(datalab[region1]+"_data")
     h_data_1.Sumw2()
-    if not "monov" in category:
+    if "monojet" in category:
         h_data_1.Rebin(2)
 
-    if region2 is "combinedW":    
+    if region2 is "combinedW":
         h_data_2 = gDirectory.Get("Wmn_data")
         h_data_2_b = gDirectory.Get("Wen_data")
         h_data_2.Add(h_data_2_b)
@@ -63,108 +66,172 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
         h_data_2 = gDirectory.Get(datalab[region2]+"_data")
 
     h_data_2.Sumw2()
-    if not "monov" in category:
+    if "monojet" in category:
         h_data_2.Rebin(2)
 
     h_data_1.Divide(h_data_2)
 
     f_mlfit = TFile(fitdiag_file,'READ')
 
+    def get_shape(region, process):
+        """Helper function to easily retrieve histograms from diagnostics file"""
+        return f_mlfit.Get("shapes_prefit/"+category+"_"+region+"/" + process)
+
+    def get_shape_sum(regions, process):
+        """Helper function to get sum of shapes for different regions"""
+        histos = [get_shape(x, process) for x in regions]
+        h = histos[0]
+        for ih in histos[1:]:
+            h.Add(ih)
+        return h
+
     channel = {"singlemuon":category+"_singlemu", "dimuon":category+"_dimuon", "gjets":category+"_photon", "signal":category+"_signal", "singleelectron":category+"_singleel", "dielectron":category+"_dielec"}
 
     h_prefit = {}
+    h_qcd_prefit = {}
+    h_ewk_prefit = {}
 
-    if region1 is "combined":    
-        h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+category+"_dimuon/total_background")
-        print f_mlfit, "shapes_prefit/"+category+"_dielec/total_background"
-        h_mc_2 = f_mlfit.Get("shapes_prefit/"+category+"_dielec/total_background")
-        h_prefit[region1].Add(h_mc_2)
-    elif region1 is "combinedW":    
-        h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+category+"_singlemu/total_background")
-        h_mc_2 = f_mlfit.Get("shapes_prefit/"+category+"_singleel/total_background")
-        h_prefit[region1].Add(h_mc_2)
-    else:
-        h_prefit[region1] = f_mlfit.Get("shapes_prefit/"+channel[region1]+"/total_background")
-    h_prefit[region1].Sumw2()
-    if not "monov" in category:
-        h_prefit[region1].Rebin(2)
+    ### Step 1: Read prefit histogram
+    for region in [region1, region2]:
+        if region is "combined":
+            regions_to_retrieve = ["dimuon","dielec"]
+            h_prefit[region] = get_shape_sum(regions_to_retrieve,"total_background")
 
-    if region2 is "combinedW":    
-        h_prefit[region2] = f_mlfit.Get("shapes_prefit/"+category+"_singlemu/total_background")
-        h_mc2_2 = f_mlfit.Get("shapes_prefit/"+category+"_singleel/total_background")
-        h_prefit[region2].Add(h_mc2_2)
-    else:
-        h_prefit[region2] = f_mlfit.Get("shapes_prefit/"+channel[region2]+"/total_background")
+            if "vbf" in category:
+                h_qcd_prefit[region] = get_shape_sum(regions_to_retrieve, "qcd_zll")
+                h_ewk_prefit[region] = get_shape_sum(regions_to_retrieve, "ewk_zll")
+        elif region is "combinedW":
+            regions_to_retrieve = ["singlemu","singleel"]
+            h_prefit[region] = get_shape_sum(regions_to_retrieve,"total_background")
+            if "vbf" in category:
+                h_qcd_prefit[region] = get_shape_sum(regions_to_retrieve,"qcd_wjets")
+                h_ewk_prefit[region] = get_shape_sum(regions_to_retrieve,"ewk_wjets")
+        elif region == 'gjets':
+            h_prefit[region] = get_shape("photon", "total_background")
+            if "vbf" in category:
+                h_qcd_prefit[region] = get_shape("photon", "qcd_gjets")
+                h_ewk_prefit[region] = get_shape("photon", "ewk_gjets")
+        else:
+            h_prefit[region] = get_shape(channel[region],"total_background")
 
-    h_prefit[region2].Sumw2()
-    if not "monov" in category:
-        h_prefit[region2].Rebin(2)
-    
+        h_prefit[region].Sumw2()
+
+        if "monojet" in category:
+            h_prefit[region].Rebin(2)
+
     h_prefit[region1].Divide(h_prefit[region2])
-    
-    if region2 is "gjets":
-        uncFile     = TFile('../makeWorkspace/sys/theory_unc_ZG.root')
-        uncertainties = [
-            uncFile.ZG_QCDScale_met,
-            uncFile.ZG_QCDShape_met,
-            uncFile.ZG_QCDProcess_met,
-            uncFile.ZG_NNLOEWK_met,
-            uncFile.ZG_Sudakov1_met,
-            uncFile.ZG_Sudakov2_met,
-            uncFile.ZG_NNLOMiss1_met,
-            uncFile.ZG_NNLOMiss2_met,
-            uncFile.ZG_MIX_met,
-            uncFile.ZG_PDF_met
-            ]
-        #uncertainties += ["SFreco"]
-        
-    else:
-        uncFile     = TFile('../makeWorkspace/sys/theory_unc_ZW.root')
-        uncertainties = [
-            uncFile.ZW_QCDScale_met,
-            uncFile.ZW_QCDShape_met,
-            uncFile.ZW_QCDProcess_met,
-            uncFile.ZW_NNLOEWK_met,
-            uncFile.ZW_Sudakov1_met,
-            uncFile.ZW_Sudakov2_met,
-            uncFile.ZW_NNLOMiss1_met,
-            uncFile.ZW_NNLOMiss2_met,
-            uncFile.ZW_MIX_met,
-            uncFile.ZW_PDF_met
-            ]
-        uncertainties += ["SFreco"]
+    if "mono" in category:
+        if region2 is "gjets":
+            uncFile     = TFile(os.path.join(DIR,'../makeWorkspace/sys/theory_unc_ZG.root'))
+            uncertainties = [
+                uncFile.ZG_QCDScale_met,
+                uncFile.ZG_QCDShape_met,
+                uncFile.ZG_QCDProcess_met,
+                uncFile.ZG_NNLOEWK_met,
+                uncFile.ZG_Sudakov1_met,
+                uncFile.ZG_Sudakov2_met,
+                uncFile.ZG_NNLOMiss1_met,
+                uncFile.ZG_NNLOMiss2_met,
+                uncFile.ZG_MIX_met,
+                uncFile.ZG_PDF_met
+                ]
+            #uncertainties += ["SFreco"]
 
+        else:
+            uncFile     = TFile(os.path.join(DIR,'../makeWorkspace/sys/theory_unc_ZW.root'))
+            uncertainties = [
+                uncFile.ZW_QCDScale_met,
+                uncFile.ZW_QCDShape_met,
+                uncFile.ZW_QCDProcess_met,
+                uncFile.ZW_NNLOEWK_met,
+                uncFile.ZW_Sudakov1_met,
+                uncFile.ZW_Sudakov2_met,
+                uncFile.ZW_NNLOMiss1_met,
+                uncFile.ZW_NNLOMiss2_met,
+                uncFile.ZW_MIX_met,
+                uncFile.ZW_PDF_met
+                ]
+            uncertainties += ["SFreco"]
+    else:
+        uncFile = TFile(os.path.join(DIR,'../makeWorkspace/sys/vbf_z_w_theory_unc_ratio_unc.root'))
+        uncertainties = [
+            "w_ewkcorr_overz_common",
+            "zoverw_nlo_muf",
+            "zoverw_nlo_mur",
+            "zoverw_nlo_pdf",
+        ]
+        if region2 is not "gjets":
+            uncertainties += ["SFreco"]
     #print uncertainties
 
     for iBin in range(h_prefit[region1].GetNbinsX()):
         if iBin == 0:
             continue
-        
-        #sumw2 = math.pow((h_prefit[region1].GetBinError(iBin)),2)
+
+        # Bare minimum is the prefit stat unc.
         sumw2 = pow((h_prefit[region1].GetBinError(iBin)),2)
-        print region1, region2, "staterror", sqrt(sumw2)
-        
+
+        # Systematic uncertainties
         for uncert in uncertainties:
-            #print uncert
-            if region2 is not "gjets" and type(uncert) == str :#uncert.startswith("SF"):
-                if "reco" in uncert:
-                    value = 0.01
-                else:
-                    value = 0.02
+            if 'mono' in category:
+                if region2 is not "gjets" and type(uncert) == str :#uncert.startswith("SF"):
+                    if "reco" in uncert:
+                        value = 0.01
+                    else:
+                        value = 0.02
 
-                if region2.startswith("single"):
-                    sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value) ),2)
-                else:
-                    sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
+                    if region2.startswith("single"):
+                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value) ),2)
+                    else:
+                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
 
+                else:
+                    findbin =  uncert.FindBin(h_prefit[region1].GetBinCenter(iBin))
+                    sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (uncert.GetBinContent(findbin))),2)
             else:
-                findbin =  uncert.FindBin(h_prefit[region1].GetBinCenter(iBin))
-                sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (uncert.GetBinContent(findbin))),2)
-            
-        print region1, region2, iBin, "total", sqrt(sumw2)
+                if "SF" in uncert:
+                    # Experimental uncertainty
+                    if "reco" in uncert:
+                            value = 0.01
+                    else:
+                        value = 0.02
+
+                    if region2.startswith("single"):
+                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value) ),2)
+                    else:
+                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
+                    continue
+                # For VBF, we calculate the uncertainty separately for EWK and QCD
+                # the uncertainty calculated in each iteration is the absolute
+                # uncertainty on the absolute spectrum, i.e. not on the ratio!
+                # The uncertainty on the ratio is obtained by dividing after summing
+                theory_sumw2 = 0
+                for proc in ['qcd','ewk']:
+                    for direction in 'up','down':
+                        # Uncertainties are stored in histogram form
+                        hname = "uncertainty_ratio_z_{PROC}_mjj_unc_{UNC}_{DIR}_{YEAR}".format(PROC=proc, UNC=uncert, DIR=direction, YEAR=year)
+                        hist_unc = uncFile.Get(hname)
+
+                        # Find the right bin to read uncertainty from
+                        findbin = hist_unc.FindBin(h_prefit[region1].GetBinCenter(iBin))
+
+                        # Nominal QCD / EWK V value
+                        nom = (h_qcd_prefit if proc=='qcd' else h_ewk_prefit)[region1].GetBinContent(iBin)
+
+                        # Total nominal value
+                        nom_tot = h_prefit[region1].GetBinContent(iBin)
+
+                        # Total unc = relative uncertainty * nominal
+                        # factor of 0.5 accounts for symmetrizing up/down                        
+                        theory_sumw2 += pow( 0.5 * hist_unc.GetBinContent(findbin) * nom, 2)
+                
+                # After QCD and EWK have been summed over, we divide by the denominator
+                theory_sumw2 /= pow(h_prefit[region2].GetBinContent(iBin),2)
+
+                # And add to the total
+                sumw2 += theory_sumw2
 
         h_prefit[region1].SetBinError(iBin,sqrt(sumw2))
-        #h_prefit[region1].SetBinError(iBin,math.sqrt(sumw2))
 
 
     c = TCanvas("c","c",600,650)
@@ -179,8 +246,8 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
     c.cd()
 
     h_clone = h_prefit[region1].Clone()
-    h_clone.SetFillColor(kGray) #SetFillColor(ROOT.kYellow)                                                                                   
-    h_clone.SetLineColor(kGray) #SetLineColor(1)                                                                                                        
+    h_clone.SetFillColor(kGray) #SetFillColor(ROOT.kYellow)
+    h_clone.SetLineColor(kGray) #SetLineColor(1)
     h_clone.SetLineWidth(1)
     h_clone.SetMarkerSize(0)
     h_clone.GetXaxis().SetTitle("")
@@ -229,17 +296,17 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
     latex2.SetNDC()
     latex2.SetTextSize(0.6*c.GetTopMargin())
     latex2.SetTextFont(42)
-    latex2.SetTextAlign(31) # align right                                                                                                                                                                                             
+    latex2.SetTextAlign(31) # align right
     latex2.DrawLatex(0.94, 0.95,"{LUMI:.1f} fb^{{-1}} (13 TeV)".format(LUMI=lumi))
     latex2.SetTextSize(0.6*c.GetTopMargin())
     latex2.SetTextFont(62)
-    latex2.SetTextAlign(11) # align right                                                                                                                                                                                                  
+    latex2.SetTextAlign(11) # align right
     latex2.DrawLatex(0.200, 0.85, "CMS")
     latex2.SetTextSize(0.6*c.GetTopMargin())
     latex2.SetTextFont(52)
     latex2.SetTextAlign(11)
     offset = 0.005
-    #latex2.DrawLatex(0.20, 0.80, "Preliminary")          
+    #latex2.DrawLatex(0.20, 0.80, "Preliminary")
 
     categoryLabel = TLatex();
     categoryLabel.SetNDC();
@@ -253,17 +320,17 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
 
     pad = TPad("pad", "pad", 0.0, 0.0, 1.0, 0.9)
     SetOwnership(pad,False)
-    
+
     pad.SetTopMargin(0.7)
     pad.SetRightMargin(0.06)
     pad.SetLeftMargin(0.15)
     pad.SetFillColor(0)
     pad.SetGridy(0)
-    
+
     pad.SetFillStyle(0)
     pad.Draw()
     pad.cd(0)
-    
+
     dummy2 = h_data_1.Clone("dummy")
     dummy2.Sumw2()
     dummy2.Divide(h_prefit[region1])
@@ -279,7 +346,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
             ratiosys.SetBinError(hbin+1,h_clone.GetBinError(hbin+1)/h_clone.GetBinContent(hbin+1))
 
     dummy2.GetYaxis().SetTitle("Data / Pred.")
-    dummy2.GetXaxis().SetTitle("Hadronic recoil p_{T} [GeV]")
+    dummy2.GetXaxis().SetTitle("Hadronic recoil p_{T} [GeV]" if "mono" in category else  "M_{jj} [GeV]")
     dummy2.GetXaxis().SetTitleOffset(1.15)
     dummy2.GetXaxis().SetTitleSize(0.05)
     dummy2.GetXaxis().SetLabelSize(0.04)
@@ -295,8 +362,8 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
     dummy2.GetYaxis().SetTitleSize(0.04)
 #    dummy2.GetYaxis().SetLabelSize(0.04)
     dummy2.GetYaxis().SetTitleOffset(1.5)
-    dummy2.SetMaximum(1.6)                                                                        
-    dummy2.SetMinimum(0.4) 
+    dummy2.SetMaximum(1.6)
+    dummy2.SetMinimum(0.4)
 
     dummy2.Draw()
 
@@ -307,7 +374,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
     ratiosys.Draw("e2same")
 
     dummy2.Draw("same")
-    
+
     f1 = TF1("f1","1",-5000,5000);
     f1.SetLineColor(1);
     f1.SetLineStyle(2);
@@ -324,15 +391,14 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi)
     #ratiosys.Draw("e2same")
     #g_ratio_pre.Draw("epsame")
 
-        
 
-    import os
+
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
-    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.pdf")
-    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.png")
-    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_ratio.C")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_"+str(year)+"ratio.pdf")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_"+str(year)+"ratio.png")
+    c.SaveAs(outdir+region1+"_"+region2+"_cat_"+category+"_"+str(year)+"ratio.C")
 
     c.Close()
     f_mlfit.Close()

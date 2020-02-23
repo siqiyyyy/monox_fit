@@ -42,7 +42,8 @@ def main():
   wsin_combine = ROOT.RooWorkspace("wspace_"+args.category,"wspace_"+args.category)
   wsin_combine._import = SafeWorkspaceImporter(wsin_combine)#getattr(wsin_combine,"import")
 
-  varl = ROOT.RooRealVar("met","met",0,100000);
+  variable_name = "mjj" if args.category == "vbf" else "met"
+  varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
 
   # Loop over all keys in the input file
   # pick out the histograms, and add to
