@@ -34,7 +34,7 @@ for YEAR in 2017 2018; do
 
     ### TAU21 CARDS
     CARD=cards/card_tau21_monov_${YEAR}.txt
-    cp card_template.txt ${CARD}
+    cp ../../templates/card_template.txt ${CARD}
     sed -i "s|combined_model.root|../root/combined_model_monov_tau21_${YEAR}.root|g" ${CARD}
     sed -i "s|@YEAR|${YEAR}|g" ${CARD}
     if [ $YEAR -eq 2017 ]; then
