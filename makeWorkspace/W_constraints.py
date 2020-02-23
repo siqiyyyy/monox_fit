@@ -147,16 +147,16 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   CRs[0].add_nuisance_shape("tauveto",_fOut)
 
   ## W electron CR first
-  add_variation(WScales, fwtowveto, "eleveto"+tag, "wen_weights_%s_eveto_Up"%cid, _fOut)
-  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_Down"%cid, _fOut)
+  add_variation(WScales_e, fwtowveto, "eleveto"+tag, "wen_weights_%s_eveto_Up"%cid, _fOut)
+  add_variation(WScales_e, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_Down"%cid, _fOut)
   CRs[1].add_nuisance_shape("eveto",_fOut)
 
-  add_variation(WScales, fwtowveto, "muveto"+tag, "wen_weights_%s_muveto_Up"%cid, _fOut)
-  add_variation(WScales, fwtowveto, "muveto_Down"+tag, "wen_weights_%s_muveto_Down"%cid, _fOut)
+  add_variation(WScales_e, fwtowveto, "muveto"+tag, "wen_weights_%s_muveto_Up"%cid, _fOut)
+  add_variation(WScales_e, fwtowveto, "muveto_Down"+tag, "wen_weights_%s_muveto_Down"%cid, _fOut)
   CRs[1].add_nuisance_shape("muveto",_fOut)
 
-  add_variation(WScales, fwtowveto, "tauveto"+tag, "wen_weights_%s_tauveto_Up"%cid, _fOut)
-  add_variation(WScales, fwtowveto, "tauveto_Down"+tag, "wen_weights_%s_tauveto_Down"%cid, _fOut)
+  add_variation(WScales_e, fwtowveto, "tauveto"+tag, "wen_weights_%s_tauveto_Up"%cid, _fOut)
+  add_variation(WScales_e, fwtowveto, "tauveto_Down"+tag, "wen_weights_%s_tauveto_Down"%cid, _fOut)
   CRs[1].add_nuisance_shape("tauveto",_fOut)
 
 
