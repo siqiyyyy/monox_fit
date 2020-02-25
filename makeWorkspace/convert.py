@@ -71,9 +71,9 @@ def convertToCombineWorkspace(wsin_combine,f_simple_hists,categories,cmb_categor
 
      expectations = ROOT.RooArgList()
      for b in range(nbins+1):
-       #print "model_mu_cat_%d_bin_%d"%(10*crd+icat,b), wsin_combine.var( "model_mu_cat_%d_bin_%d"%(10*crd+icat,b))
-       expectations.add(wsin_combine.var("model_mu_cat_%s_bin_%d"%(cat+'_'+x.model,b)))
-       #print "DAVID", b, expectations.Print("V"),wsin_combine.var("model_mu_cat_%s_bin_%d"%(cat+'_'+x.model,b)).getVal()
+       #expectations.add(wsin_combine.var("model_mu_cat_%s_bin_%d"%(cat+'_'+x.model,b)))
+       #MTR_2017_QCDZ_SR_bin1
+       expectations.add(wsin_combine.var("MTR_2017_QCDZ_SR_bin%d"%(b+1)))
      phist = ROOT.RooParametricHist("%s_signal_%s_model"%(cat,x.model),"Model Shape for %s in Category %s"%(x.model,cat),varl,expectations,samplehist)
      phist_norm = ROOT.RooAddition("%s_norm"%phist.GetName(),"Total number of expected events in %s"%phist.GetName(),expectations)
 
@@ -90,7 +90,8 @@ def convertToCombineWorkspace(wsin_combine,f_simple_hists,categories,cmb_categor
          chid = cr.chid
          cr_expectations = ROOT.RooArgList()
          for b in range(nbins):
-          cr_expectations.add(wsin_combine.function("pmu_cat_%s_ch_%s_bin_%d"%(cat+'_'+x.model,cr.chid,b)))
+          #cr_expectations.add(wsin_combine.function("pmu_cat_%s_ch_%s_bin_%d"%(cat+'_'+x.model,cr.chid,b)))
+          cr_expectations.add(wsin_combine.function("pmu_cat_%s_ch_%s_bin%d"%(cat+'_'+x.model,cr.chid,b+1)))
          print "%s_%s_%s_model"%(cat,cr.crname,x.model)
          cr_expectations.Print()
          print "Look here", samplehist.GetNbinsX(), cr_expectations.getSize()

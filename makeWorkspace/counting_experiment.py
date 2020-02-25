@@ -26,7 +26,7 @@ class Bin:
    self.id        = id
    self.catid	  = catid
    #self.type_id   = 10*MAXBINS*catid+MAXBINS*chid+id
-   self.binid     = "cat_%s_ch_%s_bin_%d"%(catid,chid,id)
+   self.binid     = "cat_%s_ch_%s_bin%d"%(catid,chid,id+1)
 
    self.wspace_out = wspace_out
    self.wspace_out._import = SafeWorkspaceImporter(self.wspace_out)
@@ -111,7 +111,8 @@ class Bin:
 
  def set_initE_precorr(self):
    return 0 
-   self.initE_precorr = self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id)).getVal()*self.wspace_out.var(self.sfactor.GetName()).getVal()
+   #self.initE_precorr = self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id)).getVal()*self.wspace_out.var(self.sfactor.GetName()).getVal()
+   self.initE_precorr = self.wspace_out.var("MTR_2017_QCDZ_SR_bin%d"%(self.id+1)).getVal()*self.wspace_out.var(self.sfactor.GetName()).getVal()
 
  def set_initE(self):
    return 0 
@@ -143,13 +144,20 @@ class Bin:
  def setup_expect_var(self,functionalForm=""):
    print functionalForm 
    if not len(functionalForm): 
-    if not self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id,)):
-     self.model_mu = r.RooRealVar("model_mu_cat_%s_bin_%d"%(self.catid,self.id),"Model of N expected events in %d"%self.id,self.initY,0,10000)
+
+    if not self.wspace_out.var("MTR_2017_QCDZ_SR_bin%d"%(self.id+1,)):
+     self.model_mu = r.RooRealVar("MTR_2017_QCDZ_SR_bin%d"%(self.id+1),"Model of N expected events in %d"%self.id,self.initY,0,10000)
      self.model_mu.removeMax()
-    else: self.model_mu = self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id))
+    else: self.model_mu = self.wspace_out.var("MTR_2017_QCDZ_SR_bin%d"%(self.id+1))
+
+    #if not self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id,)):
+    # self.model_mu = r.RooRealVar("model_mu_cat_%s_bin_%d"%(self.catid,self.id),"Model of N expected events in %d"%self.id,self.initY,0,10000)
+    # self.model_mu.removeMax()
+    #else: self.model_mu = self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id))
+
    else: 
     print "Setting up dependence!!" 
-    DEPENDANT = "%s_bin_%d"%(functionalForm,self.id)
+    DEPENDANT = "%s_bin%d"%(functionalForm,self.id+1)
     self.model_mu = self.wspace_out.function("pmu_%s"%(DEPENDANT))
 
    arglist = r.RooArgList((self.model_mu),self.wspace_out.var(self.sfactor.GetName()))
@@ -300,7 +308,7 @@ class Channel:
 
     # run through all of the bins in the control regions and create a function to interpolate
     for b in range(self.nbins):
-      func = r.RooFormulaVar("sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b)\
+      func = r.RooFormulaVar("sys_function_%s_cat_%s_ch_%s_bin%d"%(name,self.catid,self.chid,b+1)\
 	,"Systematic Varation"\
       	#,"@0*%f"%size,r.RooArgList(self.wspace_out.var("nuis_%s"%name)))
       	,"@0*%f"%size,r.RooArgList(self.wspace_out.var("%s"%name)))
@@ -353,7 +361,7 @@ class Channel:
 	coeff_a = 0.5*(vu+vd)
 	coeff_b = 0.5*(vu-vd)
 
-        func = r.RooFormulaVar("sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b) \
+        func = r.RooFormulaVar("sys_function_%s_cat_%s_ch_%s_bin%d"%(name,self.catid,self.chid,b+1) \
 		,"Systematic Varation"\
 		,"(%f*@0*@0+%f*@0)/%f"%(coeff_a,coeff_b,nsf) \
 		,r.RooArgList(self.wspace_out.var("%s"%name))) # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
@@ -570,7 +578,8 @@ class Category:
 
    for i,bl in enumerate(self.channels):
     if i >= len(self._bins)-1 : break
-    model_mu = self._wspace_out.var("model_mu_cat_%s_bin_%d"%(bl.catid,bl.id))
+    #model_mu = self._wspace_out.var("model_mu_cat_%s_bin%d"%(bl.catid,bl.id+1))
+    model_mu = self._wspace_out.var("MTR_2017_QCDZ_SR_bin%d"%(bl.id+1))
     #self._wspace_out.var(model_mu.GetName()).setVal(1.2*model_mu.getVal())
    
   def ret_control_regions(self): 

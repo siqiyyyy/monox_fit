@@ -86,7 +86,7 @@ def main():
     out_ws.saveSnapshot("PRE_EXT_FIT_Clean",out_ws.allVars())
     # Now convert workspace to combine friendly workspace
     #convertToCombineWorkspace(out_ws,_f,categories,cmb_categories,controlregions_def)
-    convertToCombineWorkspace(out_ws,_f,args.categories,cmb_categories,controlregions_def)
+    convertToCombineWorkspace(out_ws,_f,args.categories,cmb_categories,controlregions_def,'mjj_MTR_2017')
     _fOut.WriteTObject(out_ws)
 
     print "Produced constraints model in --> ", _fOut.GetName()
