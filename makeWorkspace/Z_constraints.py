@@ -85,9 +85,9 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning 
 
 
-  CRs[0].add_nuisance("mettrig",flat_uncertainties[year][mettrig])
-  CRs[1].add_nuisance("mettrig",flat_uncertainties[year][mettrig]**2)   # Square because we go from 0 to 2 muons
-  CRs[2].add_nuisance("mettrig",flat_uncertainties[year][mettrig])
+  CRs[0].add_nuisance("mettrig",flat_uncertainties[year]["mettrig"])
+  CRs[1].add_nuisance("mettrig",flat_uncertainties[year]["mettrig"]**2)   # Square because we go from 0 to 2 muons
+  CRs[2].add_nuisance("mettrig",flat_uncertainties[year]["mettrig"])
 
   #######################################################################################################  
  

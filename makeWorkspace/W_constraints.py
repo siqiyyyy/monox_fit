@@ -45,7 +45,7 @@ def add_variation(histogram, unc_file, unc_name, new_name, outfile):
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard
 model = "wjets"
-def cmodel(cid,nam,_f,_fOut, out_ws, diag):
+def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   # Some setup
   _fin    = _f.Get("category_%s"%cid)

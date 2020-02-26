@@ -51,8 +51,8 @@ def main():
 
     # Determine year from name
     bname = os.path.basename(args.file)
-    m = re.match(".*201(7|8).*")
-    if not match or (match and len(match.groups())> 1):
+    m = re.match(".*201(7|8).*",bname)
+    if not m or (m and len(m.groups())> 1):
         raise RuntimeError("Cannot derive year from input file name.")
     year = int("201" + m.groups()[0])
 
