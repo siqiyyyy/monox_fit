@@ -184,19 +184,19 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 # Photon ID / trig
                 if region2=="gjets" or region1=="gjets":
                     value = quadsum(
-                                        flat_uncertainties[year]["eff_pho"]-1,
-                                        flat_uncertainties[year]["eff_photrig"]-1,
+                                        flat_uncertainties[year]["eff_pho"],
+                                        flat_uncertainties[year]["eff_photrig"],
                                     )
                     sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * value),2)
 
                 # Uncertainty representing the average uncertainty associated to 
                 # one additional lepton
                 one_lepton_unc = 0.5 * quadsum(
-                    flat_uncertainties[year]["eff_e"]-1,
-                    flat_uncertainties[year]["eff_e_reco"]-1,
-                    flat_uncertainties[year]["eff_m"]-1,
-                    flat_uncertainties[year]["eff_m_iso"]-1,
-                    flat_uncertainties[year]["eff_m_reco"]-1,
+                    flat_uncertainties[year]["eff_e"],
+                    flat_uncertainties[year]["eff_e_reco"],
+                    flat_uncertainties[year]["eff_m"],
+                    flat_uncertainties[year]["eff_m_iso"],
+                    flat_uncertainties[year]["eff_m_reco"],
                 )
                 if one_lepton_unc > 0.1:
                     raise RuntimeError("Detected unusually large uncertainty for bin {0}: {1}".format(iBin, value))
