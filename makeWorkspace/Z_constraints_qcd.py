@@ -4,7 +4,7 @@ from counting_experiment import *
 # First define simple string which will be used for the datacard 
 model = "qcd_zjets"
 
-def cmodel(cid,nam,_f,_fOut, out_ws, diag):
+def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   
   # Some setup
   _fin = _f.Get("category_%s"%cid)

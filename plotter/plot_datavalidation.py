@@ -1,14 +1,21 @@
 from ROOT import *
-from collections import defaultdict
 import math, os
+import numpy as np
 from math import sqrt, pow
 from array import array
 from tdrStyle import *
+import sys
 import os
-
 DIR=os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(DIR,"../makeWorkspace")))
+
+from parameters import flat_uncertainties
 
 setTDRStyle()
+
+def quadsum(*args):
+    """Quadratic sum"""
+    return sqrt(sum([x**2 for x in args]))
 
 
 def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi, year):
@@ -133,10 +140,8 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 uncFile.ZG_NNLOMiss1_met,
                 uncFile.ZG_NNLOMiss2_met,
                 uncFile.ZG_MIX_met,
-                uncFile.ZG_PDF_met
+                uncFile.ZG_PDF_met,
                 ]
-            #uncertainties += ["SFreco"]
-
         else:
             uncFile     = TFile(os.path.join(DIR,'../makeWorkspace/sys/theory_unc_ZW.root'))
             uncertainties = [
@@ -151,7 +156,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 uncFile.ZW_MIX_met,
                 uncFile.ZW_PDF_met
                 ]
-            uncertainties += ["SFreco"]
+        uncertainties += ["experiment"]
     else:
         uncFile = TFile(os.path.join(DIR,'../makeWorkspace/sys/vbf_z_w_theory_unc_ratio_unc.root'))
         uncertainties = [
@@ -159,9 +164,8 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
             "zoverw_nlo_muf",
             "zoverw_nlo_mur",
             "zoverw_nlo_pdf",
+            "experiment"
         ]
-        if region2 is not "gjets":
-            uncertainties += ["SFreco"]
     #print uncertainties
 
     for iBin in range(h_prefit[region1].GetNbinsX()):
@@ -173,34 +177,44 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
 
         # Systematic uncertainties
         for uncert in uncertainties:
-            if 'mono' in category:
-                if region2 is not "gjets" and type(uncert) == str :#uncert.startswith("SF"):
-                    if "reco" in uncert:
-                        value = 0.01
-                    else:
-                        value = 0.02
 
-                    if region2.startswith("single"):
-                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value) ),2)
-                    else:
-                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
 
-                else:
-                    findbin =  uncert.FindBin(h_prefit[region1].GetBinCenter(iBin))
-                    sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (uncert.GetBinContent(findbin))),2)
-            else:
-                if "SF" in uncert:
-                    # Experimental uncertainty
-                    if "reco" in uncert:
-                            value = 0.01
-                    else:
-                        value = 0.02
+            ### Experimental uncertainties are treated the same for all channes
+            if uncert == "experiment":
+                # Photon ID / trig
+                if region2=="gjets" or region1=="gjets":
+                    value = quadsum(
+                                        flat_uncertainties[year]["eff_pho"]-1,
+                                        flat_uncertainties[year]["eff_photrig"]-1,
+                                    )
+                    sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * value),2)
 
-                    if region2.startswith("single"):
-                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value) ),2)
-                    else:
-                        sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
-                    continue
+                # Uncertainty representing the average uncertainty associated to 
+                # one additional lepton
+                one_lepton_unc = 0.5 * quadsum(
+                    flat_uncertainties[year]["eff_e"]-1,
+                    flat_uncertainties[year]["eff_e_reco"]-1,
+                    flat_uncertainties[year]["eff_m"]-1,
+                    flat_uncertainties[year]["eff_m_iso"]-1,
+                    flat_uncertainties[year]["eff_m_reco"]-1,
+                )
+                if one_lepton_unc > 0.1:
+                    raise RuntimeError("Detected unusually large uncertainty for bin {0}: {1}".format(iBin, value))
+                
+                # Z/W and W/gamma have a net difference of one lepton
+                # Z/gamma has a net difference of two leptons -> square the value
+                if (region1=="combined" and region2=="combinedW") or (region1=="combinedW" and region2=="gjets"):
+                    value = one_lepton_unc
+                elif  (region1=="combined" and region2=="gjets"):
+                    value = one_lepton_unc**2
+
+                sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
+            elif 'mono' in category:
+                ### Theory uncertainties for monojet / mono-V
+                findbin =  uncert.FindBin(h_prefit[region1].GetBinCenter(iBin))
+                sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (uncert.GetBinContent(findbin))),2)
+            elif 'vbf' in category:
+                ### Theory uncertainties for VBF
                 # For VBF, we calculate the uncertainty separately for EWK and QCD
                 # the uncertainty calculated in each iteration is the absolute
                 # uncertainty on the absolute spectrum, i.e. not on the ratio!
@@ -230,7 +244,6 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
 
                 # And add to the total
                 sumw2 += theory_sumw2
-
         h_prefit[region1].SetBinError(iBin,sqrt(sumw2))
 
 

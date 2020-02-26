@@ -49,6 +49,13 @@ def main():
     elif any(['vbf' in x for x in args.categories]):
          controlregions_def = ["Z_constraints_qcd_withphoton","W_constraints_qcd","Z_constraints_ewk_withphoton","W_constraints_ewk"]
 
+    # Determine year from name
+    bname = os.path.basename(args.file)
+    m = re.match(".*201(7|8).*")
+    if not match or (match and len(match.groups())> 1):
+        raise RuntimeError("Cannot derive year from input file name.")
+    year = int("201" + m.groups()[0])
+
     # Create output path
     outdir = os.path.dirname(args.out)
     if not os.path.exists(outdir):
@@ -75,7 +82,7 @@ def main():
         x = __import__(crn)
         for cid,cn in enumerate(args.categories):
             _fDir = _fOut.mkdir("%s_category_%s"%(crn,cn))
-            cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined))
+            cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined, year))
 
     for cid,cn in enumerate(cmb_categories):
         print "Run Model: cid, cn", cid,cn

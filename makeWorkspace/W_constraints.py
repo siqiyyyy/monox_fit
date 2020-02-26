@@ -1,5 +1,6 @@
 import ROOT
 from counting_experiment import *
+from parameters import flat_uncertainties
 
 # Tell RooFit to be quiet
 ROOT.RooMsgService.instance().setSilentMode(True)
@@ -108,14 +109,10 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning
   
   # Trigger single muon
-  add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_Up"%cid, _fOut)
-  CRs[0].add_nuisance_shape("mettrig",_fOut)
+  CRs[0].add_nuisance("mettrig", flat_uncertainties[year]["mettrig"])
 
   # Trigger single electron
-  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_Up"%cid, _fOut)
-  CRs[1].add_nuisance_shape("mettrig",_fOut)
+  CRs[1].add_nuisance("mettrig",flat_uncertainties[year]["mettrig"])
 
   # PDF unc
   fwtowpdf = r.TFile.Open("sys/wtow_pdf_sys.root")
