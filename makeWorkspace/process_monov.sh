@@ -26,4 +26,4 @@ ln -fs $(readlink -e ../monov/templates/Makefile) ${OUTDIR}/../Makefile
 pushd ${OUTDIR}/..
 make cards
 popd
-echo $(readlink -e ../monojet/$(basename $INDIR)/${TAG})
+echo $(readlink -e ../monov/$(basename $INDIR)/${TAG})
