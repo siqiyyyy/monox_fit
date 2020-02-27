@@ -106,13 +106,17 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   else:
     tag = ""
 
-  fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning
+  fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning
   
   # Trigger single muon
-  CRs[0].add_nuisance("mettrig", flat_uncertainties[year]["mettrig"])
+  add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_Up"%cid, _fOut)
+  CRs[0].add_nuisance_shape("mettrig",_fOut)
 
   # Trigger single electron
-  CRs[1].add_nuisance("mettrig",flat_uncertainties[year]["mettrig"])
+  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_Up"%cid, _fOut)
+  CRs[1].add_nuisance_shape("mettrig",_fOut)
 
   # PDF unc
   fwtowpdf = r.TFile.Open("sys/wtow_pdf_sys.root")
