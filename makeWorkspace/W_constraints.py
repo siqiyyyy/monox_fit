@@ -24,7 +24,9 @@ def do_stat_unc(histogram, proc,cid, region, CR, outfile):
     if (content<=0) or (err/content < 0.001) :
       continue
 
-    replacement["BIN"] = b
+    # Careful: The bin count "b" in this loop starts at 1
+    # In the combine model, we want it to start from 0!
+    replacement["BIN"] = b-1
     up = histogram.Clone("{PROC}_weights_{CONSTRAINT}_{CONSTRAINT}_stat_error_{REGION}_bin{BIN}_Up".format(**replacement))
     up.SetBinContent(b, content + err)
     down = histogram.Clone("{PROC}_weights_{CONSTRAINT}_{CONSTRAINT}_stat_error_{REGION}_bin{BIN}_Down".format(**replacement))
