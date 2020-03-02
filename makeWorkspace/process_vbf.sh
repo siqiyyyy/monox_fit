@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 # INDIR=../input/2020-02-05_vbf_noeletrig
-TAG='ic'
+TAG='newunc'
 INDIR=../input/vbf/2020-02-28_latest
 INDIR="$(readlink -e $INDIR)"
 
