@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-02-21_19Feb20_skim_monojet_monov
+INDIR=/uscms_data/d3/aandreas/legacy_limit/monox_fit/input/2020-02-21_19Feb20_skim_monojet_monov_gjets_ele
 TAG='default'
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
 mkdir -p ${OUTDIR}
@@ -26,3 +26,4 @@ ln -fs $(readlink -e ../monov/templates/Makefile) ${OUTDIR}/../Makefile
 pushd ${OUTDIR}/..
 make cards
 popd
+echo $(readlink -e ../monov/$(basename $INDIR)/${TAG})

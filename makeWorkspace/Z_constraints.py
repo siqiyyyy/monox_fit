@@ -1,13 +1,14 @@
 import ROOT
 from counting_experiment import *
 from W_constraints import do_stat_unc, add_variation
+from parameters import flat_uncertainties
 ROOT.RooMsgService.instance().setSilentMode(True)
 
 # Define how a control region(s) transfer is made by defining *cmodel*, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard 
 model = "zjets"
 
-def cmodel(cid,nam,_f,_fOut, out_ws, diag):
+def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   
   # Some setup
   _fin = _f.Get("category_%s"%cid)
@@ -81,21 +82,21 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   do_stat_unc(WZScales, "w", cid, "wzCR", CRs[3],_fOut)
 
   ## Here now adding the trigger uncertainty
-  fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning 
+  fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning 
 
   add_variation(PhotonScales,fztoz_trig,"trig_sys_down"+tag,"photon_weights_%s_mettrig_Down"%cid, _fOut)
   add_variation(PhotonScales,fztoz_trig,"trig_sys_up"+tag,"photon_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[0].add_nuisance_shape("mettrig",_fOut)
-
-  add_variation(ZmmScales,fztoz_trig,"trig_sys_down"+tag,"zmm_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(ZmmScales,fztoz_trig,"trig_sys_up"+tag,"zmm_weights_%s_mettrig_Up"%cid, _fOut)
+ 
+  # Take the square of the uncertainty because we are going from zero to two leptons
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_down"+tag,"zmm_weights_%s_mettrig_Down"%cid, _fOut)
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_up"+tag,"zmm_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[1].add_nuisance_shape("mettrig",_fOut)
-
+ 
   ## Here now adding the trigger uncertainty
   add_variation(ZeeScales,fztoz_trig,"trig_sys_down"+tag,"zee_weights_%s_mettrig_Down"%cid, _fOut)
   add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_Up"%cid, _fOut)
   CRs[2].add_nuisance_shape("mettrig",_fOut)
-
 
   #######################################################################################################  
  

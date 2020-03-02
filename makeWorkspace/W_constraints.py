@@ -1,5 +1,6 @@
 import ROOT
 from counting_experiment import *
+from parameters import flat_uncertainties
 
 # Tell RooFit to be quiet
 ROOT.RooMsgService.instance().setSilentMode(True)
@@ -23,7 +24,9 @@ def do_stat_unc(histogram, proc,cid, region, CR, outfile):
     if (content<=0) or (err/content < 0.001) :
       continue
 
-    replacement["BIN"] = b
+    # Careful: The bin count "b" in this loop starts at 1
+    # In the combine model, we want it to start from 0!
+    replacement["BIN"] = b-1
     up = histogram.Clone("{PROC}_weights_{CONSTRAINT}_{CONSTRAINT}_stat_error_{REGION}_bin{BIN}_Up".format(**replacement))
     up.SetBinContent(b, content + err)
     down = histogram.Clone("{PROC}_weights_{CONSTRAINT}_{CONSTRAINT}_stat_error_{REGION}_bin{BIN}_Down".format(**replacement))
@@ -44,7 +47,7 @@ def add_variation(histogram, unc_file, unc_name, new_name, outfile):
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard
 model = "wjets"
-def cmodel(cid,nam,_f,_fOut, out_ws, diag):
+def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   # Some setup
   _fin    = _f.Get("category_%s"%cid)
@@ -105,7 +108,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag):
   else:
     tag = ""
 
-  fztoz_trig = r.TFile.Open("sys/all_trig.root") # 250 - 1400 binning
+  fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning
   
   # Trigger single muon
   add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_Down"%cid, _fOut)
