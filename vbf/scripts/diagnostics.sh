@@ -10,6 +10,6 @@ for YEAR in 2017 2018; do
             --setParameters mask_vbf_signal=1 \
             -n _vbf_${YEAR} \
             ../cards/card_vbf_${YEAR}.root
-    python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py fitDiagnostics_vbf_${YEAR}.root  -g diffnuisances.root
+    python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py fitDiagnostics_vbf_${YEAR}.root  -g diffnuisances_vbf_${YEAR}.root
 done
 popd
