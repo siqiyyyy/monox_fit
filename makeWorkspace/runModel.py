@@ -51,10 +51,6 @@ def main():
 
     # Determine year from name
     bname = os.path.basename(args.file)
-    m = re.match(".*201(7|8).*",bname)
-    if not m or (m and len(m.groups())> 1):
-        raise RuntimeError("Cannot derive year from input file name.")
-    year = int("201" + m.groups()[0])
 
     # Create output path
     outdir = os.path.dirname(args.out)
@@ -81,6 +77,13 @@ def main():
     for crd,crn in enumerate(controlregions_def):
         x = __import__(crn)
         for cid,cn in enumerate(args.categories):
+
+            # Derive year name
+            m = re.match(".*201(7|8).*",cn)
+            if not m or (m and len(m.groups())> 1):
+                raise RuntimeError("Cannot derive year from category name.")
+            year = int("201" + m.groups()[0])
+
             _fDir = _fOut.mkdir("%s_category_%s"%(crn,cn))
             cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined, year))
 
