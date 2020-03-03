@@ -84,19 +84,19 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   ## Here now adding the trigger uncertainty
   fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning 
 
-  add_variation(PhotonScales,fztoz_trig,"trig_sys_down"+tag,"photon_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(PhotonScales,fztoz_trig,"trig_sys_up"+tag,"photon_weights_%s_mettrig_Up"%cid, _fOut)
-  CRs[0].add_nuisance_shape("mettrig",_fOut)
- 
+  add_variation(PhotonScales,fztoz_trig,"trig_sys_down"+tag,"photon_weights_%s_mettrig_%s_Down"%(cid,cid), _fOut)
+  add_variation(PhotonScales,fztoz_trig,"trig_sys_up"+tag,"photon_weights_%s_mettrig_%s_Up"%(cid,cid), _fOut)
+  CRs[0].add_nuisance_shape("mettrig_%s"%cid,_fOut)
+
   # Take the square of the uncertainty because we are going from zero to two leptons
-  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_down"+tag,"zmm_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_up"+tag,"zmm_weights_%s_mettrig_Up"%cid, _fOut)
-  CRs[1].add_nuisance_shape("mettrig",_fOut)
- 
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_down"+tag,"zmm_weights_%s_mettrig_%s_Down"%(cid,cid), _fOut)
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_up"+tag,"zmm_weights_%s_mettrig_%s_Up"%(cid,cid), _fOut)
+  CRs[1].add_nuisance_shape("mettrig_%s"%cid,_fOut)
+
   ## Here now adding the trigger uncertainty
-  add_variation(ZeeScales,fztoz_trig,"trig_sys_down"+tag,"zee_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_Up"%cid, _fOut)
-  CRs[2].add_nuisance_shape("mettrig",_fOut)
+  add_variation(ZeeScales,fztoz_trig,"trig_sys_down"+tag,"zee_weights_%s_mettrig_%s_Down"%(cid,cid), _fOut)
+  add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_%s_Up"%(cid,cid), _fOut)
+  CRs[2].add_nuisance_shape("mettrig_%s"%cid,_fOut)
 
   #######################################################################################################  
  
