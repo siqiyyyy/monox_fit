@@ -50,11 +50,11 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year):
   ]
 
   for c in CRs:
-    c.add_nuisance('CMS_scale2016_j_vbf',0.02)
-    c.add_nuisance('CMS_trigger2016_met',0.02)
-    c.add_nuisance('CMS_veto2016_t',0.035)
-    c.add_nuisance('CMS_veto2016_m',0.02)
-    c.add_nuisance('CMS_veto2016_e',0.015)
+    c.add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.02)
+    c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
+    c.add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     0.035)
+    c.add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     0.02)
+    c.add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     0.015)
 
 
   # ############################ USER DEFINED ###########################################################

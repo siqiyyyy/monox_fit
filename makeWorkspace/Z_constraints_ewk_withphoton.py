@@ -67,8 +67,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   ]
 
   for c in CRs[:3]:
-    c.add_nuisance('CMS_trigger2016_met',0.02)
-    c.add_nuisance('CMS_scale2016_j_vbf',0.01)
+    c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
+    c.add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.01)
 
   # ############################ USER DEFINED ###########################################################
   # Add systematics in the following, for normalisations use name, relative size (0.01 --> 1%)
