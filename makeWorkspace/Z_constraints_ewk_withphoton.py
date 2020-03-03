@@ -190,26 +190,25 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   #################################################################################################################
   ### Now lets do the same thing for W
 
-  year = "2018"
   vbf_sys = r.TFile.Open("sys/vbf_z_w_gjets_theory_unc_ratio_unc.root")
 
-  uncertainty_zoverw_ewk_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_down_"+year)
-  uncertainty_zoverw_ewk_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_up_"+year)
-  uncertainty_zoverw_muf_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_muf_down_"+year)
-  uncertainty_zoverw_muf_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_muf_up_"+year)
-  uncertainty_zoverw_mur_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_mur_down_"+year)
-  uncertainty_zoverw_mur_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_mur_up_"+year)
-  uncertainty_zoverw_pdf_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_pdf_down_"+year)
-  uncertainty_zoverw_pdf_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_pdf_up_"+year)
+  uncertainty_zoverw_ewk_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_down_"+str(year))
+  uncertainty_zoverw_ewk_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_up_"+str(year))
+  uncertainty_zoverw_muf_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_muf_down_"+str(year))
+  uncertainty_zoverw_muf_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_muf_up_"+str(year))
+  uncertainty_zoverw_mur_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_mur_down_"+str(year))
+  uncertainty_zoverw_mur_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_mur_up_"+str(year))
+  uncertainty_zoverw_pdf_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_pdf_down_"+str(year))
+  uncertainty_zoverw_pdf_up   = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_zoverw_nlo_pdf_up_"+str(year))
 
-  uncertainty_zoverg_ewk_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_w_ewkcorr_overz_common_down_"+year)
-  uncertainty_zoverg_ewk_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_w_ewkcorr_overz_common_up_"+year)
-  uncertainty_zoverg_muf_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_muf_down_"+year)
-  uncertainty_zoverg_muf_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_muf_up_"+year)
-  uncertainty_zoverg_mur_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_mur_down_"+year)
-  uncertainty_zoverg_mur_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_mur_up_"+year)
-  uncertainty_zoverg_pdf_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_pdf_down_"+year)
-  uncertainty_zoverg_pdf_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_pdf_up_"+year)
+  uncertainty_zoverg_ewk_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_w_ewkcorr_overz_common_down_"+str(year))
+  uncertainty_zoverg_ewk_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_w_ewkcorr_overz_common_up_"+str(year))
+  uncertainty_zoverg_muf_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_muf_down_"+str(year))
+  uncertainty_zoverg_muf_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_muf_up_"+str(year))
+  uncertainty_zoverg_mur_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_mur_down_"+str(year))
+  uncertainty_zoverg_mur_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_mur_up_"+str(year))
+  uncertainty_zoverg_pdf_down = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_pdf_down_"+str(year))
+  uncertainty_zoverg_pdf_up   = vbf_sys.Get("uncertainty_ratio_gjets_ewk_mjj_unc_goverz_nlo_pdf_up_"+str(year))
 
   WSpectrum = controlmc_w.Clone(); WSpectrum.SetName("ewk_w_spectrum_%s_"%nam)
   ZvvSpectrum    = target.Clone(); ZvvSpectrum.SetName("ewk_zvv_spectrum_%s_"%nam)
