@@ -325,50 +325,50 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
 
   gratio_ren_scale_up = Zvv_g.Clone();  gratio_ren_scale_up.SetName("qcd_photon_weights_%s_Photon_QCD_renscale_vbf_Up"%nam);
   gratio_ren_scale_up.Divide(Photon)
-  #for b in range(uncertainty_zoverg_mur_up.GetNbinsX()): uncertainty_zoverg_mur_up.SetBinContent(b+1,uncertainty_zoverg_mur_up.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_mur_up.GetNbinsX()): uncertainty_zoverg_mur_up.SetBinContent(b+1,uncertainty_zoverg_mur_up.GetBinContent(b+1)+1)
   gratio_ren_scale_up.Multiply(uncertainty_zoverg_mur_up)
   _fOut.WriteTObject(gratio_ren_scale_up)
   
   gratio_ren_scale_down = Zvv_g.Clone();  gratio_ren_scale_down.SetName("qcd_photon_weights_%s_Photon_QCD_renscale_vbf_Down"%nam);
   gratio_ren_scale_down.Divide(Photon)
-  #for b in range(uncertainty_zoverg_mur_down.GetNbinsX()): uncertainty_zoverg_mur_down.SetBinContent(b+1,uncertainty_zoverg_mur_down.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_mur_down.GetNbinsX()): uncertainty_zoverg_mur_down.SetBinContent(b+1,uncertainty_zoverg_mur_down.GetBinContent(b+1)+1)
   gratio_ren_scale_down.Multiply(uncertainty_zoverg_mur_down)
   _fOut.WriteTObject(gratio_ren_scale_down)
 
   gratio_fac_scale_up = Zvv_g.Clone(); gratio_fac_scale_up.SetName("qcd_photon_weights_%s_Photon_QCD_facscale_vbf_Up"%nam);
   gratio_fac_scale_up.Divide(Photon)
-  #for b in range(uncertainty_zoverg_muf_up.GetNbinsX()): uncertainty_zoverg_muf_up.SetBinContent(b+1,uncertainty_zoverg_muf_up.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_muf_up.GetNbinsX()): uncertainty_zoverg_muf_up.SetBinContent(b+1,uncertainty_zoverg_muf_up.GetBinContent(b+1)+1)
   gratio_fac_scale_up.Multiply(uncertainty_zoverg_muf_up)
   _fOut.WriteTObject(gratio_fac_scale_up)
   
   gratio_fac_scale_down = Zvv_g.Clone();  gratio_fac_scale_down.SetName("qcd_photon_weights_%s_Photon_QCD_facscale_vbf_Down"%nam);
   gratio_fac_scale_down.Divide(Photon)
-  #for b in range(uncertainty_zoverg_muf_down.GetNbinsX()): uncertainty_zoverg_muf_down.SetBinContent(b+1,uncertainty_zoverg_muf_down.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_muf_down.GetNbinsX()): uncertainty_zoverg_muf_down.SetBinContent(b+1,uncertainty_zoverg_muf_down.GetBinContent(b+1)+1)
   gratio_fac_scale_down.Multiply(uncertainty_zoverg_muf_down)
   _fOut.WriteTObject(gratio_fac_scale_down)
 
   gratio_pdf_up = Zvv_g.Clone();  gratio_pdf_up.SetName("qcd_photon_weights_%s_Photon_QCD_pdf_vbf_Up"%nam);
   gratio_pdf_up.Divide(Photon)
-  #for b in range(uncertainty_zoverg_pdf_up.GetNbinsX()): uncertainty_zoverg_pdf_up.SetBinContent(b+1,uncertainty_zoverg_pdf_up.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_pdf_up.GetNbinsX()): uncertainty_zoverg_pdf_up.SetBinContent(b+1,uncertainty_zoverg_pdf_up.GetBinContent(b+1)+1)
   gratio_pdf_up.Multiply(uncertainty_zoverg_pdf_up)
   _fOut.WriteTObject(gratio_pdf_up)
   
   gratio_pdf_down = Zvv_g.Clone();  gratio_pdf_down.SetName("qcd_photon_weights_%s_Photon_QCD_pdf_vbf_Down"%nam);
   gratio_pdf_down.Divide(Photon)
-  #for b in range(uncertainty_zoverg_pdf_down.GetNbinsX()): uncertainty_zoverg_pdf_down.SetBinContent(b+1,uncertainty_zoverg_pdf_down.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_pdf_down.GetNbinsX()): uncertainty_zoverg_pdf_down.SetBinContent(b+1,uncertainty_zoverg_pdf_down.GetBinContent(b+1)+1)
   gratio_pdf_down.Multiply(uncertainty_zoverg_pdf_down)
   _fOut.WriteTObject(gratio_pdf_down)
 
   gratio_ewk_up = Zvv_g.Clone();  gratio_ewk_up.SetName("qcd_photon_weights_%s_ewk_Up"%nam);
   gratio_ewk_up.Divide(Photon)
-  #for b in range(uncertainty_zoverg_ewk_up.GetNbinsX()): uncertainty_zoverg_ewk_up.SetBinContent(b+1,uncertainty_zoverg_ewk_up.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_ewk_up.GetNbinsX()): uncertainty_zoverg_ewk_up.SetBinContent(b+1,uncertainty_zoverg_ewk_up.GetBinContent(b+1)+1)
   gratio_ewk_up.Multiply(uncertainty_zoverg_ewk_up)
   # We are now going to uncorrelate the bins
   #_fOut.WriteTObject(ratio_ewk_up)
   
   gratio_ewk_down = Zvv_g.Clone();  gratio_ewk_down.SetName("qcd_photon_weights_%s_ewk_Down"%nam);
   gratio_ewk_down.Divide(Photon)
-  #for b in range(uncertainty_zoverg_ewk_down.GetNbinsX()): uncertainty_zoverg_ewk_down.SetBinContent(b+1,uncertainty_zoverg_ewk_down.GetBinContent(b+1)+1)
+  for b in range(uncertainty_zoverg_ewk_down.GetNbinsX()): uncertainty_zoverg_ewk_down.SetBinContent(b+1,uncertainty_zoverg_ewk_down.GetBinContent(b+1)+1)
   gratio_ewk_down.Multiply(uncertainty_zoverg_ewk_down)
   # We are now going to uncorrelate the bins
   #_fOut.WriteTObject(ratio_ewk_down)
