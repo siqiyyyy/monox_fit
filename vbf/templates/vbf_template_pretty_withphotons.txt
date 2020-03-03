@@ -130,7 +130,7 @@ vbf_stat_error_ewk_dielectronCR_bin0  param  0.0 1
 vbf_stat_error_ewk_dielectronCR_bin3  param  0.0 1
 vbf_stat_error_ewk_dielectronCR_bin2  param  0.0 1
 Photon_EWK_facscale_vbf  param  0.0 1
-CMS_veto2016_t  param  0.0 1
+CMS_veto@YEAR_t  param  0.0 1
 ewk_ewk_vbf_bin7  param  0.0 1
 vbf_stat_error_qcd_photonCR_bin8  param  0.0 1
 qcd_photon_ewk_vbf_bin8  param  0.0 1
@@ -142,8 +142,8 @@ vbf_stat_error_qcd_photonCR_bin1  param  0.0 1
 vbf_stat_error_ewk_photonCR_bin3  param  0.0 1
 vbf_stat_error_qcd_photonCR_bin3  param  0.0 1
 vbf_stat_error_qcd_photonCR_bin2  param  0.0 1
-CMS_veto2016_e  param  0.0 1
-CMS_veto2016_m  param  0.0 1
+CMS_veto@YEAR_e  param  0.0 1
+CMS_veto@YEAR_m  param  0.0 1
 vbf_stat_error_qcd_singleelectron_bin6  param  0.0 1
 vbf_stat_error_qcd_singleelectron_bin7  param  0.0 1
 vbf_stat_error_qcd_singleelectron_bin4  param  0.0 1
@@ -200,7 +200,7 @@ ZnunuWJets_EWK_renscale_vbf  param  0.0 1
 vbf_stat_error_ewk_photonCR_bin5  param  0.0 1
 qcd_photon_ewk_vbf_bin0  param  0.0 1
 vbf_stat_error_ewk_photonCR_bin2  param  0.0 1
-CMS_trigger2016_met  param  0.0 1
+CMS_trigger@YEAR_met  param  0.0 1
 vbf_stat_error_ewk_photonCR_bin0  param  0.0 1
 vbf_stat_error_ewk_photonCR_bin1  param  0.0 1
 vbf_stat_error_qcd_dimuonCR_bin4  param  0.0 1
@@ -218,7 +218,7 @@ vbf_stat_error_ewk_wzCR_bin5  param  0.0 1
 vbf_stat_error_ewk_wzCR_bin4  param  0.0 1
 vbf_stat_error_ewk_wzCR_bin7  param  0.0 1
 vbf_stat_error_ewk_wzCR_bin6  param  0.0 1
-CMS_scale2016_j_vbf  param  0.0 1
+CMS_scale@YEAR_j_vbf  param  0.0 1
 vbf_stat_error_ewk_wzCR_bin0  param  0.0 1
 vbf_stat_error_ewk_wzCR_bin3  param  0.0 1
 vbf_stat_error_ewk_wzCR_bin2  param  0.0 1

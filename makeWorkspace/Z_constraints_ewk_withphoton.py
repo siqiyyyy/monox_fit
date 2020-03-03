@@ -44,7 +44,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   _fOut.WriteTObject(PhotonScales)
 
 
-  my_function(_wspace,_fin,_fOut,cid,diag)
+  my_function(_wspace,_fin,_fOut,cid,diag, year)
 
 
   #######################################################################################################
@@ -173,7 +173,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
 
 # My Function. Just to put all of the complicated part into one function
-def my_function(_wspace,_fin,_fOut,nam,diag):
+def my_function(_wspace,_fin,_fOut,nam,diag, year):
 
   metname    = "mjj"   # Observable variable name
   gvptname   = "genBosonPt"    # Weights are in generator pT
@@ -259,8 +259,8 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_pdf_down.Multiply(uncertainty_zoverw_pdf_down)
   _fOut.WriteTObject(wratio_pdf_down)
 
-  uncertainty_zoverw_ewk_up= vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_up_"+year)
-  uncertainty_zoverw_ewk_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_down_"+year)
+  uncertainty_zoverw_ewk_up= vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_up_"+str(year))
+  uncertainty_zoverw_ewk_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_down_"+str(year))
 
   wratio_ewk_up = Zvv_w.Clone();  wratio_ewk_up.SetName("ewk_w_weights_%s_ewk_Up"%nam);
   wratio_ewk_up.Divide(Wsig)
