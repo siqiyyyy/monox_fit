@@ -17,3 +17,9 @@ for YEAR in 2017 2018; do
     text2workspace.py ${CARD} --channel-masks
     python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${YEAR}.html
 done
+
+
+COMBINED=cards/card_monojet_combined.txt
+combineCards.py cards/card_monojet_201*.txt > ${COMBINED}
+sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
+text2workspace.py ${COMBINED} --channel-masks

@@ -13,20 +13,33 @@ lumi ={
 regions = ['singlemuon','dimuon','gjets','singleelectron','dielectron']
 procs = ['zmm','zee','w_weights','photon','wen','wmn']
 
-### Monojet
+### Years fit separately
 for year in [2017,2018]:
-    ws_file = "root/ws_monojet_{year}.root".format(year=year)
+    ws_file = "root/ws_monojet.root".format(year=year)
     fitdiag_file = 'diagnostics/fitDiagnostics_monojet_{year}.root'.format(year=year)
     diffnuis_file = 'diagnostics/diffnuisances_monojet_{year}.root'.format(year=year)
-    category='monojet'
+    category='monojet_{year}'.format(year=year)
     outdir = './plots/{year}/'.format(year=year)
     for region in regions:
         plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
     for proc in procs:
-        plot_ratio(proc, category, 'root/combined_model_monojet_{year}.root'.format(year=year), outdir, lumi[year],year)
+        plot_ratio(proc, category, 'root/combined_model_monojet.root'.format(year=year), outdir, lumi[year],year)
     dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
     dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
     dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir,lumi[year],year)
 
     plot_nuis(diffnuis_file, outdir)
-    
+
+
+### Years fit together
+outdir="plots/combined"
+diffnuis_file = 'diagnostics/diffnuisances_monojet_combined.root'
+plot_nuis(diffnuis_file, outdir)
+
+for year in [2017,2018]:
+    ws_file = "root/ws_monojet.root".format(year=year)
+    fitdiag_file = 'diagnostics/fitDiagnostics_monojet_combined.root'.format(year=year)
+    category='monojet_{year}'.format(year=year)
+    outdir = './plots/combined_{year}/'.format(year=year)
+    for region in regions:
+        plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
