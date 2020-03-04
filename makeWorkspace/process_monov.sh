@@ -19,7 +19,6 @@ for TAGGER in nominal MD; do
     for WP in tight loose; do
         WSFILE=${OUTDIR}/ws_monov_${TAGGER}_${WP}.root
         INFILE=${INDIR}/merged_legacy_limit_${TAGGER}_monov.root
-        
             # Save the check sum for the input
         md5sum ${INFILE} >> ${INFOFILE}
 
@@ -36,8 +35,8 @@ done
 INFILE=${INDIR}/merged_legacy_limit_monov_tau21.root
 # Save the check sum for the input
 md5sum ${INFILE} >> ${INFOFILE}
-./make_ws.py ${INFILE} --out ${OUTDIR}/ws_tau21.root --category monov
-./runModel.py ${OUTDIR}/ws_tau21.root --categories monov --out ${OUTDIR}/combined_model_monov_tau21.root
+./make_ws.py ${INFILE} --out ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018
+./runModel.py ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018 --out ${OUTDIR}/combined_model_monov_tau21.root
 
 
 # Save the check sums for the output

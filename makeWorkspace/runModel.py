@@ -81,7 +81,7 @@ def main():
             # Derive year name
             m = re.match(".*201(7|8).*",cn)
             if not m or (m and len(m.groups())> 1):
-                raise RuntimeError("Cannot derive year from category name.")
+                raise RuntimeError("Cannot derive year from category name: " + cn)
             year = int("201" + m.groups()[0])
 
             _fDir = _fOut.mkdir("%s_category_%s"%(crn,cn))
