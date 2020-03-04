@@ -13,7 +13,13 @@ for YEAR in 2017 2018; do
     elif [ $YEAR -eq 2018 ]; then
         sed -i "s|@LUMI|1.023|g" ${CARD}
     fi
-    sed -i "s|combined_model.root|../root/combined_model_monojet_${YEAR}.root|g" ${CARD}
+    sed -i "s|combined_model.root|../root/combined_model_monojet.root|g" ${CARD}
     text2workspace.py ${CARD} --channel-masks
     python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${YEAR}.html
 done
+
+
+COMBINED=cards/card_monojet_combined.txt
+combineCards.py cards/card_monojet_201*.txt > ${COMBINED}
+sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
+text2workspace.py ${COMBINED} --channel-masks

@@ -4,7 +4,7 @@ from counting_experiment import *
 # First define simple string which will be used for the datacard
 model = "qcd_zjets"
 
-def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
+def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
 
   # Some setup
   _fin = _f.Get("category_%s"%cid)
@@ -63,11 +63,11 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   # TRANSFERFACTORS are what is created above, eg WScales
 
   CRs = [
-    Channel("qcd_dimuon",_wspace,out_ws,cid+'_'+model,ZmmScales)
-    ,Channel("qcd_dielectron",_wspace,out_ws,cid+'_'+model,ZeeScales)
-    ,Channel("qcd_wjetssignal",_wspace,out_ws,cid+'_'+model,WZScales)
-    ,Channel("qcd_photon",_wspace,out_ws,cid+'_'+model,PhotonScales)
-    ,Channel("ewkqcd_signal",_wspace,out_ws,cid+'_'+model,EQScales)
+    Channel("qcd_dimuon",_wspace,out_ws,cid+'_'+model,ZmmScales,convention=convention)
+    ,Channel("qcd_dielectron",_wspace,out_ws,cid+'_'+model,ZeeScales,convention=convention)
+    ,Channel("qcd_wjetssignal",_wspace,out_ws,cid+'_'+model,WZScales,convention=convention)
+    ,Channel("qcd_photon",_wspace,out_ws,cid+'_'+model,PhotonScales,convention=convention)
+    ,Channel("ewkqcd_signal",_wspace,out_ws,cid+'_'+model,EQScales,convention=convention)
   ]
   for c in CRs[:3]:
     c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
@@ -187,7 +187,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   #######################################################################################################
 
-  cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
+  cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag,convention=convention)
   # Return of course
   return cat
 

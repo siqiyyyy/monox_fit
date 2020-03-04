@@ -1,10 +1,23 @@
 import ROOT as r
 import sys
 import array 
-
+import re
 from HiggsAnalysis.CombinedLimit.ModelTools import *
 
 MAXBINS=100
+
+
+def naming_convention(id, catid, convention="BU"):
+    if convention=="BU":
+        return "model_mu_cat_%s_bin_%d"%(catid,id)
+    elif convention=="IC":
+        m = re.match(".*(201\d).*", catid)
+        if not m or len(m.groups())>1:
+          raise RuntimeError("Cannot derive year from category ID: " + catid)
+        year = m.groups()[0]
+        return "MTR_%s_QCDZ_SR_bin%d"%(year,id+1)
+    else:
+      raise RuntimeError("Unknown naming convention: " + convention)
 
 def getNormalizedHist(hist):
   thret = hist.Clone()
@@ -19,14 +32,19 @@ def getNormalizedHist(hist):
 
 
 class Bin:
- def __init__(self,category,catid,chid,id,var,datasetname,wspace,wspace_out,xmin,xmax):
-
+ def __init__(self,category,catid,chid,id,var,datasetname,wspace,wspace_out,xmin,xmax, convention):
    self.category  = category
    self.chid	  = chid# This is the thing that links two bins from different controls togeher
    self.id        = id
    self.catid	  = catid
    #self.type_id   = 10*MAXBINS*catid+MAXBINS*chid+id
-   self.binid     = "cat_%s_ch_%s_bin_%d"%(catid,chid,id)
+
+   self.convention = convention
+
+   if self.convention=="BU":
+      self.binid     = "cat_%s_ch_%s_bin_%d"%(catid,chid,id)
+   elif self.convention=="IC":
+      self.binid     = "cat_%s_ch_%s_bin%d"%(catid,chid,id+1)
 
    self.wspace_out = wspace_out
    self.wspace_out._import = SafeWorkspaceImporter(self.wspace_out)
@@ -111,7 +129,7 @@ class Bin:
 
  def set_initE_precorr(self):
    return 0 
-   self.initE_precorr = self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id)).getVal()*self.wspace_out.var(self.sfactor.GetName()).getVal()
+   self.initE_precorr = self.wspace_out.var(naming_convention(self.id, self.catid, self.convention)).getVal()*self.wspace_out.var(self.sfactor.GetName()).getVal()
 
  def set_initE(self):
    return 0 
@@ -143,13 +161,17 @@ class Bin:
  def setup_expect_var(self,functionalForm=""):
    print functionalForm 
    if not len(functionalForm): 
-    if not self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id,)):
-     self.model_mu = r.RooRealVar("model_mu_cat_%s_bin_%d"%(self.catid,self.id),"Model of N expected events in %d"%self.id,self.initY,0,10000)
+    if not self.wspace_out.var(naming_convention(self.id, self.catid, self.convention)):
+     self.model_mu = r.RooRealVar(naming_convention(self.id, self.catid, self.convention),"Model of N expected events in %d"%self.id,self.initY,0,10000)
      self.model_mu.removeMax()
-    else: self.model_mu = self.wspace_out.var("model_mu_cat_%s_bin_%d"%(self.catid,self.id))
+    else: self.model_mu = self.wspace_out.var(naming_convention(self.id, self.catid, self.convention))
    else: 
     print "Setting up dependence!!" 
-    DEPENDANT = "%s_bin_%d"%(functionalForm,self.id)
+    if self.convention == "BU":
+      DEPENDANT = "%s_bin_%d"%(functionalForm,self.id)
+    else:
+      DEPENDANT = "%s_bin%d"%(functionalForm,self.id+1)
+
     self.model_mu = self.wspace_out.function("pmu_%s"%(DEPENDANT))
 
    arglist = r.RooArgList((self.model_mu),self.wspace_out.var(self.sfactor.GetName()))
@@ -245,7 +267,7 @@ class Bin:
 
 class Channel:
   # This class holds a "channel" which is as dumb as saying it holds a dataset and scale factors 
-  def __init__(self,cname,wspace,wspace_out,catid,scalefactors):
+  def __init__(self,cname,wspace,wspace_out,catid,scalefactors,convention="BU"):
     self.catid = catid
     self.chid = cname
     self.scalefactors = scalefactors
@@ -259,6 +281,7 @@ class Channel:
     self.systematics = {}
     self.crname = cname
     self.nbins  = scalefactors.GetNbinsX()
+    self.convention = convention
   def ret_title(self):
     return self.crname
   def add_systematic_shape(self,sys,file):
@@ -300,10 +323,15 @@ class Channel:
 
     # run through all of the bins in the control regions and create a function to interpolate
     for b in range(self.nbins):
-      func = r.RooFormulaVar("sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b)\
-	,"Systematic Varation"\
-      	#,"@0*%f"%size,r.RooArgList(self.wspace_out.var("nuis_%s"%name)))
-      	,"@0*%f"%size,r.RooArgList(self.wspace_out.var("%s"%name)))
+      if self.convention=="BU":
+        fname = "sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b)
+      else:
+        fname = "sys_function_%s_cat_%s_ch_%s_bin%d"%(name,self.catid,self.chid,b+1)
+      func = r.RooFormulaVar(
+                              fname,
+                              "Systematic Varation",
+                              "@0*%f"%size,r.RooArgList(self.wspace_out.var("%s"%name))
+                              )
       if not self.wspace_out.function(func.GetName()) :self.wspace_out._import(func)
     # else 
     #  nuis = self.wspace_out.var("nuis_%s"%name)
@@ -353,10 +381,16 @@ class Channel:
 	coeff_a = 0.5*(vu+vd)
 	coeff_b = 0.5*(vu-vd)
 
-        func = r.RooFormulaVar("sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b) \
-		,"Systematic Varation"\
-		,"(%f*@0*@0+%f*@0)/%f"%(coeff_a,coeff_b,nsf) \
-		,r.RooArgList(self.wspace_out.var("%s"%name))) # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
+        if self.convention=="BU":
+          fname = "sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b)
+        else:
+          fname = "sys_function_%s_cat_%s_ch_%s_bin%d"%(name,self.catid,self.chid,b+1)
+        func = r.RooFormulaVar(
+                               fname,
+                               "Systematic Varation",
+                               "(%f*@0*@0+%f*@0)/%f"%(coeff_a,coeff_b,nsf),
+                               r.RooArgList(self.wspace_out.var("%s"%name))
+                               ) # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
 
         if (coeff_a == 0): 
           func.setAttribute("temp",True)
@@ -420,6 +454,7 @@ class Category:
    ,_target_datasetname # only for initial fit values
    ,_control_regions 	# CRs constructed 
    ,diag		# a diagonalizer object
+   ,convention="BU" # Naming convention to use: either BU or IC
   ):
    self.GNAME = corrname
    self.cname = cname;
@@ -465,6 +500,8 @@ class Category:
    #  if i >= len(self._bins)-1 : continue
    #  self.sample.defineType("cat_%s_ch_%s_bin_%d"%(self.catid,j,i),10*MAXBINS*catid+MAXBINS*j+i)
    #  self.sample.setIndex(10*MAXBINS*catid+MAXBINS*j+i)
+
+   self.convention = convention
   def setDependant(self,BASE,CONTROL):
    self.isSecondDependant = True
    self.BASE = BASE
@@ -541,7 +578,18 @@ class Category:
      xmin,xmax = bl,self._bins[i+1]
      if i==len(self._bins)-2:
        xmax = 999999.
-     ch = Bin(self.category,self.catid,cr.chid,i,self._var,"",self._wspace,self._wspace_out,xmin,xmax)
+     ch = Bin(
+              self.category,
+              self.catid,
+              cr.chid,
+              i,
+              self._var,
+              "",
+              self._wspace,
+              self._wspace_out,
+              xmin,
+              xmax,
+              convention=self.convention)
      ch.set_control_region(cr)
      if cr.has_background(): ch.add_background(cr.ret_background())
      ch.set_label(sample) # should import the sample category label

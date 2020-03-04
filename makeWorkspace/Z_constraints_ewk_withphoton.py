@@ -4,7 +4,7 @@ from counting_experiment import *
 # First define simple string which will be used for the datacard
 model = "ewk_zjets"
 
-def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
+def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
 
   # Some setup
   _fin = _f.Get("category_%s"%cid)
@@ -60,10 +60,10 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   # TRANSFERFACTORS are what is created above, eg WScales
 
   CRs = [
-  Channel("ewk_dimuon",_wspace,out_ws,cid+'_'+model,ZmmScales)
-  ,Channel("ewk_dielectron",_wspace,out_ws,cid+'_'+model,ZeeScales)
-  ,Channel("ewk_wjetssignal",_wspace,out_ws,cid+'_'+model,WZScales)
-  ,Channel("ewk_photon",_wspace,out_ws,cid+'_'+model,PhotonScales)
+  Channel("ewk_dimuon",_wspace,out_ws,cid+'_'+model,ZmmScales,convention=convention)
+  ,Channel("ewk_dielectron",_wspace,out_ws,cid+'_'+model,ZeeScales,convention=convention)
+  ,Channel("ewk_wjetssignal",_wspace,out_ws,cid+'_'+model,WZScales,convention=convention)
+  ,Channel("ewk_photon",_wspace,out_ws,cid+'_'+model,PhotonScales,convention=convention)
   ]
 
   for c in CRs[:3]:
@@ -166,7 +166,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   #######################################################################################################
 
-  cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
+  cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag,convention=convention)
   cat.setDependant("qcd_zjets","ewkqcd_signal")
   # Return of course
   return cat

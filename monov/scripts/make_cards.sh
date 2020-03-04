@@ -9,7 +9,7 @@ for YEAR in 2017 2018; do
         for TAGGER in nominal MD; do
             CARD=cards/card_${TAGGER}_monov${WP}_${YEAR}.txt
             cp ../../templates/card_template.txt ${CARD}
-            sed -i "s/monov/monov${WP}/g" ${CARD}
+            sed -i "s/monov/monov${WP}_${YEAR}/g" ${CARD}
             sed -i "s|@YEAR|${YEAR}|g" ${CARD}
 
             if [ $YEAR -eq 2017 ]; then
@@ -17,27 +17,29 @@ for YEAR in 2017 2018; do
             elif [ $YEAR -eq 2018 ]; then
                 sed -i "s|@LUMI|1.023|g" ${CARD}
             fi
-            sed -i "s|combined_model.root|../root/combined_model_monov_${TAGGER}_${WP}_${YEAR}.root|g" ${CARD}
+            sed -i "s|combined_model.root|../root/combined_model_monov_${TAGGER}_${WP}.root|g" ${CARD}
             text2workspace.py ${CARD} --channel-masks
-            python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${TAGGER}_monov${WP}_${YEAR}.html
+            python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > systematics_${TAGGER}_monov${WP}_${YEAR}.html
         done
     done
 
+    pushd cards
     ### COMBINED TAGGER CARDS
     for TAGGER in nominal MD; do
-        COMBINED=./cards/card_${TAGGER}_monov_${YEAR}.txt
-        combineCards.py  ./cards/card_${TAGGER}_monovloose_${YEAR}.txt \
-                        ./cards/card_${TAGGER}_monovtight_${YEAR}.txt \
+        COMBINED=card_${TAGGER}_monov_${YEAR}.txt
+        combineCards.py  card_${TAGGER}_monovloose_${YEAR}.txt \
+                        card_${TAGGER}_monovtight_${YEAR}.txt \
                         > ${COMBINED}
         sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
         text2workspace.py ${COMBINED} --channel-masks
-        python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > cards/systematics_${TAGGER}_monov_${YEAR}.html
+        python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > systematics_${TAGGER}_monov_${YEAR}.html
     done
 
     ### TAU21 CARDS
-    CARD=cards/card_tau21_monov_${YEAR}.txt
-    cp ../../templates/card_template.txt ${CARD}
-    sed -i "s|combined_model.root|../root/combined_model_monov_tau21_${YEAR}.root|g" ${CARD}
+    CARD=card_tau21_monov_${YEAR}.txt
+    cp ../../../templates/card_template.txt ${CARD}
+    sed -i "s/monov/monov_${YEAR}/g" ${CARD}
+    sed -i "s|combined_model.root|../root/combined_model_monov_tau21.root|g" ${CARD}
     sed -i "s|@YEAR|${YEAR}|g" ${CARD}
     if [ $YEAR -eq 2017 ]; then
         sed -i "s|@LUMI|1.025|g" ${CARD}
@@ -45,5 +47,25 @@ for YEAR in 2017 2018; do
         sed -i "s|@LUMI|1.023|g" ${CARD}
     fi
     text2workspace.py ${CARD} --channel-masks
-    python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_tau21_monov_${YEAR}.html
+    python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > systematics_tau21_monov_${YEAR}.html
+
+    popd
 done
+
+
+pushd cards
+# Combine across years
+for TAGGER in nominal MD; do
+    COMBINED=card_${TAGGER}_monov_combined.txt
+    combineCards.py card_${TAGGER}_monov_201*.txt > ${COMBINED}
+    sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
+    text2workspace.py ${COMBINED} --channel-masks
+
+    for WP in loose tight; do
+        COMBINED=card_${TAGGER}_monov${WP}_combined.txt
+        combineCards.py card_${TAGGER}_monov${WP}_201*.txt > ${COMBINED}
+        sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
+        text2workspace.py ${COMBINED} --channel-masks
+    done
+done
+popd

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from counting_experiment import *
+# from counting_experiment import SafeWorkspaceImporter
 from convert import *
 import argparse
 import os
@@ -25,6 +25,7 @@ def cli_args():
     parser.add_argument('file', type=str, help='Input file to use.')
     parser.add_argument('--out', type=str, help='Path to save output under.', default='combined_model.root')
     parser.add_argument('--categories', type=str, default=None, help='Analysis categories')
+    parser.add_argument('--rename', type=str, default="", help='New name for analysis variable to pass to convertToCombineWorkspace')
     args = parser.parse_args()
 
     args.file = os.path.abspath(args.file)
@@ -51,10 +52,6 @@ def main():
 
     # Determine year from name
     bname = os.path.basename(args.file)
-    m = re.match(".*201(7|8).*",bname)
-    if not m or (m and len(m.groups())> 1):
-        raise RuntimeError("Cannot derive year from input file name.")
-    year = int("201" + m.groups()[0])
 
     # Create output path
     outdir = os.path.dirname(args.out)
@@ -81,8 +78,19 @@ def main():
     for crd,crn in enumerate(controlregions_def):
         x = __import__(crn)
         for cid,cn in enumerate(args.categories):
+
+            # Derive year name
+            m = re.match(".*201(7|8).*",cn)
+            if not m or (m and len(m.groups())> 1):
+                raise RuntimeError("Cannot derive year from category name: " + cn)
+            year = int("201" + m.groups()[0])
+
             _fDir = _fOut.mkdir("%s_category_%s"%(crn,cn))
-            cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined, year))
+
+            if "MTR" in args.rename:
+                cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined, year, convention="IC"))
+            else:
+                cmb_categories.append(x.cmodel(cn,crn,_f,_fDir,out_ws,diag_combined, year))
 
     for cid,cn in enumerate(cmb_categories):
         print "Run Model: cid, cn", cid,cn
@@ -92,8 +100,7 @@ def main():
     # Save a Pre-fit snapshot
     out_ws.saveSnapshot("PRE_EXT_FIT_Clean",out_ws.allVars())
     # Now convert workspace to combine friendly workspace
-    #convertToCombineWorkspace(out_ws,_f,categories,cmb_categories,controlregions_def)
-    convertToCombineWorkspace(out_ws,_f,args.categories,cmb_categories,controlregions_def)
+    convertToCombineWorkspace(out_ws,_f,args.categories,cmb_categories,controlregions_def, args.rename)
     _fOut.WriteTObject(out_ws)
 
     print "Produced constraints model in --> ", _fOut.GetName()

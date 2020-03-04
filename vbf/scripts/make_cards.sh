@@ -13,7 +13,22 @@ for YEAR in 2017 2018; do
     elif [ $YEAR -eq 2018 ]; then
         sed -i "s|@LUMI|1.023|g" ${CARD}
     fi
-    sed -i "s|combined_model.root|../root/combined_model_vbf_${YEAR}.root|g" ${CARD}
+    sed -i "s|combined_model.root|../root/combined_model_vbf.root|g" ${CARD}
     text2workspace.py ${CARD} --channel-masks
     python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${YEAR}.html
+done
+
+
+COMBINED=cards/card_vbf_combined.txt
+combineCards.py cards/card_vbf_201*.txt > ${COMBINED}
+sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
+text2workspace.py ${COMBINED} --channel-masks
+
+
+# Cards for IC
+for YEAR in 2017 2018; do
+    CARD=cards/card_vbf_photons_${YEAR}.txt
+    cp ../../templates/vbf_template_photon_only.txt ${CARD}
+    sed -i "s|@YEAR|${YEAR}|g" ${CARD}
+    sed -i "s|combined_model.root|../root/combined_model_vbf_forIC_${YEAR}.root|g" ${CARD}
 done

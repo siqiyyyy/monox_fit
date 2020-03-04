@@ -2,7 +2,7 @@
 set -e
 
 INDIR=/uscms_data/d3/aandreas/legacy_limit/monox_fit/input/2020-02-21_19Feb20_skim_monojet_monov_gjets_ele
-TAG='default'
+TAG='combined'
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
@@ -15,27 +15,28 @@ echo "Input directory: ${INDIR}" > ${INFOFILE}
 echo "--- INPUT ---" > ${INFOFILE}
 
 ### Start by making workspaces split by working point and tagger type
-for YEAR in 2017 2018; do
-    for TAGGER in nominal MD; do
-        for WP in tight loose; do
-            WSFILE=${OUTDIR}/ws_monov_${TAGGER}_${WP}_${YEAR}.root
-            INFILE=${INDIR}/merged_legacy_limit_${TAGGER}_monov_${YEAR}.root
-            
-             # Save the check sum for the input
-            md5sum ${INFILE} >> ${INFOFILE}
+for TAGGER in nominal MD; do
+    for WP in tight loose; do
+        WSFILE=${OUTDIR}/ws_monov_${TAGGER}_${WP}.root
+        INFILE=${INDIR}/merged_legacy_limit_${TAGGER}_monov.root
+            # Save the check sum for the input
+        md5sum ${INFILE} >> ${INFOFILE}
 
-            ./make_ws.py ${INFILE} --out ${WSFILE} --category monov${WP};
-            ./runModel.py ${WSFILE} --categories monov${WP} --out ${OUTDIR}/combined_model_monov_${TAGGER}_${WP}_${YEAR}.root
-        done;
-    done
+        ./make_ws.py ${INFILE} \
+                     --out ${WSFILE} \
+                     --categories monov${WP}_2017,monov${WP}_2018;
 
-    # Tau 21 has just one WP
-    INFILE=${INDIR}/merged_legacy_limit_monov_tau21_${YEAR}.root
-     # Save the check sum for the input
-    md5sum ${INFILE} >> ${INFOFILE}
-    ./make_ws.py ${INFILE} --out ${OUTDIR}/ws_tau21_${YEAR}.root --category monov
-    ./runModel.py ${OUTDIR}/ws_tau21_${YEAR}.root --categories monov --out ${OUTDIR}/combined_model_monov_tau21_${YEAR}.root
+        ./runModel.py ${WSFILE} --categories monov${WP}_2017,monov${WP}_2018 \
+                                --out ${OUTDIR}/combined_model_monov_${TAGGER}_${WP}.root
+    done;
 done
+
+# Tau 21 has just one WP
+INFILE=${INDIR}/merged_legacy_limit_monov_tau21.root
+# Save the check sum for the input
+md5sum ${INFILE} >> ${INFOFILE}
+./make_ws.py ${INFILE} --out ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018
+./runModel.py ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018 --out ${OUTDIR}/combined_model_monov_tau21.root
 
 
 # Save the check sums for the output

@@ -1,7 +1,7 @@
 import ROOT
 from counting_experiment import *
 from parameters import flat_uncertainties
-
+import re
 # Tell RooFit to be quiet
 ROOT.RooMsgService.instance().setSilentMode(True)
 
@@ -110,15 +110,18 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning
   
+  # We want to correlate experimental uncertainties between the loose and tight regions.
+  cid_corr = re.sub("(loose|tight)","",cid)
+
   # Trigger single muon
-  add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_Up"%cid, _fOut)
-  CRs[0].add_nuisance_shape("mettrig",_fOut)
+  add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_%s_Down"%(cid,cid_corr), _fOut)
+  add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_%s_Up"%(cid,cid_corr), _fOut)
+  CRs[0].add_nuisance_shape("mettrig_%s"%cid_corr,_fOut)
 
   # Trigger single electron
-  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_Down"%cid, _fOut)
-  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_Up"%cid, _fOut)
-  CRs[1].add_nuisance_shape("mettrig",_fOut)
+  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_%s_Down"%(cid,cid_corr), _fOut)
+  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_%s_Up"%(cid,cid_corr), _fOut)
+  CRs[1].add_nuisance_shape("mettrig_%s"%cid_corr,_fOut)
 
   # PDF unc
   fwtowpdf = r.TFile.Open("sys/wtow_pdf_sys.root")
@@ -137,30 +140,30 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   fwtowveto = r.TFile.Open("sys/veto_sys.root") # 250 - 1400 binning
 
   ## Wmuon CR first
-  add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_Up"%cid, _fOut)
-  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_Down"%cid, _fOut)
-  CRs[0].add_nuisance_shape("eveto",_fOut)
+  add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_%s_Up"%(cid,cid_corr), _fOut)
+  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_%s_Down"%(cid,cid_corr), _fOut)
+  CRs[0].add_nuisance_shape("eveto_%s"%cid_corr,_fOut)
 
-  add_variation(WScales, fwtowveto, "muveto"+tag, "wmn_weights_%s_muveto_Up"%cid, _fOut)
-  add_variation(WScales, fwtowveto, "muveto_Down"+tag, "wmn_weights_%s_muveto_Down"%cid, _fOut)
-  CRs[0].add_nuisance_shape("muveto",_fOut)
+  add_variation(WScales, fwtowveto, "muveto"+tag, "wmn_weights_%s_muveto_%s_Up"%(cid,cid_corr), _fOut)
+  add_variation(WScales, fwtowveto, "muveto_Down"+tag, "wmn_weights_%s_muveto_%s_Down"%(cid,cid_corr), _fOut)
+  CRs[0].add_nuisance_shape("muveto_%s"%cid_corr,_fOut)
 
-  add_variation(WScales, fwtowveto, "tauveto"+tag, "wmn_weights_%s_tauveto_Up"%cid, _fOut)
-  add_variation(WScales, fwtowveto, "tauveto_Down"+tag, "wmn_weights_%s_tauveto_Down"%cid, _fOut)
-  CRs[0].add_nuisance_shape("tauveto",_fOut)
+  add_variation(WScales, fwtowveto, "tauveto"+tag, "wmn_weights_%s_tauveto_%s_Up"%(cid,cid_corr), _fOut)
+  add_variation(WScales, fwtowveto, "tauveto_Down"+tag, "wmn_weights_%s_tauveto_%s_Down"%(cid,cid_corr), _fOut)
+  CRs[0].add_nuisance_shape("tauveto_%s"%cid_corr,_fOut)
 
   ## W electron CR first
-  add_variation(WScales_e, fwtowveto, "eleveto"+tag, "wen_weights_%s_eveto_Up"%cid, _fOut)
-  add_variation(WScales_e, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_Down"%cid, _fOut)
-  CRs[1].add_nuisance_shape("eveto",_fOut)
+  add_variation(WScales_e, fwtowveto, "eleveto"+tag, "wen_weights_%s_eveto_%s_Up"%(cid,cid_corr), _fOut)
+  add_variation(WScales_e, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_%s_Down"%(cid,cid_corr), _fOut)
+  CRs[1].add_nuisance_shape("eveto_%s"%cid_corr,_fOut)
 
-  add_variation(WScales_e, fwtowveto, "muveto"+tag, "wen_weights_%s_muveto_Up"%cid, _fOut)
-  add_variation(WScales_e, fwtowveto, "muveto_Down"+tag, "wen_weights_%s_muveto_Down"%cid, _fOut)
-  CRs[1].add_nuisance_shape("muveto",_fOut)
+  add_variation(WScales_e, fwtowveto, "muveto"+tag, "wen_weights_%s_muveto_%s_Up"%(cid,cid_corr), _fOut)
+  add_variation(WScales_e, fwtowveto, "muveto_Down"+tag, "wen_weights_%s_muveto_%s_Down"%(cid,cid_corr), _fOut)
+  CRs[1].add_nuisance_shape("muveto_%s"%cid_corr,_fOut)
 
-  add_variation(WScales_e, fwtowveto, "tauveto"+tag, "wen_weights_%s_tauveto_Up"%cid, _fOut)
-  add_variation(WScales_e, fwtowveto, "tauveto_Down"+tag, "wen_weights_%s_tauveto_Down"%cid, _fOut)
-  CRs[1].add_nuisance_shape("tauveto",_fOut)
+  add_variation(WScales_e, fwtowveto, "tauveto"+tag, "wen_weights_%s_tauveto_%s_Up"%(cid,cid_corr), _fOut)
+  add_variation(WScales_e, fwtowveto, "tauveto_Down"+tag, "wen_weights_%s_tauveto_%s_Down"%(cid,cid_corr), _fOut)
+  CRs[1].add_nuisance_shape("tauveto_%s"%cid_corr,_fOut)
 
 
 
