@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 # INDIR=../input/2020-02-05_vbf_noeletrig
-TAG='newunc'
-INDIR=../input/vbf/2020-02-28_latest
+TAG='combine'
+INDIR=../input/vbf/2020-03-03_vbf_nohem
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../vbf/$(basename $INDIR)/${TAG}/root"
@@ -14,16 +14,14 @@ INFOFILE=${OUTDIR}/INFO.txt
 echo "Input directory: ${INDIR}" > ${INFOFILE}
 echo "--- INPUT ---" > ${INFOFILE}
 
-for YEAR in 2017 2018; do
-    WSFILE=${OUTDIR}/ws_vbf_${YEAR}.root
-    INFILE=${INDIR}/legacy_limit_${YEAR}.root
+INFILE=${INDIR}/legacy_limit_vbf.root
+WSFILE=${OUTDIR}/ws_vbf.root
 
-    # Save the check sum for the input
-    md5sum ${INFILE} >> ${INFOFILE}
+# Save the check sum for the input
+md5sum ${INFILE} >> ${INFOFILE}
 
-    ./make_ws.py ${INFILE} --out ${WSFILE} --category vbf
-    ./runModel.py ${WSFILE} --categories vbf --out ${OUTDIR}/combined_model_vbf_${YEAR}.root
-done;
+./make_ws.py ${INFILE} --out ${WSFILE} --categories vbf_2017,vbf_2018
+./runModel.py ${WSFILE} --categories vbf_2017,vbf_2018 --out ${OUTDIR}/combined_model_vbf.root
 
 # Save the check sums for the output
 echo "--- OUTPUT ---" >> ${INFOFILE}
