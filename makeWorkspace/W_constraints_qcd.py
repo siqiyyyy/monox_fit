@@ -3,7 +3,7 @@ from counting_experiment import *
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard 
 model = "qcd_wjets"
-def cmodel(cid,nam,_f,_fOut, out_ws, diag,year):
+def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
   
   # Some setup
   _fin    = _f.Get("category_%s"%cid)
@@ -45,8 +45,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year):
   # TRANSFERFACTORS are what is created above, eg WScales
 
   CRs = [
-   Channel("qcd_singlemuon",_wspace,out_ws,cid+'_'+model,WScales),
-   Channel("qcd_singleelectron",_wspace,out_ws,cid+'_'+model,WScales_e),
+   Channel("qcd_singlemuon",_wspace,out_ws,cid+'_'+model,WScales, convention=convention),
+   Channel("qcd_singleelectron",_wspace,out_ws,cid+'_'+model,WScales_e, convention=convention),
   ]
 
   for c in CRs:
@@ -89,7 +89,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year):
 
   #######################################################################################################
 
-  cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,targetmc.GetName(),CRs,diag)
+  cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,targetmc.GetName(),CRs,diag, convention=convention)
   cat.setDependant("qcd_zjets","qcd_wjetssignal")  # Can use this to state that the "BASE" of this is already dependant on another process
   # EG if the W->lv in signal is dependant on the Z->vv and then the W->mv is depenant on W->lv, then 
   # give the arguments model,channel name from the config which defines the Z->vv => W->lv map! 

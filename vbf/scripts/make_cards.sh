@@ -23,3 +23,12 @@ COMBINED=cards/card_vbf_combined.txt
 combineCards.py cards/card_vbf_201*.txt > ${COMBINED}
 sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
 text2workspace.py ${COMBINED} --channel-masks
+
+
+# Cards for IC
+for YEAR in 2017 2018; do
+    CARD=cards/card_vbf_photons_${YEAR}.txt
+    cp ../../templates/vbf_template_photon_only.txt ${CARD}
+    sed -i "s|@YEAR|${YEAR}|g" ${CARD}
+    sed -i "s|combined_model.root|../root/combined_model_vbf_forIC_${YEAR}.root|g" ${CARD}
+done

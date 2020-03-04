@@ -23,6 +23,10 @@ md5sum ${INFILE} >> ${INFOFILE}
 ./make_ws.py ${INFILE} --out ${WSFILE} --categories vbf_2017,vbf_2018
 ./runModel.py ${WSFILE} --categories vbf_2017,vbf_2018 --out ${OUTDIR}/combined_model_vbf.root
 
+# Split for IC
+./runModel.py ${WSFILE} --categories vbf_2017 --out ${OUTDIR}/combined_model_vbf_forIC_2017.root --rename "mjj_MTR_2017"
+./runModel.py ${WSFILE} --categories vbf_2018 --out ${OUTDIR}/combined_model_vbf_forIC_2018.root --rename "mjj_MTR_2018"
+
 # Save the check sums for the output
 echo "--- OUTPUT ---" >> ${INFOFILE}
 md5sum ${OUTDIR}/*root >> ${INFOFILE}
