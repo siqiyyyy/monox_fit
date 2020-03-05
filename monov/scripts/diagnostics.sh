@@ -28,6 +28,6 @@ for TAGGER in nominal MD; do
             -n _${TAGGER}_monovtight_combined \
             ../cards/card_${TAGGER}_monovtight_combined.root
 
-            python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py fitDiagnostics_${TAGGER}_monovtight_combined.root  -g diffnuisances_${TAGGER}_monov_combined.root
+            python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py fitDiagnostics_${TAGGER}_monovtight_combined.root  -g diffnuisances_${TAGGER}_monovtight_combined.root
 done
 popd
