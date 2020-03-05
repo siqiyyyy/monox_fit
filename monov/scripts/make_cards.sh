@@ -60,12 +60,20 @@ for TAGGER in nominal MD; do
     combineCards.py card_${TAGGER}_monov_201*.txt > ${COMBINED}
     sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
     text2workspace.py ${COMBINED} --channel-masks
+    python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > systematics_${TAGGER}_monov_combined.html
 
     for WP in loose tight; do
         COMBINED=card_${TAGGER}_monov${WP}_combined.txt
         combineCards.py card_${TAGGER}_monov${WP}_201*.txt > ${COMBINED}
         sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
         text2workspace.py ${COMBINED} --channel-masks
+        python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > systematics_${TAGGER}_monov${WP}_combined.html
     done
+
+    COMBINED=card_tau21_monov_combined.txt
+    combineCards.py card_tau21_monov_201*.txt > ${COMBINED}
+    sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
+    text2workspace.py ${COMBINED} --channel-masks
+    python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > systematics_tau21_monov_combined.html
 done
 popd
