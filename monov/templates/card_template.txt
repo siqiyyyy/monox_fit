@@ -1,32 +1,32 @@
-Combination of monov.txt
+Combination of monov@WP_@YEAR.txt
 imax 6 number of bins
 jmax 10 number of processes minus 1
 kmax 91 number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
-shapes *                         monov_dielec    combined_model.root combinedws:monov_Zee_$PROCESS
-shapes data_obs                  monov_dielec    combined_model.root combinedws:monov_Zee_data
-shapes zll                       monov_dielec    combined_model.root combinedws:monov_dielectron_zjets_model
-shapes *                         monov_dimuon    combined_model.root combinedws:monov_Zmm_$PROCESS
-shapes data_obs                  monov_dimuon    combined_model.root combinedws:monov_Zmm_data
-shapes zll                       monov_dimuon    combined_model.root combinedws:monov_dimuon_zjets_model
-shapes *                         monov_photon    combined_model.root combinedws:monov_gjets_$PROCESS
-shapes data_obs                  monov_photon    combined_model.root combinedws:monov_gjets_data
-shapes gjets                     monov_photon    combined_model.root combinedws:monov_photon_zjets_model
-shapes *                         monov_signal    combined_model.root combinedws:monov_signal_$PROCESS
-shapes data_obs                  monov_signal    combined_model.root combinedws:monov_signal_data
-shapes wjets                     monov_signal    combined_model.root combinedws:monov_wjetssignal_zjets_model
-shapes zjets                     monov_signal    combined_model.root combinedws:monov_signal_zjets_model
-shapes *                         monov_singleel  combined_model.root combinedws:monov_Wen_$PROCESS
-shapes data_obs                  monov_singleel  combined_model.root combinedws:monov_Wen_data
-shapes wjets                     monov_singleel  combined_model.root combinedws:monov_singleelectron_wjets_model
-shapes *                         monov_singlemu  combined_model.root combinedws:monov_Wmn_$PROCESS
-shapes data_obs                  monov_singlemu  combined_model.root combinedws:monov_Wmn_data
-shapes wjets                     monov_singlemu  combined_model.root combinedws:monov_singlemuon_wjets_model
+shapes *                         monov@WP_@YEAR_dielec    combined_model.root combinedws:monov@WP_@YEAR_Zee_$PROCESS
+shapes data_obs                  monov@WP_@YEAR_dielec    combined_model.root combinedws:monov@WP_@YEAR_Zee_data
+shapes zll                       monov@WP_@YEAR_dielec    combined_model.root combinedws:monov@WP_@YEAR_dielectron_zjets_model
+shapes *                         monov@WP_@YEAR_dimuon    combined_model.root combinedws:monov@WP_@YEAR_Zmm_$PROCESS
+shapes data_obs                  monov@WP_@YEAR_dimuon    combined_model.root combinedws:monov@WP_@YEAR_Zmm_data
+shapes zll                       monov@WP_@YEAR_dimuon    combined_model.root combinedws:monov@WP_@YEAR_dimuon_zjets_model
+shapes *                         monov@WP_@YEAR_photon    combined_model.root combinedws:monov@WP_@YEAR_gjets_$PROCESS
+shapes data_obs                  monov@WP_@YEAR_photon    combined_model.root combinedws:monov@WP_@YEAR_gjets_data
+shapes gjets                     monov@WP_@YEAR_photon    combined_model.root combinedws:monov@WP_@YEAR_photon_zjets_model
+shapes *                         monov@WP_@YEAR_signal    combined_model.root combinedws:monov@WP_@YEAR_signal_$PROCESS
+shapes data_obs                  monov@WP_@YEAR_signal    combined_model.root combinedws:monov@WP_@YEAR_signal_data
+shapes wjets                     monov@WP_@YEAR_signal    combined_model.root combinedws:monov@WP_@YEAR_wjetssignal_zjets_model
+shapes zjets                     monov@WP_@YEAR_signal    combined_model.root combinedws:monov@WP_@YEAR_signal_zjets_model
+shapes *                         monov@WP_@YEAR_singleel  combined_model.root combinedws:monov@WP_@YEAR_Wen_$PROCESS
+shapes data_obs                  monov@WP_@YEAR_singleel  combined_model.root combinedws:monov@WP_@YEAR_Wen_data
+shapes wjets                     monov@WP_@YEAR_singleel  combined_model.root combinedws:monov@WP_@YEAR_singleelectron_wjets_model
+shapes *                         monov@WP_@YEAR_singlemu  combined_model.root combinedws:monov@WP_@YEAR_Wmn_$PROCESS
+shapes data_obs                  monov@WP_@YEAR_singlemu  combined_model.root combinedws:monov@WP_@YEAR_Wmn_data
+shapes wjets                     monov@WP_@YEAR_singlemu  combined_model.root combinedws:monov@WP_@YEAR_singlemuon_wjets_model
 ----------------------------------------------------------------------------------------------------------------------------------
-bin              monov_signal        monov_dimuon        monov_dielec        monov_photon        monov_singlemu      monov_singleel
+bin              monov@WP_@YEAR_signal        monov@WP_@YEAR_dimuon        monov@WP_@YEAR_dielec        monov@WP_@YEAR_photon        monov@WP_@YEAR_singlemu      monov@WP_@YEAR_singleel
 observation  -1                    -1                    -1                    -1                    -1                    -1                  
 ----------------------------------------------------------------------------------------------------------------------------------
-bin                                  monov_signal          monov_signal          monov_signal          monov_signal          monov_signal          monov_signal          monov_signal          monov_signal          monov_signal          monov_dimuon          monov_dimuon          monov_dimuon          monov_dielec          monov_dielec          monov_dielec          monov_photon          monov_photon          monov_singlemu        monov_singlemu        monov_singlemu        monov_singlemu        monov_singlemu        monov_singleel        monov_singleel        monov_singleel        monov_singleel        monov_singleel        monov_singleel
+bin                                  monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_signal          monov@WP_@YEAR_dimuon          monov@WP_@YEAR_dimuon          monov@WP_@YEAR_dimuon          monov@WP_@YEAR_dielec          monov@WP_@YEAR_dielec          monov@WP_@YEAR_dielec          monov@WP_@YEAR_photon          monov@WP_@YEAR_photon          monov@WP_@YEAR_singlemu        monov@WP_@YEAR_singlemu        monov@WP_@YEAR_singlemu        monov@WP_@YEAR_singlemu        monov@WP_@YEAR_singlemu        monov@WP_@YEAR_singleel        monov@WP_@YEAR_singleel        monov@WP_@YEAR_singleel        monov@WP_@YEAR_singleel        monov@WP_@YEAR_singleel        monov@WP_@YEAR_singleel
 process                              zh                    vbf                   wh                    ggh                   diboson               top                   wjets                 qcd                   zjets                 zll                   top                   diboson               zll                   top                   diboson               gjets                 qcd                   zll                   top                   diboson               wjets                 qcd                   zll                   top                   diboson               wjets                 qcd                   gjets                 
 process                              -3                    -2                    -1                    0                     1                     2                     3                     4                     5                     6                     2                     1                     6                     2                     1                     7                     4                     6                     2                     1                     3                     4                     6                     2                     1                     3                     4                     4                   
 rate                                 -1                    -1                    -1                    -1                    -1                    -1                    1                     -1                    1                     1                     -1                    -1                    1                     -1                    -1                    1                     -1                    -1                    -1                    -1                    1                     -1                    -1                    -1                    -1                    1                     -1                    -1                  
@@ -57,35 +57,35 @@ ggh_Norm13TeV           lnN          -                     -                    
 wh_Norm13TeV            lnN          -                     -                     1.05                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -                     -        
 wewk          param  0.0 1
 wqcdshape     param  0.0 1
-monov_stat_error_photonCR_bin0 param 0.0 1
-monov_stat_error_photonCR_bin1 param 0.0 1
-monov_stat_error_photonCR_bin2 param 0.0 1
-monov_stat_error_photonCR_bin3 param 0.0 1
-monov_stat_error_photonCR_bin4 param 0.0 1
-monov_stat_error_photonCR_bin5 param 0.0 1
-monov_stat_error_photonCR_bin6 param 0.0 1
-mettrig param 0.0 1
-monov_stat_error_dimuonCR_bin0 param 0.0 1
-monov_stat_error_dimuonCR_bin1 param 0.0 1
-monov_stat_error_dimuonCR_bin2 param 0.0 1
-monov_stat_error_dimuonCR_bin3 param 0.0 1
-monov_stat_error_dimuonCR_bin4 param 0.0 1
-monov_stat_error_dimuonCR_bin5 param 0.0 1
-monov_stat_error_dimuonCR_bin6 param 0.0 1
-monov_stat_error_dielectronCR_bin0 param 0.0 1
-monov_stat_error_dielectronCR_bin1 param 0.0 1
-monov_stat_error_dielectronCR_bin2 param 0.0 1
-monov_stat_error_dielectronCR_bin3 param 0.0 1
-monov_stat_error_dielectronCR_bin4 param 0.0 1
-monov_stat_error_dielectronCR_bin5 param 0.0 1
-monov_stat_error_dielectronCR_bin6 param 0.0 1
-monov_stat_error_wzCR_bin0 param 0.0 1
-monov_stat_error_wzCR_bin1 param 0.0 1
-monov_stat_error_wzCR_bin2 param 0.0 1
-monov_stat_error_wzCR_bin3 param 0.0 1
-monov_stat_error_wzCR_bin4 param 0.0 1
-monov_stat_error_wzCR_bin5 param 0.0 1
-monov_stat_error_wzCR_bin6 param 0.0 1
+monov@WP_@YEAR_stat_error_photonCR_bin0 param 0.0 1
+monov@WP_@YEAR_stat_error_photonCR_bin1 param 0.0 1
+monov@WP_@YEAR_stat_error_photonCR_bin2 param 0.0 1
+monov@WP_@YEAR_stat_error_photonCR_bin3 param 0.0 1
+monov@WP_@YEAR_stat_error_photonCR_bin4 param 0.0 1
+monov@WP_@YEAR_stat_error_photonCR_bin5 param 0.0 1
+monov@WP_@YEAR_stat_error_photonCR_bin6 param 0.0 1
+mettrig_monov_@YEAR param 0.0 1
+monov@WP_@YEAR_stat_error_dimuonCR_bin0 param 0.0 1
+monov@WP_@YEAR_stat_error_dimuonCR_bin1 param 0.0 1
+monov@WP_@YEAR_stat_error_dimuonCR_bin2 param 0.0 1
+monov@WP_@YEAR_stat_error_dimuonCR_bin3 param 0.0 1
+monov@WP_@YEAR_stat_error_dimuonCR_bin4 param 0.0 1
+monov@WP_@YEAR_stat_error_dimuonCR_bin5 param 0.0 1
+monov@WP_@YEAR_stat_error_dimuonCR_bin6 param 0.0 1
+monov@WP_@YEAR_stat_error_dielectronCR_bin0 param 0.0 1
+monov@WP_@YEAR_stat_error_dielectronCR_bin1 param 0.0 1
+monov@WP_@YEAR_stat_error_dielectronCR_bin2 param 0.0 1
+monov@WP_@YEAR_stat_error_dielectronCR_bin3 param 0.0 1
+monov@WP_@YEAR_stat_error_dielectronCR_bin4 param 0.0 1
+monov@WP_@YEAR_stat_error_dielectronCR_bin5 param 0.0 1
+monov@WP_@YEAR_stat_error_dielectronCR_bin6 param 0.0 1
+monov@WP_@YEAR_stat_error_wzCR_bin0 param 0.0 1
+monov@WP_@YEAR_stat_error_wzCR_bin1 param 0.0 1
+monov@WP_@YEAR_stat_error_wzCR_bin2 param 0.0 1
+monov@WP_@YEAR_stat_error_wzCR_bin3 param 0.0 1
+monov@WP_@YEAR_stat_error_wzCR_bin4 param 0.0 1
+monov@WP_@YEAR_stat_error_wzCR_bin5 param 0.0 1
+monov@WP_@YEAR_stat_error_wzCR_bin6 param 0.0 1
 qcd param 0.0 1
 qcdshape param 0.0 1
 qcdprocess param 0.0 1
@@ -104,21 +104,21 @@ sudakovW param 0.0 1
 nnlomissW param 0.0 1
 wcross param 0.0 1
 wpdf param 0.0 1
-monov_stat_error_singlemuonCR_bin0 param 0.0 1
-monov_stat_error_singlemuonCR_bin1 param 0.0 1
-monov_stat_error_singlemuonCR_bin2 param 0.0 1
-monov_stat_error_singlemuonCR_bin3 param 0.0 1
-monov_stat_error_singlemuonCR_bin4 param 0.0 1
-monov_stat_error_singlemuonCR_bin5 param 0.0 1
-monov_stat_error_singlemuonCR_bin6 param 0.0 1
-monov_stat_error_singleelectronCR_bin0 param 0.0 1
-monov_stat_error_singleelectronCR_bin1 param 0.0 1
-monov_stat_error_singleelectronCR_bin2 param 0.0 1
-monov_stat_error_singleelectronCR_bin3 param 0.0 1
-monov_stat_error_singleelectronCR_bin4 param 0.0 1
-monov_stat_error_singleelectronCR_bin5 param 0.0 1
-monov_stat_error_singleelectronCR_bin6 param 0.0 1
+monov@WP_@YEAR_stat_error_singlemuonCR_bin0 param 0.0 1
+monov@WP_@YEAR_stat_error_singlemuonCR_bin1 param 0.0 1
+monov@WP_@YEAR_stat_error_singlemuonCR_bin2 param 0.0 1
+monov@WP_@YEAR_stat_error_singlemuonCR_bin3 param 0.0 1
+monov@WP_@YEAR_stat_error_singlemuonCR_bin4 param 0.0 1
+monov@WP_@YEAR_stat_error_singlemuonCR_bin5 param 0.0 1
+monov@WP_@YEAR_stat_error_singlemuonCR_bin6 param 0.0 1
+monov@WP_@YEAR_stat_error_singleelectronCR_bin0 param 0.0 1
+monov@WP_@YEAR_stat_error_singleelectronCR_bin1 param 0.0 1
+monov@WP_@YEAR_stat_error_singleelectronCR_bin2 param 0.0 1
+monov@WP_@YEAR_stat_error_singleelectronCR_bin3 param 0.0 1
+monov@WP_@YEAR_stat_error_singleelectronCR_bin4 param 0.0 1
+monov@WP_@YEAR_stat_error_singleelectronCR_bin5 param 0.0 1
+monov@WP_@YEAR_stat_error_singleelectronCR_bin6 param 0.0 1
 wtowpdf param 0.0 1
-eveto param 0.0 1
-muveto param 0.0 1
-tauveto param 0.0 1
+eveto_monov_@YEAR param 0.0 1
+muveto_monov_@YEAR param 0.0 1
+tauveto_monov_@YEAR param 0.0 1
