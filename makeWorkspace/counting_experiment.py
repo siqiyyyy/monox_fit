@@ -618,7 +618,7 @@ class Category:
 
    for i,bl in enumerate(self.channels):
     if i >= len(self._bins)-1 : break
-    model_mu = self._wspace_out.var("model_mu_cat_%s_bin_%d"%(bl.catid,bl.id))
+    model_mu = self._wspace_out.var(naming_convention(bl.id, bl.catid,self.convention))
     #self._wspace_out.var(model_mu.GetName()).setVal(1.2*model_mu.getVal())
    
   def ret_control_regions(self): 
