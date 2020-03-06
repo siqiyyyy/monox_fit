@@ -39,7 +39,6 @@ for year in [2017,2018]:
 
 
 ### Years fit together
-outdir = './plots/combined/'
 filler = {
     "category" : "monovtight"
 }
@@ -49,6 +48,7 @@ diffnuis_file = 'diagnostics/diffnuisances_nominal_{category}_combined.root'.for
 model_file = "root/combined_model_monov_nominal_tight.root".format(**filler)
 
 for year in [2017,2018]:
+    outdir = './plots/combined_{YEAR}/'.format(YEAR=year)
     category = 'monovtight_{YEAR}'.format(YEAR=year)
     for region in regions:
         plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
@@ -59,5 +59,6 @@ for year in [2017,2018]:
     dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir, lumi[year], year)
     dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir, lumi[year], year)
 
-    plot_nuis(diffnuis_file, outdir)
+outdir = './plots/combined/'
+plot_nuis(diffnuis_file, outdir)
 
