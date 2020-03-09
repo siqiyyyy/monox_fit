@@ -5,9 +5,23 @@ do_impacts(){
     SIGNAL=${2}
     mkdir -p ${YEAR}_${SIGNAL}
     pushd ${YEAR}_${SIGNAL}
-    combineTool.py -M Impacts -d ../../cards/card_monojet_${YEAR}.root -m 125 --doInitialFit --robustFit 1 -t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1
-    combineTool.py -M Impacts -d ../../cards/card_monojet_${YEAR}.root -m 125 --robustFit 1 --doFits --parallel 4 -t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1
-    combineTool.py -M Impacts -d ../../cards/card_monojet_${YEAR}.root -m 125 -o impacts.json -t -1 --expectSignal=${SIGNAL}  --parallel=4 --rMin=-1
+    COMMON_OPTS="-t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1 --autoRange 5 --squareDistPoiStep"
+    combineTool.py -M Impacts \
+                   -d ../../cards/card_monojet_${YEAR}.root \
+                   -m 125 \
+                   --doInitialFit \
+                   --robustFit 1 \
+                   ${COMMON_OPTS}
+    combineTool.py -M Impacts -d ../../cards/card_monojet_${YEAR}.root \
+                   -m 125 \
+                   --robustFit 1 \
+                   --doFits \
+                    ${COMMON_OPTS}
+    combineTool.py -M Impacts \
+                   -d ../../cards/card_monojet_${YEAR}.root \
+                   -m 125 \
+                   -o impacts.json \
+                    ${COMMON_OPTS}
     popd
     plotImpacts.py -i ${YEAR}_${SIGNAL}/impacts.json -o impacts_monojet_${YEAR}_${SIGNAL}
 }
