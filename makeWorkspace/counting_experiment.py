@@ -162,8 +162,13 @@ class Bin:
    print functionalForm 
    if not len(functionalForm): 
     if not self.wspace_out.var(naming_convention(self.id, self.catid, self.convention)):
-     self.model_mu = r.RooRealVar(naming_convention(self.id, self.catid, self.convention),"Model of N expected events in %d"%self.id,self.initY,0,10000)
-     self.model_mu.removeMax()
+     self.model_mu = r.RooRealVar(
+                                  naming_convention(self.id, self.catid, self.convention),
+                                  "Model of N expected events in %d"%self.id,
+                                  self.initY,
+                                  0,
+                                  3*self.initY
+                                  )
     else: self.model_mu = self.wspace_out.var(naming_convention(self.id, self.catid, self.convention))
    else: 
     print "Setting up dependence!!" 
