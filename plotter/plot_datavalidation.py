@@ -208,7 +208,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 elif  (region1=="combined" and region2=="gjets"):
                     value = one_lepton_unc**2
 
-                sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value*2) ),2)
+                sumw2 += pow((h_prefit[region1].GetBinContent(iBin) * (value) ),2)
             elif 'mono' in category:
                 ### Theory uncertainties for monojet / mono-V
                 findbin =  uncert.FindBin(h_prefit[region1].GetBinCenter(iBin))
