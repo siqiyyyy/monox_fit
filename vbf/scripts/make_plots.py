@@ -24,10 +24,18 @@ for year in [2017, 2018]:
         plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
     for proc in procs:
         plot_ratio(proc, category, 'root/combined_model_vbf.root'.format(year=year), outdir, lumi[year], year)
-    dataValidation("combined",  "combinedW", category, ws_file, fitdiag_file, outdir,lumi[year], year)
-    dataValidation("combinedW",  "gjets", category, ws_file, fitdiag_file, outdir,lumi[year], year)
-    dataValidation("combined",  "gjets", category, ws_file, fitdiag_file, outdir,lumi[year], year)
 
+    # Flavor integrated
+    dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    # Split by flavor
+    dataValidation("dimuon",        "singlemuon",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    dataValidation("dielectron",    "singleelectron",category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    dataValidation("singleelectron","gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    dataValidation("singlemuon",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    dataValidation("dielectron",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
+    dataValidation("dimuon",        "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
     plot_nuis(diffnuis_file, outdir)
 
 
