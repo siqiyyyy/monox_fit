@@ -17,6 +17,9 @@ printdiag:
 impacts:
 	bash $(TOPDIR)/scripts/impacts.sh
 
+impactscondor:
+	bash $(TOPDIR)/scripts/impacts_condor.sh
+
 printimpacts:
 	cat $(TOPDIR)/scripts/impacts.sh
 
