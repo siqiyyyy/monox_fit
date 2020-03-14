@@ -1,4 +1,4 @@
-TOPDIR=/uscms_data/d3/aandreas/legacy_limit/monox_fit/monojet/
+TOPDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))/..
 
 .PHONY: *
 
@@ -16,6 +16,9 @@ printdiag:
 
 impacts:
 	bash $(TOPDIR)/scripts/impacts.sh
+
+impactscondor:
+	bash $(TOPDIR)/scripts/impacts_condor.sh
 
 printimpacts:
 	cat $(TOPDIR)/scripts/impacts.sh
