@@ -1,4 +1,4 @@
-TOPDIR=/uscms_data/d3/aandreas/legacy_limit/monox_fit/monov/
+TOPDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))/..
 
 .PHONY: *
 
