@@ -169,6 +169,7 @@ class Bin:
                                   0,
                                   3*self.initY
                                   )
+     self.model_mu.removeMax()
     else: self.model_mu = self.wspace_out.var(naming_convention(self.id, self.catid, self.convention))
    else: 
     print "Setting up dependence!!" 
