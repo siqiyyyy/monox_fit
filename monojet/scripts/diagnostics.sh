@@ -3,12 +3,12 @@ mkdir -p diagnostics
 pushd diagnostics
 # Individual years
 for YEAR in 2017 2018; do
-    combine -M FitDiagnostics
-            --saveShapes
-            --saveWithUncertainties
-            --robustFit 1
-            --setParameters mask_monojet_${YEAR}_signal=1
-            -n _monojet_${YEAR}
+    combine -M FitDiagnostics \
+            --saveShapes \
+            --saveWithUncertainties \
+            --robustFit 1 \
+            --setParameters mask_monojet_${YEAR}_signal=1 \
+            -n _monojet_${YEAR} \
             ../cards/card_monojet_${YEAR}.root
 
     python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \

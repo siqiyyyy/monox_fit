@@ -94,6 +94,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
         return h
 
     channel = {"singlemuon":"singlemu", "dimuon":"dimuon", "gjets":"photon", "signal":"signal", "singleelectron":"singleel", "dielectron":"dielec"}
+    leadbg = {"singlemuon":"wjets", "dimuon":"zll", "gjets":"gjets", "singleelectron":"wjets", "dielectron":"zll"}
 
     h_prefit = {}
     h_qcd_prefit = {}
@@ -121,7 +122,10 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 h_ewk_prefit[region] = get_shape("photon", "ewk_gjets")
         else:
             h_prefit[region] = get_shape(channel[region],"total_background")
+            if "vbf" in category:
 
+                h_qcd_prefit[region] = get_shape(channel[region], "qcd_"+leadbg[region])
+                h_ewk_prefit[region] = get_shape(channel[region], "ewk_"+leadbg[region])
         h_prefit[region].Sumw2()
 
         if "monojet" in category:
@@ -159,7 +163,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 ]
         uncertainties += ["experiment"]
     else:
-        uncFile = TFile(os.path.join(DIR,'../makeWorkspace/sys/vbf_z_w_theory_unc_ratio_unc.root'))
+        uncFile = TFile(os.path.join(DIR,'../makeWorkspace/sys/vbf_z_w_gjets_theory_unc_ratio_unc.root'))
         uncertainties = [
             "w_ewkcorr_overz_common",
             "zoverw_nlo_muf",
@@ -237,6 +241,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                     for direction in 'up','down':
                         # Uncertainties are stored in histogram form
                         hname = "uncertainty_ratio_z_{PROC}_mjj_unc_{UNC}_{DIR}_{YEAR}".format(PROC=proc, UNC=uncert, DIR=direction, YEAR=year)
+                        print hname
                         hist_unc = uncFile.Get(hname)
 
                         # Find the right bin to read uncertainty from
