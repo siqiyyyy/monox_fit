@@ -40,7 +40,7 @@ export -f do_impacts
 mkdir -p impacts
 pushd impacts
 for SIGNAL in "0.0"; do
-    for YEAR in combined; do
+    for YEAR in combined 2017 2018; do
         nohup bash -c "do_impacts $YEAR $SIGNAL" >  impacts_${YEAR}_${SIGNAL}.log &
     done
 done
