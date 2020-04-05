@@ -1,7 +1,7 @@
 Combination of monov@WP_@YEAR.txt
 imax 6 number of bins
 jmax 10 number of processes minus 1
-kmax 91 number of nuisance parameters
+kmax 92 number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
 shapes *                         monov@WP_@YEAR_dielec    combined_model.root combinedws:monov@WP_@YEAR_Zee_$PROCESS
 shapes data_obs                  monov@WP_@YEAR_dielec    combined_model.root combinedws:monov@WP_@YEAR_Zee_data
