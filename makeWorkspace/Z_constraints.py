@@ -88,19 +88,19 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   # We want to correlate experimental uncertainties between the loose and tight regions.
   cid_corr = re.sub("(loose|tight)","",cid)
 
-  add_variation(PhotonScales,fztoz_trig,"trig_sys_down"+tag,"photon_weights_%s_mettrig_%s_Down"%(cid,cid_corr), _fOut)
-  add_variation(PhotonScales,fztoz_trig,"trig_sys_up"+tag,"photon_weights_%s_mettrig_%s_Up"%(cid,cid_corr), _fOut)
-  CRs[0].add_nuisance_shape("mettrig_%s"%cid_corr,_fOut)
+  add_variation(PhotonScales,fztoz_trig,"trig_sys_down"+tag,"photon_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
+  add_variation(PhotonScales,fztoz_trig,"trig_sys_up"+tag,"photon_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
+  CRs[0].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
   # Take the square of the uncertainty because we are going from zero to two leptons
-  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_down"+tag,"zmm_weights_%s_mettrig_%s_Down"%(cid,cid_corr), _fOut)
-  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_up"+tag,"zmm_weights_%s_mettrig_%s_Up"%(cid,cid_corr), _fOut)
-  CRs[1].add_nuisance_shape("mettrig_%s"%cid_corr,_fOut)
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_down"+tag,"zmm_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
+  add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_up"+tag,"zmm_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
+  CRs[1].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
   ## Here now adding the trigger uncertainty
-  add_variation(ZeeScales,fztoz_trig,"trig_sys_down"+tag,"zee_weights_%s_mettrig_%s_Down"%(cid,cid_corr), _fOut)
-  add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_%s_Up"%(cid,cid_corr), _fOut)
-  CRs[2].add_nuisance_shape("mettrig_%s"%cid_corr,_fOut)
+  add_variation(ZeeScales,fztoz_trig,"trig_sys_down"+tag,"zee_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
+  add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
+  CRs[2].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
   #######################################################################################################  
  

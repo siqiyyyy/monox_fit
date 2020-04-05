@@ -179,7 +179,7 @@ monojet_@YEAR_stat_error_singleelectronCR_bin16  param  0.0 1
 cross         param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin14  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin15  param  0.0 1
-mettrig_monojet_@YEAR       param  0.0 1
+mettrig_@YEAR       param  0.0 1
 sudakovW      param  0.0 1
 sudakovZ      param  0.0 1
 monojet_@YEAR_stat_error_photonCR_bin12  param  0.0 1
