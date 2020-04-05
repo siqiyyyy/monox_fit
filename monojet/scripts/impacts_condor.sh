@@ -14,7 +14,7 @@ do_impacts(){
                    ${COMMON_OPTS}
 
     # Submit the hard work to condor
-    TAG=task
+    TAG=task_${YEAR}_${SIGNAL}_${RANDOM}
     combineTool.py -M Impacts -d ../../cards/card_monojet_${YEAR}.root \
                    -m 125 \
                    --robustFit 1 \
@@ -25,8 +25,12 @@ do_impacts(){
 
     # Wait for condor jobs to return
     date
-    condor_wait -status ${TAG}*.log
-
+    for i in $(seq 1 1 10); do
+        condor_wait -debug -status ${TAG}*.log && break;
+        sleep $((i*120))
+    done
+    date
+    sleep 60
     combineTool.py -M Impacts \
                    -d ../../cards/card_monojet_${YEAR}.root \
                    -m 125 \
