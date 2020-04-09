@@ -114,14 +114,14 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   cid_corr = re.sub("(loose|tight)","",cid)
 
   # Trigger single muon
-  add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_%s_Down"%(cid,cid_corr), _fOut)
-  add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_%s_Up"%(cid,cid_corr), _fOut)
-  CRs[0].add_nuisance_shape("mettrig_%s"%cid_corr,_fOut)
+  add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
+  add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
+  CRs[0].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
   # Trigger single electron
-  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_%s_Down"%(cid,cid_corr), _fOut)
-  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_%s_Up"%(cid,cid_corr), _fOut)
-  CRs[1].add_nuisance_shape("mettrig_%s"%cid_corr,_fOut)
+  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
+  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
+  CRs[1].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
   # PDF unc
   fwtowpdf = r.TFile.Open("sys/wtow_pdf_sys.root")
