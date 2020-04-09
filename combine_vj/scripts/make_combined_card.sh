@@ -1,5 +1,11 @@
-JDIR=../monojet/2020-03-27_monojet_monov_overlap_v2/combined/
-VDIR=../monov/2020-03-27_monojet_monov_overlap_v2/combined/
+TAG=2020-03-27_monojet_monov_overlap_v2
+SUBTAG=v1
+JDIR=$(readlink -e ../monojet/${TAG}/combined/)
+VDIR=$(readlink -e ../monov/${TAG}/combined/)
+
+WDIR=./${TAG}/${SUBTAG}/
+mkdir -p $WDIR
+pushd $WDIR
 
 mkdir -p root
 cp $JDIR/root/combined_model_monojet.root ./root
@@ -32,3 +38,5 @@ for YEAR in 2017 2018 combined; do
     sed -i '/combined_model_/ s|[^ ]*\(combined_model_.*.root\)|root/\1|g' ${INDIVIDUAL}
     text2workspace.py ${INDIVIDUAL} --channel-masks
 done
+popd
+ln -fs $(readlink -e scripts/Makefile) ${WDIR}/Makefile
