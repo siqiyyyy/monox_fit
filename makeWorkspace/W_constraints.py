@@ -151,20 +151,20 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   fmuveto = r.TFile.Open("sys/muon_veto_unc.root")
 
   ## Wmuon CR
-  add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_%s_Up"%(cid,year), _fOut)
+  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_%s_Down"%(cid,year), _fOut)
   CRs[0].add_nuisance_shape("eveto_%s"%year,_fOut)
 
-  add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut)
+  add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut)
   CRs[0].add_nuisance_shape("muveto_id_%s"%year,_fOut)
 
-  add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut)
+  add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut)
   CRs[0].add_nuisance_shape("muveto_iso_%s"%year,_fOut)
 
-  add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Up"%(cid,year), _fOut)
+  add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Down"%(cid,year), _fOut)
   CRs[0].add_nuisance_shape("tauveto_%s"%year,_fOut)
 
   ## W electron CR
@@ -172,16 +172,16 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   add_variation(WScales_e, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_%s_Down"%(cid,year), _fOut)
   CRs[1].add_nuisance_shape("eveto_%s"%year,_fOut)
 
-  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut)
+  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut)
   CRs[1].add_nuisance_shape("muveto_id_%s"%year,_fOut)
 
-  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut)
+  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut)
   CRs[1].add_nuisance_shape("muveto_iso_%s"%year,_fOut)
 
-  add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Up"%(cid,year), _fOut)
+  add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Down"%(cid,year), _fOut)
   CRs[1].add_nuisance_shape("tauveto_%s"%year,_fOut)
 
 
