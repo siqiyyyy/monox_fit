@@ -6,22 +6,22 @@ import re
 ROOT.RooMsgService.instance().setSilentMode(True)
 
 # Define how a control region(s) transfer is made by defining *cmodel*, the calling pattern must be unchanged!
-# First define simple string which will be used for the datacard 
+# First define simple string which will be used for the datacard
 model = "zjets"
 
 def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
-  
+
   # Some setup
   _fin = _f.Get("category_%s"%cid)
   _wspace = _fin.Get("wspace_%s"%cid)
 
   # ############################ USER DEFINED ###########################################################
-  # First define the nominal transfer factors (histograms of signal/control, usually MC 
-  # note there are many tools available inside include/diagonalize.h for you to make 
-  # special datasets/histograms representing these and systematic effects 
-  # example below for creating shape systematic for photon which is just every bin up/down 30% 
+  # First define the nominal transfer factors (histograms of signal/control, usually MC
+  # note there are many tools available inside include/diagonalize.h for you to make
+  # special datasets/histograms representing these and systematic effects
+  # example below for creating shape systematic for photon which is just every bin up/down 30%
 
-  metname    = "met"          # Observable variable name 
+  metname    = "met"          # Observable variable name
   gvptname   = "genBosonPt"   # Weights are in generator pT
 
   target             = _fin.Get("signal_zjets")      # define monimal (MC) of which process this config will model
@@ -30,41 +30,43 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   controlmc_e        = _fin.Get("Zee_zll")           # defines Zmm MC of which process will be controlled by
   controlmc_w        = _fin.Get("signal_wjets")
 
-  # Create the transfer factors and save them (not here you can also create systematic variations of these 
+  # Create the transfer factors and save them (not here you can also create systematic variations of these
   # transfer factors (named with extention _sysname_Up/Down
   ZmmScales = target.Clone(); ZmmScales.SetName("zmm_weights_%s"%cid)
   ZmmScales.Divide(controlmc)
-  _fOut.WriteTObject(ZmmScales)  # always write out to the directory 
+  _fOut.WriteTObject(ZmmScales)  # always write out to the directory
 
   ZeeScales = target.Clone(); ZeeScales.SetName("zee_weights_%s"%cid)
   ZeeScales.Divide(controlmc_e)
-  _fOut.WriteTObject(ZeeScales)  # always write out to the directory 
+  _fOut.WriteTObject(ZeeScales)  # always write out to the directory
 
   WZScales = target.Clone(); WZScales.SetName("w_weights_%s"%cid)
   WZScales.Divide(controlmc_w)
-  _fOut.WriteTObject(WZScales)  # always write out to the directory 
-  
-  my_function(_wspace,_fin,_fOut,cid,diag)
-  PhotonScales = _fOut.Get("photon_weights_%s"%cid)
+  _fOut.WriteTObject(WZScales)  # always write out to the directory
+
+  PhotonScales = target.Clone(); PhotonScales.SetName("photon_weights_%s"%cid)
+  PhotonScales.Divide(controlmc_photon)
+  _fOut.WriteTObject(PhotonScales)
 
   #######################################################################################################
 
-  _bins = []  # take bins from some histogram, can choose anything but this is easy 
+  _bins = []  # take bins from some histogram, can choose anything but this is easy
   for b in range(target.GetNbinsX()+1):
     _bins.append(target.GetBinLowEdge(b+1))
 
-  # Here is the important bit which "Builds" the control region, make a list of control regions which 
+  # Here is the important bit which "Builds" the control region, make a list of control regions which
   # are constraining this process, each "Channel" is created with ...
-  # 	(name,_wspace,out_ws,cid+'_'+model,TRANSFERFACTORS) 
+  # 	(name,_wspace,out_ws,cid+'_'+model,TRANSFERFACTORS)
   # the second and third arguments can be left unchanged, the others instead must be set
   # TRANSFERFACTORS are what is created above, eg WScales
 
   CRs = [
-   Channel("photon",_wspace,out_ws,cid+'_'+model,PhotonScales) 
+   Channel("photon",_wspace,out_ws,cid+'_'+model,PhotonScales)
   ,Channel("dimuon",_wspace,out_ws,cid+'_'+model,ZmmScales)
   ,Channel("dielectron",_wspace,out_ws,cid+'_'+model,ZeeScales)
   ,Channel("wjetssignal",_wspace,out_ws,cid+'_'+model,WZScales)
   ]
+  my_function(_wspace,_fin,_fOut,cid,diag)
 
   # ############################ USER DEFINED ###########################################################
   # Add systematics in the following, for normalisations use name, relative size (0.01 --> 1%)
@@ -83,7 +85,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   do_stat_unc(WZScales, "w", cid, "wzCR", CRs[3],_fOut)
 
   ## Here now adding the trigger uncertainty
-  fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning 
+  fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning
 
   # We want to correlate experimental uncertainties between the loose and tight regions.
   cid_corr = re.sub("(loose|tight)","",cid)
@@ -102,8 +104,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
   CRs[2].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
-  #######################################################################################################  
- 
+  #######################################################################################################
+
   CRs[0].add_nuisance_shape("qcd",_fOut)
   CRs[0].add_nuisance_shape("qcdshape",_fOut)
   CRs[0].add_nuisance_shape("qcdprocess",_fOut)
@@ -113,7 +115,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   CRs[0].add_nuisance_shape("nnlomissZ",_fOut)
   CRs[0].add_nuisance_shape("nnlomissG",_fOut)
   CRs[0].add_nuisance_shape("cross",_fOut)
-  CRs[0].add_nuisance_shape("pdf",_fOut) 
+  CRs[0].add_nuisance_shape("pdf",_fOut)
 
   CRs[3].add_nuisance_shape("wqcd",_fOut)
   CRs[3].add_nuisance_shape("wqcdshape",_fOut)
@@ -124,9 +126,32 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   CRs[3].add_nuisance_shape("nnlomissZ",_fOut)
   CRs[3].add_nuisance_shape("nnlomissW",_fOut)
   CRs[3].add_nuisance_shape("wcross",_fOut)
-  CRs[3].add_nuisance_shape("wpdf",_fOut) 
+  CRs[3].add_nuisance_shape("wpdf",_fOut)
 
   #######################################################################################################
+
+
+  # Veto uncertainties
+  filler = {
+    "YEAR" : year,
+    "CHANNEL" : "monojet" if "monojet" in cid else "monov"
+  }
+
+  ftauveto = r.TFile.Open("sys/tau_veto_unc.root")
+  fmuveto = r.TFile.Open("sys/muon_veto_unc.root")
+
+  add_variation(WZScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "w_weights_%s_tauveto_%s_Up"%(cid, cid_corr), _fOut)
+  add_variation(WZScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "w_weights_%s_tauveto_%s_Down"%(cid, cid_corr), _fOut)
+  CRs[3].add_nuisance_shape("tauveto_%s"%cid_corr,_fOut)
+
+  add_variation(WZScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "w_weights_%s_muveto_id_%s_Up"%(cid, cid_corr), _fOut)
+  add_variation(WZScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "w_weights_%s_muveto_id_%s_Down"%(cid, cid_corr), _fOut)
+  CRs[3].add_nuisance_shape("muveto_id_%s"%cid_corr,_fOut)
+
+  add_variation(WZScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "w_weights_%s_muveto_iso_%s_Up"%(cid, cid_corr), _fOut)
+  add_variation(WZScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "w_weights_%s_muveto_iso_%s_Down"%(cid, cid_corr), _fOut)
+  CRs[3].add_nuisance_shape("muveto_iso_%s"%cid_corr,_fOut)
+
 
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course
@@ -142,7 +167,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   else:
     tag = ""
 
-  metname    = "met"          # Observable variable name 
+  metname    = "met"          # Observable variable name
   gvptname   = "genBosonPt"   # Weights are in generator pT
 
   target             = _fin.Get("signal_zjets")      # define monimal (MC) of which process this config will model
@@ -165,7 +190,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   Pho = controlmc_photon.Clone(); Pho.SetName("photon_weights_denom_%s"%nam)
   Zvv = target.Clone(); Zvv.SetName("photon_weights_nom_%s"%nam)
 
-  fztog = r.TFile.Open("sys/gz_unc.root") # 250 - 1400 binning 
+  fztog = r.TFile.Open("sys/gz_unc.root") # 250 - 1400 binning
 
   ## qcd scale
   ztog_qcd_up   = fztog.Get("ZG_QCDScale_met"+tag)
@@ -217,7 +242,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   ratio_ewk_up.Divide(Pho)
   ratio_ewk_up.Multiply(ztog_ewk_up)
   _fOut.WriteTObject(ratio_ewk_up)
-  
+
   ratio_ewk_down = Zvv.Clone();  ratio_ewk_down.SetName("photon_weights_%s_ewk_Down"%nam);
   ratio_ewk_down.Divide(Pho)
   ratio_ewk_down.Multiply(ztog_ewk_down)
@@ -231,7 +256,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   ratio_sudakov1_up.Divide(Pho)
   ratio_sudakov1_up.Multiply(ztog_sudakov1_up)
   _fOut.WriteTObject(ratio_sudakov1_up)
-  
+
   ratio_sudakov1_down = Zvv.Clone();  ratio_sudakov1_down.SetName("photon_weights_%s_sudakovZ_Down"%nam);
   ratio_sudakov1_down.Divide(Pho)
   ratio_sudakov1_down.Multiply(ztog_sudakov1_down)
@@ -245,7 +270,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   ratio_sudakov2_up.Divide(Pho)
   ratio_sudakov2_up.Multiply(ztog_sudakov2_up)
   _fOut.WriteTObject(ratio_sudakov2_up)
-  
+
   ratio_sudakov2_down = Zvv.Clone();  ratio_sudakov2_down.SetName("photon_weights_%s_sudakovG_Down"%nam);
   ratio_sudakov2_down.Divide(Pho)
   ratio_sudakov2_down.Multiply(ztog_sudakov2_down)
@@ -259,7 +284,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   ratio_nnlomiss1_up.Divide(Pho)
   ratio_nnlomiss1_up.Multiply(ztog_nnlomiss1_up)
   _fOut.WriteTObject(ratio_nnlomiss1_up)
-  
+
   ratio_nnlomiss1_down = Zvv.Clone();  ratio_nnlomiss1_down.SetName("photon_weights_%s_nnlomissZ_Down"%nam);
   ratio_nnlomiss1_down.Divide(Pho)
   ratio_nnlomiss1_down.Multiply(ztog_nnlomiss1_down)
@@ -273,7 +298,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   ratio_nnlomiss2_up.Divide(Pho)
   ratio_nnlomiss2_up.Multiply(ztog_nnlomiss2_up)
   _fOut.WriteTObject(ratio_nnlomiss2_up)
-  
+
   ratio_nnlomiss2_down = Zvv.Clone();  ratio_nnlomiss2_down.SetName("photon_weights_%s_nnlomissG_Down"%nam);
   ratio_nnlomiss2_down.Divide(Pho)
   ratio_nnlomiss2_down.Multiply(ztog_nnlomiss2_down)
@@ -287,7 +312,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   ratio_pdf_up.Divide(Pho)
   ratio_pdf_up.Multiply(ztog_pdf_up)
   _fOut.WriteTObject(ratio_pdf_up)
-  
+
   ratio_pdf_down = Zvv.Clone();  ratio_pdf_down.SetName("photon_weights_%s_pdf_Down"%nam);
   ratio_pdf_down.Divide(Pho)
   ratio_pdf_down.Multiply(ztog_pdf_down)
@@ -301,7 +326,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   ratio_cross_up.Divide(Pho)
   ratio_cross_up.Multiply(ztog_cross_up)
   _fOut.WriteTObject(ratio_cross_up)
-  
+
   ratio_cross_down = Zvv.Clone();  ratio_cross_down.SetName("photon_weights_%s_cross_Down"%nam);
   ratio_cross_down.Divide(Pho)
   ratio_cross_down.Multiply(ztog_cross_down)
@@ -309,11 +334,11 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
 
   Zvv.Divide(Pho); Zvv.SetName("photon_weights_%s"%nam)
 
-  PhotonScales = Zvv.Clone()
-  _fOut.WriteTObject(PhotonScales)
+  # PhotonScales = Zvv.Clone()
+  # _fOut.WriteTObject(PhotonScales)
 
 
-  #################################################################################################################                                                                   
+  #################################################################################################################
   #################################################################################################################
   ### Now lets do the same thing for W
 
@@ -379,7 +404,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_ewk_up.Divide(Wsig)
   wratio_ewk_up.Multiply(ztow_ewk_up)
   _fOut.WriteTObject(wratio_ewk_up)
-  
+
   wratio_ewk_down = Zvv_w.Clone();  wratio_ewk_down.SetName("w_weights_%s_wewk_Down"%nam);
   wratio_ewk_down.Divide(Wsig)
   wratio_ewk_down.Multiply(ztow_ewk_down)
@@ -393,7 +418,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_sudakov1_up.Divide(Wsig)
   wratio_sudakov1_up.Multiply(ztow_sudakov1_up)
   _fOut.WriteTObject(wratio_sudakov1_up)
-  
+
   wratio_sudakov1_down = Zvv_w.Clone();  wratio_sudakov1_down.SetName("w_weights_%s_sudakovZ_Down"%nam);
   wratio_sudakov1_down.Divide(Wsig)
   wratio_sudakov1_down.Multiply(ztow_sudakov1_down)
@@ -407,7 +432,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_sudakov2_up.Divide(Wsig)
   wratio_sudakov2_up.Multiply(ztow_sudakov2_up)
   _fOut.WriteTObject(wratio_sudakov2_up)
-  
+
   wratio_sudakov2_down = Zvv_w.Clone();  wratio_sudakov2_down.SetName("w_weights_%s_sudakovW_Down"%nam);
   wratio_sudakov2_down.Divide(Wsig)
   wratio_sudakov2_down.Multiply(ztow_sudakov2_down)
@@ -421,7 +446,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_nnlomiss1_up.Divide(Wsig)
   wratio_nnlomiss1_up.Multiply(ztow_nnlomiss1_up)
   _fOut.WriteTObject(wratio_nnlomiss1_up)
-  
+
   wratio_nnlomiss1_down = Zvv_w.Clone();  wratio_nnlomiss1_down.SetName("w_weights_%s_nnlomissZ_Down"%nam);
   wratio_nnlomiss1_down.Divide(Wsig)
   wratio_nnlomiss1_down.Multiply(ztow_nnlomiss1_down)
@@ -435,7 +460,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_nnlomiss2_up.Divide(Wsig)
   wratio_nnlomiss2_up.Multiply(ztow_nnlomiss2_up)
   _fOut.WriteTObject(wratio_nnlomiss2_up)
-  
+
   wratio_nnlomiss2_down = Zvv_w.Clone();  wratio_nnlomiss2_down.SetName("w_weights_%s_nnlomissW_Down"%nam);
   wratio_nnlomiss2_down.Divide(Wsig)
   wratio_nnlomiss2_down.Multiply(ztow_nnlomiss2_down)
@@ -449,7 +474,7 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_pdf_up.Divide(Wsig)
   wratio_pdf_up.Multiply(ztow_pdf_up)
   _fOut.WriteTObject(wratio_pdf_up)
-  
+
   wratio_pdf_down = Zvv_w.Clone();  wratio_pdf_down.SetName("w_weights_%s_wpdf_Down"%nam);
   wratio_pdf_down.Divide(Wsig)
   wratio_pdf_down.Multiply(ztow_pdf_down)
@@ -463,11 +488,12 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
   wratio_cross_up.Divide(Wsig)
   wratio_cross_up.Multiply(ztow_cross_up)
   _fOut.WriteTObject(wratio_cross_up)
-  
+
   wratio_cross_down = Zvv_w.Clone();  wratio_cross_down.SetName("w_weights_%s_wcross_Down"%nam);
   wratio_cross_down.Divide(Wsig)
   wratio_cross_down.Multiply(ztow_cross_down)
   _fOut.WriteTObject(wratio_cross_down)
+
 
   ############### GET SOMETHING CENTRAL PLEASE ############################
   #Wsig = controlmc_w.Clone(); Wsig.SetName("w_weights_denom_%s"%nam)
@@ -475,4 +501,4 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
 
   Zvv_w.Divide(Wsig)
 
- 
+

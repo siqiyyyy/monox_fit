@@ -38,10 +38,17 @@ def do_stat_unc(histogram, proc,cid, region, CR, outfile):
     CR.add_nuisance_shape("{CONSTRAINT}_stat_error_{REGION}_bin{BIN}".format(**replacement),outfile)
 
 
-def add_variation(histogram, unc_file, unc_name, new_name, outfile):
+def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False):
   variation = histogram.Clone(new_name)
   factor = unc_file.Get(unc_name)
-  variation.Multiply(factor)
+
+  if not factor:
+    raise IOError("Could not retrieve histogram '%s' from file '%s'."%(unc_name), unc_file)
+
+  if invert:
+    variation.Divide(factor)
+  else:
+    variation.Multiply(factor)
   outfile.WriteTObject(variation)
 
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
@@ -102,12 +109,13 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   do_stat_unc(WScales, "wmn", cid, "singlemuonCR", CRs[0],_fOut)
   do_stat_unc(WScales_e, "wen", cid, "singleelectronCR", CRs[1],_fOut)
 
-
+  filler = {"YEAR":year}
   if "monov" in cid:
     tag = "_monov"
+    filler["CHANNEL"] = "monov"
   else:
     tag = ""
-
+    filler["CHANNEL"] = "monojet"
   fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning
   
   # We want to correlate experimental uncertainties between the loose and tight regions.
@@ -139,30 +147,41 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   ## Veto uncertainties
   fwtowveto = r.TFile.Open("sys/veto_sys.root") # 250 - 1400 binning
 
-  ## Wmuon CR first
-  add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_%s_Up"%(cid,cid_corr), _fOut)
-  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_%s_Down"%(cid,cid_corr), _fOut)
+  ftauveto = r.TFile.Open("sys/tau_veto_unc.root")
+  fmuveto = r.TFile.Open("sys/muon_veto_unc.root")
+  
+  ## Wmuon CR
+  add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_%s_Up"%(cid,cid_corr), _fOut, invert=True)
+  add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_%s_Down"%(cid,cid_corr), _fOut, invert=True)
   CRs[0].add_nuisance_shape("eveto_%s"%cid_corr,_fOut)
 
-  add_variation(WScales, fwtowveto, "muveto"+tag, "wmn_weights_%s_muveto_%s_Up"%(cid,cid_corr), _fOut)
-  add_variation(WScales, fwtowveto, "muveto_Down"+tag, "wmn_weights_%s_muveto_%s_Down"%(cid,cid_corr), _fOut)
-  CRs[0].add_nuisance_shape("muveto_%s"%cid_corr,_fOut)
+  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Up"%(cid,cid_corr), _fOut, invert=True)
+  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Down"%(cid,cid_corr), _fOut, invert=True)
+  CRs[0].add_nuisance_shape("muveto_id_%s"%cid_corr,_fOut)
 
-  add_variation(WScales, fwtowveto, "tauveto"+tag, "wmn_weights_%s_tauveto_%s_Up"%(cid,cid_corr), _fOut)
-  add_variation(WScales, fwtowveto, "tauveto_Down"+tag, "wmn_weights_%s_tauveto_%s_Down"%(cid,cid_corr), _fOut)
+  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Up"%(cid,cid_corr), _fOut, invert=True)
+  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Down"%(cid,cid_corr), _fOut, invert=True)
+  CRs[0].add_nuisance_shape("muveto_iso_%s"%cid_corr,_fOut)
+
+  add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Up"%(cid,cid_corr), _fOut, invert=True)
+  add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Down"%(cid,cid_corr), _fOut, invert=True)
   CRs[0].add_nuisance_shape("tauveto_%s"%cid_corr,_fOut)
 
-  ## W electron CR first
+  ## W electron CR 
   add_variation(WScales_e, fwtowveto, "eleveto"+tag, "wen_weights_%s_eveto_%s_Up"%(cid,cid_corr), _fOut)
   add_variation(WScales_e, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_%s_Down"%(cid,cid_corr), _fOut)
   CRs[1].add_nuisance_shape("eveto_%s"%cid_corr,_fOut)
 
-  add_variation(WScales_e, fwtowveto, "muveto"+tag, "wen_weights_%s_muveto_%s_Up"%(cid,cid_corr), _fOut)
-  add_variation(WScales_e, fwtowveto, "muveto_Down"+tag, "wen_weights_%s_muveto_%s_Down"%(cid,cid_corr), _fOut)
-  CRs[1].add_nuisance_shape("muveto_%s"%cid_corr,_fOut)
+  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Up"%(cid,cid_corr), _fOut, invert=True)
+  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Down"%(cid,cid_corr), _fOut, invert=True)
+  CRs[1].add_nuisance_shape("muveto_id_%s"%cid_corr,_fOut)
 
-  add_variation(WScales_e, fwtowveto, "tauveto"+tag, "wen_weights_%s_tauveto_%s_Up"%(cid,cid_corr), _fOut)
-  add_variation(WScales_e, fwtowveto, "tauveto_Down"+tag, "wen_weights_%s_tauveto_%s_Down"%(cid,cid_corr), _fOut)
+  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Up"%(cid,cid_corr), _fOut, invert=True)
+  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Down"%(cid,cid_corr), _fOut, invert=True)
+  CRs[1].add_nuisance_shape("muveto_iso_%s"%cid_corr,_fOut)
+
+  add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Up"%(cid,cid_corr), _fOut, invert=True)
+  add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Down"%(cid,cid_corr), _fOut, invert=True)
   CRs[1].add_nuisance_shape("tauveto_%s"%cid_corr,_fOut)
 
 
