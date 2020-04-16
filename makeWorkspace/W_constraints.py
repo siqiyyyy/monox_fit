@@ -117,7 +117,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     tag = ""
     filler["CHANNEL"] = "monojet"
   fztoz_trig = r.TFile.Open("sys/all_trig_2017.root") # 250 - 1400 binning
-  
+
   # We want to correlate experimental uncertainties between the loose and tight regions.
   cid_corr = re.sub("(loose|tight)","",cid)
 
@@ -149,25 +149,25 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   ftauveto = r.TFile.Open("sys/tau_veto_unc.root")
   fmuveto = r.TFile.Open("sys/muon_veto_unc.root")
-  
+
   ## Wmuon CR
   add_variation(WScales, fwtowveto, "eleveto"+tag, "wmn_weights_%s_eveto_%s_Up"%(cid,year), _fOut, invert=True)
   add_variation(WScales, fwtowveto, "eleveto_Down"+tag, "wmn_weights_%s_eveto_%s_Down"%(cid,year), _fOut, invert=True)
   CRs[0].add_nuisance_shape("eveto_%s"%year,_fOut)
 
-  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut, invert=True)
   CRs[0].add_nuisance_shape("muveto_id_%s"%year,_fOut)
 
-  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut, invert=True)
-  add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut, invert=True)
+  add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut, invert=True)
   CRs[0].add_nuisance_shape("muveto_iso_%s"%year,_fOut)
 
   add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Up"%(cid,year), _fOut, invert=True)
   add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Down"%(cid,year), _fOut, invert=True)
   CRs[0].add_nuisance_shape("tauveto_%s"%year,_fOut)
 
-  ## W electron CR 
+  ## W electron CR
   add_variation(WScales_e, fwtowveto, "eleveto"+tag, "wen_weights_%s_eveto_%s_Up"%(cid,year), _fOut)
   add_variation(WScales_e, fwtowveto, "eleveto_Down"+tag, "wen_weights_%s_eveto_%s_Down"%(cid,year), _fOut)
   CRs[1].add_nuisance_shape("eveto_%s"%year,_fOut)
@@ -185,6 +185,20 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   CRs[1].add_nuisance_shape("tauveto_%s"%year,_fOut)
 
 
+  # Prefiring uncertainty
+  # The shape in the input file is just one histogram to be used for up/down
+  # -> need to invert for one variation
+  # Note that the "invert" argument is the other way round for electrons and muons
+  # To take into account the anticorrelation between them
+  if year == 2017:
+    fpref = r.TFile.Open("sys/pref_unc.root")
+    add_variation(WScales, fpref, "{CHANNEL}_pref_unc_w_over_m".format(**filler), "wmn_weights_%s_prefiring_Up"%cid, _fOut)
+    add_variation(WScales, fpref, "{CHANNEL}_pref_unc_w_over_m".format(**filler), "wmn_weights_%s_prefiring_Down"%cid, _fOut, invert=True)
+    CRs[0].add_nuisance_shape("prefiring",_fOut)
+
+    add_variation(WScales_e, fpref, "{CHANNEL}_pref_unc_w_over_e".format(**filler), "wen_weights_%s_prefiring_Up"%cid, _fOut, invert=True)
+    add_variation(WScales_e, fpref, "{CHANNEL}_pref_unc_w_over_e".format(**filler), "wen_weights_%s_prefiring_Down"%cid, _fOut)
+    CRs[1].add_nuisance_shape("prefiring",_fOut)
 
   #######################################################################################################
 
