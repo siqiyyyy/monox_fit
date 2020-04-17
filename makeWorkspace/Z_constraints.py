@@ -136,12 +136,18 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     "YEAR" : year,
     "CHANNEL" : "monojet" if "monojet" in cid else "monov"
   }
-
+  fwtowveto = r.TFile.Open("sys/veto_sys.root") # 250 - 1400 binning
   ftauveto = r.TFile.Open("sys/tau_veto_unc.root")
   fmuveto = r.TFile.Open("sys/muon_veto_unc.root")
 
   # The transfer factor here is Z(SR) / W(SR)
   # -> Invert the veto shapes relative to W_constraints, where the TF is W(SR) / W(CR)
+
+
+  add_variation(WZScales, fwtowveto, "eleveto"+tag, "w_weights_%s_eveto_%s_Up"%(cid, year), _fOut,invert=True)
+  add_variation(WZScales, fwtowveto, "eleveto_Down"+tag, "w_weights_%s_eveto_%s_Down"%(cid, year), _fOut,invert=True)
+  CRs[3].add_nuisance_shape("eveto_%s"%year,_fOut)
+
   add_variation(WZScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "w_weights_%s_tauveto_%s_Up"%(cid, year), _fOut,invert=True)
   add_variation(WZScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "w_weights_%s_tauveto_%s_Down"%(cid, year), _fOut,invert=True)
   CRs[3].add_nuisance_shape("tauveto_%s"%year,_fOut)
