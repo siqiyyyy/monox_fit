@@ -1,7 +1,7 @@
 Combination of monojet_@YEAR.txt
 imax 6 number of bins
 jmax 10 number of processes minus 1
-kmax 179 number of nuisance parameters
+kmax * number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
 shapes *                         monojet_@YEAR_dielec    combined_model.root combinedws:monojet_@YEAR_Zee_$PROCESS
 shapes data_obs                  monojet_@YEAR_dielec    combined_model.root combinedws:monojet_@YEAR_Zee_data
@@ -136,7 +136,7 @@ monojet_@YEAR_stat_error_dimuonCR_bin16  param  0.0 1
 monojet_@YEAR_stat_error_dimuonCR_bin17  param  0.0 1
 monojet_@YEAR_stat_error_dimuonCR_bin18  param  0.0 1
 monojet_@YEAR_stat_error_dimuonCR_bin19  param  0.0 1
-eveto_monojet_@YEAR         param  0.0 1
+eveto_@YEAR         param  0.0 1
 wtowpdf       param  0.0 1
 wqcdprocess   param  0.0 1
 pdf           param  0.0 1
@@ -167,7 +167,8 @@ nnlomissZ     param  0.0 1
 monojet_@YEAR_stat_error_singlemuonCR_bin10  param  0.0 1
 wqcd          param  0.0 1
 nnlomissW     param  0.0 1
-muveto_monojet_@YEAR        param  0.0 1
+muveto_id_@YEAR        param  0.0 1
+muveto_iso_@YEAR        param  0.0 1
 ewk           param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin18  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin19  param  0.0 1
@@ -201,7 +202,7 @@ monojet_@YEAR_stat_error_singleelectronCR_bin20  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin8  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin9  param  0.0 1
 qcdprocess    param  0.0 1
-tauveto_monojet_@YEAR       param  0.0 1
+tauveto_@YEAR       param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin0  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin1  param  0.0 1
 monojet_@YEAR_stat_error_dielectronCR_bin20  param  0.0 1
@@ -210,3 +211,4 @@ monojet_@YEAR_stat_error_singleelectronCR_bin4  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin5  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin6  param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin7  param  0.0 1
+prefiring  param  0.0 1

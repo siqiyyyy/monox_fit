@@ -16,7 +16,9 @@ for YEAR in 2017 2018; do
                 sed -i "s|@LUMI|1.025|g" ${CARD}
             elif [ $YEAR -eq 2018 ]; then
                 sed -i "s|@LUMI|1.023|g" ${CARD}
+                sed -i "/prefiring/d" ${CARD}
             fi
+
             sed -i "s|combined_model.root|../root/combined_model_monov_${TAGGER}_${WP}.root|g" ${CARD}
             text2workspace.py ${CARD} --channel-masks
             python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${TAGGER}_monov${WP}_${YEAR}.html
@@ -45,6 +47,7 @@ for YEAR in 2017 2018; do
         sed -i "s|@LUMI|1.025|g" ${CARD}
     elif [ $YEAR -eq 2018 ]; then
         sed -i "s|@LUMI|1.023|g" ${CARD}
+        sed -i "/prefiring/d" ${CARD}
     fi
     text2workspace.py ${CARD} --channel-masks
     python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > systematics_tau21_monov_${YEAR}.html
