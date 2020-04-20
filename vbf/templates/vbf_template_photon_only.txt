@@ -21,6 +21,7 @@ CMS_trigger@YEAR_g      lnN            1.01              1.01              -
 QCD_NormPurity@YEAR     lnN            -                 -                 1.25             
 
 CMS_scale@YEAR_j_vbf param 0.0 1
+CMS_res@YEAR_j_vbf param 0.0 1
 vbf_@YEAR_stat_error_qcd_photonCR_bin1 param 0.0 1
 vbf_@YEAR_stat_error_qcd_photonCR_bin2 param 0.0 1
 vbf_@YEAR_stat_error_qcd_photonCR_bin3 param 0.0 1
