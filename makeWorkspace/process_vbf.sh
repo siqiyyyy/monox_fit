@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 # INDIR=../input/2020-02-05_vbf_noeletrig
-TAG='combine'
-INDIR=../input/vbf/2020-03-03_vbf_nohem
+TAG='newjes'
+INDIR=../input/vbf/2020-04-19_simplify_photon_kfac_vbf
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../vbf/$(basename $INDIR)/${TAG}/root"
