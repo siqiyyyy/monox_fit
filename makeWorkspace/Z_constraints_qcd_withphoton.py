@@ -198,7 +198,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
   CRs[2].add_nuisance_shape("ZnunuWJets_QCD_pdf_vbf",_fOut)
 
   for b in range(target.GetNbinsX()):
-    CRs[2].add_nuisance_shape("qcd_ewk_%s_bin%d"%(cid,b),_fOut)
+    CRs[2].add_nuisance_shape("qcd_ewk_%s_bin%d"%(re.sub("_201(\d)","",cid),b),_fOut)
 
 
   CRs[3].add_nuisance_shape("Photon_QCD_renscale_vbf",_fOut)
@@ -206,7 +206,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
   CRs[3].add_nuisance_shape("Photon_QCD_pdf_vbf",_fOut)
 
   for b in range(target.GetNbinsX()):
-    CRs[3].add_nuisance_shape("qcd_photon_ewk_%s_bin%d"%(cid,b),_fOut)
+    CRs[3].add_nuisance_shape("qcd_photon_ewk_%s_bin%d"%(re.sub("_201(\d)","",cid),b),_fOut)
 
 
   #######################################################################################################
@@ -314,8 +314,8 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
   #Now lets uncorrelate the bins:
   for b in range(target.GetNbinsX()):
     #print "HELLO trying to fill up / down"
-    ewk_up_w = Zvv_w.Clone(); ewk_up_w.SetName("qcd_w_weights_%s_qcd_ewk_%s_bin%d_Up"%(nam,nam,b))
-    ewk_down_w = Zvv_w.Clone(); ewk_down_w.SetName("qcd_w_weights_%s_qcd_ewk_%s_bin%d_Down"%(nam,nam,b))
+    ewk_up_w = Zvv_w.Clone(); ewk_up_w.SetName("qcd_w_weights_%s_qcd_ewk_%s_bin%d_Up"%(nam,re.sub("_201(\d)","",nam),b))
+    ewk_down_w = Zvv_w.Clone(); ewk_down_w.SetName("qcd_w_weights_%s_qcd_ewk_%s_bin%d_Down"%(nam,re.sub("_201(\d)","",nam),b))
     for i in range(target.GetNbinsX()):
       if i==b:
         ewk_up_w.SetBinContent(i+1,wratio_ewk_up.GetBinContent(i+1))
@@ -384,8 +384,8 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
   #Now lets uncorrelate the bins:
   for b in range(target.GetNbinsX()):
     #print "HELLO trying to fill up / down"
-    ewk_up_g = Zvv_g.Clone(); ewk_up_g.SetName("qcd_photon_weights_%s_qcd_photon_ewk_%s_bin%d_Up"%(nam,nam,b))
-    ewk_down_g = Zvv_g.Clone(); ewk_down_g.SetName("qcd_photon_weights_%s_qcd_photon_ewk_%s_bin%d_Down"%(nam,nam,b))
+    ewk_up_g = Zvv_g.Clone(); ewk_up_g.SetName("qcd_photon_weights_%s_qcd_photon_ewk_%s_bin%d_Up"%(nam,re.sub("_201(\d)","",nam),b))
+    ewk_down_g = Zvv_g.Clone(); ewk_down_g.SetName("qcd_photon_weights_%s_qcd_photon_ewk_%s_bin%d_Down"%(nam,re.sub("_201(\d)","",nam),b))
     for i in range(target.GetNbinsX()):
       if i==b:
         ewk_up_g.SetBinContent(i+1,gratio_ewk_up.GetBinContent(i+1))
