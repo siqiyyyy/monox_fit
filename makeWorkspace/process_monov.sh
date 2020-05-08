@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=/uscms_data/d3/aandreas/legacy_limit/monox_fit/input/2020-02-21_19Feb20_skim_monojet_monov_gjets_ele
-TAG='combined'
+INDIR=../input/2020-04-20_monojetv_v2
+TAG='default'
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
