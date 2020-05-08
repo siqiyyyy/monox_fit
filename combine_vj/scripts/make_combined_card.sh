@@ -1,7 +1,7 @@
-TAG=2020-03-27_monojet_monov_overlap_v2
-SUBTAG=v1
-JDIR=$(readlink -e ../monojet/${TAG}/combined/)
-VDIR=$(readlink -e ../monov/${TAG}/combined/)
+TAG=2020-04-20_monojetv_v2
+SUBTAG=default
+JDIR=$(readlink -e ../monojet/${TAG}/${SUBTAG}/)
+VDIR=$(readlink -e ../monov/${TAG}/${SUBTAG}/)
 
 WDIR=./${TAG}/${SUBTAG}/
 mkdir -p $WDIR
