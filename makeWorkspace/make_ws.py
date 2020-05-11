@@ -5,6 +5,7 @@ ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
 from HiggsAnalysis.CombinedLimit.ModelTools import *
 import os
 import argparse
+from math import sqrt
 pjoin = os.path.join
 
 def cli_args():
@@ -65,6 +66,20 @@ def main():
       # Ensure non-zero integral for combine
       if not obj.Integral() > 0:
         obj.SetBinContent(1,0.0001)
+
+      # Add overflow to last bin
+      overflow        = obj.GetBinContent(obj.GetNbinsX()+1)
+      overflow_err    = obj.GetBinError(obj.GetNbinsX()+1)
+      lastbin         = obj.GetBinContent(obj.GetNbinsX())
+      lastbin_err     = obj.GetBinError(obj.GetNbinsX())
+      new_lastbin     = overflow + lastbin
+      new_lastbin_err = sqrt(overflow_err**2 + lastbin_err**2)
+
+      obj.SetBinContent(obj.GetNbinsX(), new_lastbin)
+      obj.SetBinError(obj.GetNbinsX(), new_lastbin_err)
+      obj.SetBinContent(obj.GetNbinsX()+1, 0)
+      obj.SetBinError(obj.GetNbinsX()+1, 0)
+
 
       print "Creating Data Hist for ", name
       dhist = ROOT.RooDataHist(
