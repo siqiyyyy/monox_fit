@@ -55,13 +55,12 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
     jer = 0.01
   elif year==2018:
     jes = 0.01
-    jer = 0.0
+    jer = 0.01
   else:
     raise RuntimeError("Year not recognized: " + str(year))
   for c in CRs:
     c.add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year), jes)
     c.add_nuisance('CMS_res{YEAR}_j_vbf'.format(YEAR=year), jer)
-    c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
     c.add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     0.01)
     c.add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     0.02)
     c.add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     0.015)

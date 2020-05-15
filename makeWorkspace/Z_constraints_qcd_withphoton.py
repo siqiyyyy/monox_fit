@@ -69,9 +69,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
     ,Channel("qcd_photon",_wspace,out_ws,cid+'_'+model,PhotonScales,convention=convention)
     ,Channel("ewkqcd_signal",_wspace,out_ws,cid+'_'+model,EQScales,convention=convention)
   ]
-  for c in CRs[:3]:
-    c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
-
   CRs[2].add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     -0.01)
   CRs[2].add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     -0.02)
   CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.015)
