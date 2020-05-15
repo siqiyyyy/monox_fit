@@ -62,7 +62,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
     c.add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year), jes)
     c.add_nuisance('CMS_res{YEAR}_j_vbf'.format(YEAR=year), jer)
     c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
-    c.add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     0.035)
+    c.add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     0.01)
     c.add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     0.02)
     c.add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     0.015)
 
