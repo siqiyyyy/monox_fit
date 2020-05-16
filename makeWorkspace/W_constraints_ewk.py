@@ -1,5 +1,6 @@
 import ROOT
 from counting_experiment import *
+from W_constraints import do_stat_unc
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard 
 model = "ewk_wjets"
@@ -71,30 +72,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
   # for shapes use add_nuisance_shape with (name,_fOut)
   # note, the code will LOOK for something called NOMINAL_name_Up and NOMINAL_name_Down, where NOMINAL=WScales.GetName()
   # these must be created and writted to the same dirctory as the nominal (fDir)
-
-  
-  def addStatErrs(hx,cr,crname1,crname2):
-    for b in range(1,targetmc.GetNbinsX()+1):
-      err = hx.GetBinError(b)
-      if not hx.GetBinContent(b)>0:
-        continue
-      relerr = err/hx.GetBinContent(b)
-      if relerr<0.01:
-        continue
-      byb_u = hx.Clone(); byb_u.SetName('%s_weights_%s_%s_stat_error_%s_bin%d_Up'%(crname1,cid,cid,crname2,b))
-      byb_u.SetBinContent(b,hx.GetBinContent(b)+err)
-      byb_d = hx.Clone(); byb_d.SetName('%s_weights_%s_%s_stat_error_%s_bin%d_Down'%(crname1,cid,cid,crname2,b))
-      if err<hx.GetBinContent(b):
-        byb_d.SetBinContent(b,hx.GetBinContent(b)-err)
-      else:
-        byb_d.SetBinContent(b,0)
-      _fOut.WriteTObject(byb_u)
-      _fOut.WriteTObject(byb_d)
-      cr.add_nuisance_shape('%s_stat_error_%s_bin%d'%(cid,crname2,b),_fOut)
-
-  addStatErrs(WScales,CRs[0],'ewk_wmn','ewk_singlemuon')
-  addStatErrs(WScales_e,CRs[1],'ewk_wen','ewk_singleelectron')
-
+  do_stat_unc(WScales,proc='ewk_wmn', region='ewk_singlemuon', CR=CRs[0], cid=cid,outfile=_fOut)
+  do_stat_unc(WScales,proc='ewk_wen', region='ewk_singlemuon', CR=CRs[1], cid=cid,outfile=_fOut)
 
   #######################################################################################################
 
