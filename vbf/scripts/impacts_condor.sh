@@ -2,9 +2,14 @@
 do_impacts(){
     YEAR=${1}
     SIGNAL=${2}
-    mkdir -p ${YEAR}_${SIGNAL}
-    pushd ${YEAR}_${SIGNAL}
+    SUBTAG=${3}
+    mkdir -p ${SUBTAG}${YEAR}_${SIGNAL}
+    pushd ${SUBTAG}${YEAR}_${SIGNAL}
     COMMON_OPTS="-t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1 --autoRange 5 --squareDistPoiStep"
+
+    if [ "${SUBTAG}" = "nophoton" ]; then
+        COMMON_OPTS="${COMMON_OPTS} --setParameters mask_vbf_${YEAR}_photon=1"
+    fi
     combineTool.py -M Impacts \
                    -d ../../cards/card_vbf_${YEAR}.root \
                    -m 125 \
@@ -37,16 +42,18 @@ do_impacts(){
                    -o impacts.json \
                     ${COMMON_OPTS}
     popd
-    plotImpacts.py -i ${YEAR}_${SIGNAL}/impacts.json -o impacts_vbf_${YEAR}_${SIGNAL}
+    plotImpacts.py -i ${SUBTAG}${YEAR}_${SIGNAL}/impacts.json -o impacts_vbf_${SUBTAG}${YEAR}_${SIGNAL}
 }
 
 export -f do_impacts
 ### Impacts
 mkdir -p impacts
 pushd impacts
-for SIGNAL in "0.0"; do
-    for YEAR in combined 2017 2018; do
-        nohup bash -c "do_impacts $YEAR $SIGNAL" >  impacts_${YEAR}_${SIGNAL}.log &
+for SUBTAG in "nophoton"; do
+    for SIGNAL in "0.0"; do
+        for YEAR in 2017; do
+            nohup bash -c "do_impacts $YEAR $SIGNAL ${SUBTAG}" >  impacts_${SUBTAG}${YEAR}_${SIGNAL}.log &
+        done
     done
 done
 popd
