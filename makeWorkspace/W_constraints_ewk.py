@@ -73,7 +73,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
   # note, the code will LOOK for something called NOMINAL_name_Up and NOMINAL_name_Down, where NOMINAL=WScales.GetName()
   # these must be created and writted to the same dirctory as the nominal (fDir)
   do_stat_unc(WScales,proc='ewk_wmn', region='ewk_singlemuon', CR=CRs[0], cid=cid,outfile=_fOut)
-  do_stat_unc(WScales,proc='ewk_wen', region='ewk_singlemuon', CR=CRs[1], cid=cid,outfile=_fOut)
+  do_stat_unc(WScales,proc='ewk_wen', region='ewk_singleelectron', CR=CRs[1], cid=cid,outfile=_fOut)
 
   #######################################################################################################
 
