@@ -10,7 +10,10 @@ ROOT.RooMsgService.instance().setSilentMode(True)
 model = "zjets"
 
 def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
-
+  filler = {
+    "YEAR" : year,
+    "CHANNEL" : "monojet" if "monojet" in cid else "monov"
+  }
   # Some setup
   _fin = _f.Get("category_%s"%cid)
   _wspace = _fin.Get("wspace_%s"%cid)
@@ -66,7 +69,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   ,Channel("dielectron",_wspace,out_ws,cid+'_'+model,ZeeScales)
   ,Channel("wjetssignal",_wspace,out_ws,cid+'_'+model,WZScales)
   ]
-  my_function(_wspace,_fin,_fOut,cid,diag)
+  my_function(_wspace,_fin,_fOut,cid,diag, filler)
 
   # ############################ USER DEFINED ###########################################################
   # Add systematics in the following, for normalisations use name, relative size (0.01 --> 1%)
@@ -128,22 +131,18 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   CRs[3].add_nuisance_shape("wcross",_fOut)
   CRs[3].add_nuisance_shape("wpdf",_fOut)
 
+
+
   #######################################################################################################
 
 
   # Veto uncertainties
-  filler = {
-    "YEAR" : year,
-    "CHANNEL" : "monojet" if "monojet" in cid else "monov"
-  }
   fwtowveto = r.TFile.Open("sys/veto_sys.root") # 250 - 1400 binning
   ftauveto = r.TFile.Open("sys/tau_veto_unc.root")
   fmuveto = r.TFile.Open("sys/muon_veto_unc.root")
 
   # The transfer factor here is Z(SR) / W(SR)
   # -> Invert the veto shapes relative to W_constraints, where the TF is W(SR) / W(CR)
-
-
   add_variation(WZScales, fwtowveto, "eleveto"+tag, "w_weights_%s_eveto_%s_Up"%(cid, year), _fOut,invert=True)
   add_variation(WZScales, fwtowveto, "eleveto_Down"+tag, "w_weights_%s_eveto_%s_Down"%(cid, year), _fOut,invert=True)
   CRs[3].add_nuisance_shape("eveto_%s"%year,_fOut)
@@ -176,12 +175,21 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(ZeeScales, fpref, "{CHANNEL}_pref_unc_z_over_ee".format(**filler), "zee_weights_%s_prefiring_Down"%cid, _fOut)
     CRs[2].add_nuisance_shape("prefiring",_fOut)
 
+
+  fphotonid = r.TFile.Open("sys/photon_id_unc.root")
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Up"%(cid, year), _fOut)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Down"%(cid, year), _fOut)
+  CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho".format(**filler),_fOut)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Up"%(cid, year), _fOut)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut)
+  CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho_extrap".format(**filler),_fOut)
+
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course
   return cat
 
 # My Function. Just to put all of the complicated part into one function
-def my_function(_wspace,_fin,_fOut,nam,diag):
+def my_function(_wspace,_fin,_fOut,nam,diag, filler):
 
   print "What is your cid?", nam
 
@@ -359,7 +367,6 @@ def my_function(_wspace,_fin,_fOut,nam,diag):
 
   # PhotonScales = Zvv.Clone()
   # _fOut.WriteTObject(PhotonScales)
-
 
   #################################################################################################################
   #################################################################################################################
