@@ -344,7 +344,7 @@ class Channel:
     if bkg: self.bkg_nuisances.append(name)
     else:   self.nuisances.append(name)
     
-  def add_nuisance_shape(self,name,file,setv=""):
+  def add_nuisance_shape(self,name,file,setv="",functype="quadratic"):
     if not(self.wspace_out.var("%s"%name)) :
       nuis = r.RooRealVar("%s"%name,"Nuisance - %s"%name,0,-3,3);
       nuis.setAttribute("NuisanceParameter_EXTERNAL",True);
@@ -361,57 +361,81 @@ class Channel:
     print "Looking for systematic shapes ... %s,%s"%(sfup,sfdn)
     sysup,sysdn =  file.Get(sfup),file.Get(sfdn)
     try:
-     sysup.GetName()
-     sysdn.GetName()
+      sysup.GetName()
+      sysdn.GetName()
     except ReferenceError: 
-     print "Missing one of ", sfup, sfdn, " in ", file.GetName()
-     print "Following is in directory "
-     file.ls()
-     sys.exit()
+      print "Missing one of ", sfup, sfdn, " in ", file.GetName()
+      print "Following is in directory "
+      file.ls()
+      sys.exit()
     # Now we loop through each bin and construct a polynomial function per bin 
     for b in range(self.nbins):
-    	if self.scalefactors.GetBinContent(b+1) == 0 : 
-	 nsf=0
-	 vu=0
-	 vd=0
-	else:
-         print "ZEYNEP scalefactor  :", self.scalefactors.GetName(), self.scalefactors.GetBinContent(b+1)
-         print "ZEYNEP sys up / down:", sysup.GetBinContent(b+1), sysdn.GetBinContent(b+1)
-    	 nsf = 1./(self.scalefactors.GetBinContent(b+1))
-	 vu = 1./(sysup.GetBinContent(b+1)) - nsf 
+      # Name of the function depends on the naming convention
+      if self.convention=="BU":
+        fname = "sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b)
+      else:
+        fname = "sys_function_%s_cat_%s_ch_%s_bin%d"%(name,self.catid,self.chid,b+1)
 
-         if sysdn.GetBinContent(b+1) == 0 :
-           vd = 0
-         else:
-           vd = 1./(sysdn.GetBinContent(b+1)) - nsf  # Note this should be <ve if down is lower, its not a bug
-	coeff_a = 0.5*(vu+vd)
-	coeff_b = 0.5*(vu-vd)
-
-        if self.convention=="BU":
-          fname = "sys_function_%s_cat_%s_ch_%s_bin_%d"%(name,self.catid,self.chid,b)
+      # Option 1: Quadratic interpolation
+      if functype=="quadratic":
+        if self.scalefactors.GetBinContent(b+1) == 0 : 
+          nsf=0
+          vu=0
+          vd=0
         else:
-          fname = "sys_function_%s_cat_%s_ch_%s_bin%d"%(name,self.catid,self.chid,b+1)
-        func = r.RooFormulaVar(
-                               fname,
-                               "Systematic Varation",
-                               "(%f*@0*@0+%f*@0)/%f"%(coeff_a,coeff_b,nsf),
-                               r.RooArgList(self.wspace_out.var("%s"%name))
-                               ) # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
+          nsf = 1./(self.scalefactors.GetBinContent(b+1))
+          vu = 1./(sysup.GetBinContent(b+1)) - nsf 
 
+          if sysdn.GetBinContent(b+1) == 0:
+            vd = 0
+          else:
+            vd = 1./(sysdn.GetBinContent(b+1)) - nsf  # Note this should be <ve if down is lower, its not a bug
+        coeff_a = 0.5*(vu+vd)
+        coeff_b = 0.5*(vu-vd)
+
+
+        func = r.RooFormulaVar(
+                                fname,
+                                "Systematic Varation",
+                                "(%f*@0*@0+%f*@0)/%f"%(coeff_a,coeff_b,nsf),
+                                r.RooArgList(self.wspace_out.var("%s"%name))
+                                ) # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
         if (coeff_a == 0): 
           func.setAttribute("temp",True)
+      elif functype=="lognorm":
 
-	self.wspace_out.var("%s"%name).setVal(0)
-        if not self.wspace_out.function(func.GetName()) :self.wspace_out._import(func)
-    if setv!="":
-      if "SetTo" in setv: 
-       vv = float(setv.split("=")[1])
-       self.wspace_out.var("nuis_IN_%s"%name).setVal(vv)
-       self.wspace_out.var("%s"%name).setVal(vv)
-      else: 
-      	print "DIRECTIVE %s IN SYSTEMATIC %s, NOT UNDERSTOOD!"%(setv,name)
-	sys.exit()
-    self.nuisances.append(name)
+        # Central value of the transfer factor
+        n0 = self.scalefactors.GetBinContent(b+1)
+
+        # Symmetrized uncertainty
+        if n0 == 0:
+          sigma = 0
+        else:
+          sigma = 0.5 * abs(sysup.GetBinContent(b+1) - sysdn.GetBinContent(b+1))
+
+        # Log-normal function (sigma/n0)^x, where x is the nuisance parameter.
+        func = r.RooFormulaVar(
+                                fname,
+                                "Systematic Varation",
+                                "((1+%f/%f)^@0-1)*%f"%(sigma,n0,n0),
+                                r.RooArgList(self.wspace_out.var("%s"%name))
+                                )
+        if (sigma == 0): 
+          func.setAttribute("temp",True)
+      else:
+        raise ValueError("Encountered unknown functype argument: " + functype)
+      self.wspace_out.var("%s"%name).setVal(0)
+      if not self.wspace_out.function(func.GetName()):
+        self.wspace_out._import(func)
+      if setv!="":
+        if "SetTo" in setv: 
+          vv = float(setv.split("=")[1])
+          self.wspace_out.var("nuis_IN_%s"%name).setVal(vv)
+          self.wspace_out.var("%s"%name).setVal(vv)
+        else: 
+          print "DIRECTIVE %s IN SYSTEMATIC %s, NOT UNDERSTOOD!"%(setv,name)
+          sys.exit()
+      self.nuisances.append(name)
 
   def set_wspace(self,w):
    self.wspace = w
