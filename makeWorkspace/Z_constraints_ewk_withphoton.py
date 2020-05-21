@@ -68,7 +68,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
   ]
   CRs[2].add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     -0.01)
   CRs[2].add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     -0.02)
-  CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.015)
+  CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.03)
   
   # JES / JER for Z/Z is 1% 
   CRs[0].add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.01)
