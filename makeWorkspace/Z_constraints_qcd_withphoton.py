@@ -1,5 +1,6 @@
 import ROOT
 from counting_experiment import *
+from W_constraints import do_stat_unc
 # Define how a control region(s) transfer is made by defining *cmodel*, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard
 model = "qcd_zjets"
@@ -69,10 +70,10 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
     ,Channel("qcd_photon",_wspace,out_ws,cid+'_'+model,PhotonScales,convention=convention)
     ,Channel("ewkqcd_signal",_wspace,out_ws,cid+'_'+model,EQScales,convention=convention)
   ]
-  for c in CRs[:3]:
-    c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
+  CRs[2].add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     -0.01)
+  CRs[2].add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     -0.015)
+  CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.03)
 
-    
   # JES / JER for Z/Z is 1% 
   CRs[0].add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.01)
   CRs[1].add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.01)
@@ -105,93 +106,13 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
 
   # Bin by bin nuisances to cover statistical uncertainties ...
 
-  for b in range(target.GetNbinsX()):
-    err = ZmmScales.GetBinError(b+1)
-    if not ZmmScales.GetBinContent(b+1)>0: continue
-    relerr = err/ZmmScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = ZmmScales.Clone(); byb_u.SetName("qcd_zmm_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"qcd_dimuonCR",b))
-    byb_u.SetBinContent(b+1,ZmmScales.GetBinContent(b+1)+err)
-    byb_d = ZmmScales.Clone(); byb_d.SetName("qcd_zmm_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"qcd_dimuonCR",b))
-    if (ZmmScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,ZmmScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[0].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"qcd_dimuonCR",b),_fOut)
-
-  for b in range(target.GetNbinsX()):
-    err = ZeeScales.GetBinError(b+1)
-    if not ZeeScales.GetBinContent(b+1)>0: continue
-    relerr = err/ZeeScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = ZeeScales.Clone(); byb_u.SetName("qcd_zee_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"qcd_dielectronCR",b))
-    byb_u.SetBinContent(b+1,ZeeScales.GetBinContent(b+1)+err)
-    byb_d = ZeeScales.Clone(); byb_d.SetName("qcd_zee_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"qcd_dielectronCR",b))
-    if (ZeeScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,ZeeScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[1].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"qcd_dielectronCR",b),_fOut)
-
-  for b in range(target.GetNbinsX()):
-    err = WZScales.GetBinError(b+1)
-    if not WZScales.GetBinContent(b+1)>0: continue
-    relerr = err/WZScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = WZScales.Clone(); byb_u.SetName("qcd_w_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"qcd_wzCR",b))
-    byb_u.SetBinContent(b+1,WZScales.GetBinContent(b+1)+err)
-    byb_d = WZScales.Clone(); byb_d.SetName("qcd_w_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"qcd_wzCR",b))
-    if (WZScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,WZScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[2].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"qcd_wzCR",b),_fOut)
-
-  # for b in range(target.GetNbinsX()):
-  #   err = EQScales.GetBinError(b+1)
-  #   if not EQScales.GetBinContent(b+1)>0: continue
-  #   relerr = err/EQScales.GetBinContent(b+1)
-  #   if relerr<0.01: continue
-  #   byb_u = EQScales.Clone(); byb_u.SetName("ewkqcd_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"ewkqcdzCR",b))
-  #   byb_u.SetBinContent(b+1,EQScales.GetBinContent(b+1)+err)
-  #   byb_d = EQScales.Clone(); byb_d.SetName("ewkqcd_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"ewkqcdzCR",b))
-  #   if (EQScales.GetBinContent(b+1)-err > 0):
-  #     byb_d.SetBinContent(b+1,EQScales.GetBinContent(b+1)-err)
-  #   else:
-  #     byb_d.SetBinContent(b+1,1)
-  #   _fOut.WriteTObject(byb_u)
-  #   _fOut.WriteTObject(byb_d)
-  #   print "Adding an error -- ", byb_u.GetName(),err
-  #   CRs[3].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"ewkqcdzCR",b),_fOut)
-
-  for b in range(target.GetNbinsX()):
-    err = PhotonScales.GetBinError(b+1)
-    if not PhotonScales.GetBinContent(b+1)>0: continue
-    relerr = err/PhotonScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = PhotonScales.Clone(); byb_u.SetName("qcd_photon_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"qcd_photonCR",b))
-    byb_u.SetBinContent(b+1,PhotonScales.GetBinContent(b+1)+err)
-    byb_d = PhotonScales.Clone(); byb_d.SetName("qcd_photon_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"qcd_photonCR",b))
-    if (PhotonScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,PhotonScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[3].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"qcd_photonCR",b),_fOut)
+  do_stat_unc(ZmmScales,    proc='qcd_zmm',      region='qcd_dimuonCR',     CR=CRs[0], cid=cid, outfile=_fOut)
+  do_stat_unc(ZeeScales,    proc='qcd_zee',      region='qcd_dielectronCR', CR=CRs[1], cid=cid, outfile=_fOut)
+  do_stat_unc(WZScales,     proc='qcd_w',        region='qcd_wzCR',         CR=CRs[2], cid=cid, outfile=_fOut)
+  do_stat_unc(PhotonScales, proc='qcd_photon',   region='qcd_photonCR',     CR=CRs[3], cid=cid, outfile=_fOut)
+  do_stat_unc(EQScales,     proc='ewkqcd',       region='ewkqcdzCR',        CR=CRs[4], cid=cid, outfile=_fOut)
 
   #######################################################################################################
-
 
   CRs[2].add_nuisance_shape("ZnunuWJets_QCD_renscale_vbf",_fOut)
   CRs[2].add_nuisance_shape("ZnunuWJets_QCD_facscale_vbf",_fOut)

@@ -1,5 +1,6 @@
 import ROOT
 from counting_experiment import *
+from W_constraints import do_stat_unc
 # Define how a control region(s) transfer is made by defining *cmodel*, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard
 model = "ewk_zjets"
@@ -65,10 +66,9 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
   ,Channel("ewk_wjetssignal",_wspace,out_ws,cid+'_'+model,WZScales,convention=convention)
   ,Channel("ewk_photon",_wspace,out_ws,cid+'_'+model,PhotonScales,convention=convention)
   ]
-
-  for c in CRs[:3]:
-    c.add_nuisance('CMS_trigger{YEAR}_met'.format(YEAR=year),0.02)
-  
+  CRs[2].add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),     -0.01)
+  CRs[2].add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     -0.02)
+  CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.03)
   
   # JES / JER for Z/Z is 1% 
   CRs[0].add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.01)
@@ -102,74 +102,10 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
 
   # Bin by bin nuisances to cover statistical uncertainties ...
 
-  for b in range(target.GetNbinsX()):
-    err = ZmmScales.GetBinError(b+1)
-    if not ZmmScales.GetBinContent(b+1)>0: continue
-    relerr = err/ZmmScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = ZmmScales.Clone(); byb_u.SetName("ewk_zmm_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"ewk_dimuonCR",b))
-    byb_u.SetBinContent(b+1,ZmmScales.GetBinContent(b+1)+err)
-    byb_d = ZmmScales.Clone(); byb_d.SetName("ewk_zmm_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"ewk_dimuonCR",b))
-    if (ZmmScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,ZmmScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[0].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"ewk_dimuonCR",b),_fOut)
-
-  for b in range(target.GetNbinsX()):
-    err = ZeeScales.GetBinError(b+1)
-    if not ZeeScales.GetBinContent(b+1)>0: continue
-    relerr = err/ZeeScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = ZeeScales.Clone(); byb_u.SetName("ewk_zee_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"ewk_dielectronCR",b))
-    byb_u.SetBinContent(b+1,ZeeScales.GetBinContent(b+1)+err)
-    byb_d = ZeeScales.Clone(); byb_d.SetName("ewk_zee_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"ewk_dielectronCR",b))
-    if (ZeeScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,ZeeScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[1].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"ewk_dielectronCR",b),_fOut)
-
-  for b in range(target.GetNbinsX()):
-    err = WZScales.GetBinError(b+1)
-    if not WZScales.GetBinContent(b+1)>0: continue
-    relerr = err/WZScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = WZScales.Clone(); byb_u.SetName("ewk_w_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"ewk_wzCR",b))
-    byb_u.SetBinContent(b+1,WZScales.GetBinContent(b+1)+err)
-    byb_d = WZScales.Clone(); byb_d.SetName("ewk_w_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"ewk_wzCR",b))
-    if (WZScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,WZScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[2].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"ewk_wzCR",b),_fOut)
-
-  for b in range(target.GetNbinsX()):
-    err = PhotonScales.GetBinError(b+1)
-    if not PhotonScales.GetBinContent(b+1)>0: continue
-    relerr = err/PhotonScales.GetBinContent(b+1)
-    if relerr<0.01: continue
-    byb_u = PhotonScales.Clone(); byb_u.SetName("ewk_photon_weights_%s_%s_stat_error_%s_bin%d_Up"%(cid,cid,"ewk_photonCR",b))
-    byb_u.SetBinContent(b+1,PhotonScales.GetBinContent(b+1)+err)
-    byb_d = PhotonScales.Clone(); byb_d.SetName("ewk_photon_weights_%s_%s_stat_error_%s_bin%d_Down"%(cid,cid,"ewk_photonCR",b))
-    if (PhotonScales.GetBinContent(b+1)-err > 0):
-      byb_d.SetBinContent(b+1,PhotonScales.GetBinContent(b+1)-err)
-    else:
-      byb_d.SetBinContent(b+1,1)
-    _fOut.WriteTObject(byb_u)
-    _fOut.WriteTObject(byb_d)
-    print "Adding an error -- ", byb_u.GetName(),err
-    CRs[3].add_nuisance_shape("%s_stat_error_%s_bin%d"%(cid,"ewk_photonCR",b),_fOut)
-
+  do_stat_unc(ZmmScales,    proc='ewk_zmm',      region='ewk_dimuonCR',     CR=CRs[0], cid=cid, outfile=_fOut)
+  do_stat_unc(ZeeScales,    proc='ewk_zee',      region='ewk_dielectronCR', CR=CRs[1], cid=cid, outfile=_fOut)
+  do_stat_unc(WZScales,     proc='ewk_w',        region='ewk_wzCR',         CR=CRs[2], cid=cid, outfile=_fOut)
+  do_stat_unc(PhotonScales, proc='ewk_photon',   region='ewk_photonCR',     CR=CRs[3], cid=cid, outfile=_fOut)
 
   #######################################################################################################
 
