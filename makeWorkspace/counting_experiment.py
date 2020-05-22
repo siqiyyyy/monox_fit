@@ -405,7 +405,7 @@ class Channel:
         else:
             self.nuisances.append(name)
 
-    def add_nuisance_shape(self, name, file, setv=""):
+    def add_nuisance_shape(self, name, file, setv="", functype="quadratic"):
         if not(self.wspace_out.var("%s" % name)):
             nuis = r.RooRealVar("%s" % name, "Nuisance - %s" % name, 0, -3, 3)
             nuis.setAttribute("NuisanceParameter_EXTERNAL", True)
@@ -433,43 +433,42 @@ class Channel:
             sys.exit()
         # Now we loop through each bin and construct a polynomial function per bin
         for b in range(self.nbins):
-            if self.scalefactors.GetBinContent(b+1) == 0:
-                nsf = 0
-                vu = 0
-                vd = 0
-            else:
-                print "ZEYNEP scalefactor  :", self.scalefactors.GetName(
-                ), self.scalefactors.GetBinContent(b+1)
-                print "ZEYNEP sys up / down:", sysup.GetBinContent(
-                    b+1), sysdn.GetBinContent(b+1)
-                nsf = 1./(self.scalefactors.GetBinContent(b+1))
-                vu = 1./(sysup.GetBinContent(b+1)) - nsf
-
-                if sysdn.GetBinContent(b+1) == 0:
-                    vd = 0
-                else:
-                    # Note this should be <ve if down is lower, its not a bug
-                    vd = 1./(sysdn.GetBinContent(b+1)) - nsf
-            coeff_a = 0.5*(vu+vd)
-            coeff_b = 0.5*(vu-vd)
-
+            # Name of the function depends on naming scheme
             if self.convention == "BU":
                 fname = "sys_function_%s_cat_%s_ch_%s_bin_%d" % (
                     name, self.catid, self.chid, b)
             else:
                 fname = "sys_function_%s_cat_%s_ch_%s_bin%d" % (
                     name, self.catid, self.chid, b+1)
-            func = r.RooFormulaVar(
-                fname,
-                "Systematic Varation",
-                "(%f*@0*@0+%f*@0)/%f" % (coeff_a, coeff_b, nsf),
-                r.RooArgList(
-                    self.wspace_out.var("%s" % name))
-            )  # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
+            if functype=="quadratic":
+                if self.scalefactors.GetBinContent(b+1) == 0:
+                    nsf = 0
+                    vu = 0
+                    vd = 0
+                else:
+                    nsf = 1./(self.scalefactors.GetBinContent(b+1))
+                    vu = 1./(sysup.GetBinContent(b+1)) - nsf
 
-            if (coeff_a == 0):
-                func.setAttribute("temp", True)
+                    if sysdn.GetBinContent(b+1) == 0:
+                        vd = 0
+                    else:
+                        # Note this should be <ve if down is lower, its not a bug
+                        vd = 1./(sysdn.GetBinContent(b+1)) - nsf
+                coeff_a = 0.5*(vu+vd)
+                coeff_b = 0.5*(vu-vd)
 
+                func = r.RooFormulaVar(
+                    fname,
+                    "Systematic Varation",
+                    "(%f*@0*@0+%f*@0)/%f" % (coeff_a, coeff_b, nsf),
+                    r.RooArgList(
+                        self.wspace_out.var("%s" % name))
+                )  # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
+
+                if (coeff_a == 0):
+                    func.setAttribute("temp", True)
+            elif functype=="lognorm":
+                pass
             self.wspace_out.var("%s" % name).setVal(0)
             if not self.wspace_out.function(func.GetName()):
                 self.wspace_out._import(func)
