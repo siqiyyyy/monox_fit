@@ -468,7 +468,20 @@ class Channel:
                 if (coeff_a == 0):
                     func.setAttribute("temp", True)
             elif functype=="lognorm":
-                pass
+                n0 = self.scalefactors.GetBinContent(b+1)
+                if n0 == 0:
+                    sigma = 0
+                else:
+                    sigma = 0.5 * (sysup.GetBinContent(b+1) -sysdn.GetBinContent(b+1))
+
+                func = r.RooFormulaVar(
+                    fname,
+                    "Systematic Variation",
+                    "({N} * (1+{SIGMA}/{N})**@0 - {N})".format(N=n0, sigma=sigma),
+                    r.RooArgList(self.wspace_out.var("%s" % name))
+                )
+                if sigma == 0:
+                    func.setAttribute("temp", True)
             self.wspace_out.var("%s" % name).setVal(0)
             if not self.wspace_out.function(func.GetName()):
                 self.wspace_out._import(func)
