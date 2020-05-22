@@ -472,12 +472,14 @@ class Channel:
                 if n0 == 0:
                     sigma = 0
                 else:
-                    sigma = 0.5 * (sysup.GetBinContent(b+1) -sysdn.GetBinContent(b+1))
-
+                    sfmax = max(0, sysup.GetBinContent(b+1))
+                    sfmin = max(0, sysdn.GetBinContent(b+1))
+                    sigma = 0.5 * abs(sfmax-sfmin)
+                
                 func = r.RooFormulaVar(
                     fname,
                     "Systematic Variation",
-                    "({N} * (1+{SIGMA}/{N})**@0 - {N})".format(N=n0, sigma=sigma),
+                    "({N} * (1+{SIGMA}/{N})**@0 - {N}) / {N}".format(N=n0, SIGMA=sigma),
                     r.RooArgList(self.wspace_out.var("%s" % name))
                 )
                 if sigma == 0:

@@ -5,7 +5,7 @@ import re
 # Tell RooFit to be quiet
 ROOT.RooMsgService.instance().setSilentMode(True)
 
-def do_stat_unc(histogram, proc,cid, region, CR, outfile):
+def do_stat_unc(histogram, proc,cid, region, CR, outfile, functype="lognorm"):
   """Add stat. unc. variations to the workspace"""
 
   # Store formatting inputs for repeated use
@@ -35,7 +35,7 @@ def do_stat_unc(histogram, proc,cid, region, CR, outfile):
     outfile.WriteTObject(down)
 
     print "Adding an error -- ", up.GetName(),err
-    CR.add_nuisance_shape("{CONSTRAINT}_stat_error_{REGION}_bin{BIN}".format(**replacement),outfile)
+    CR.add_nuisance_shape("{CONSTRAINT}_stat_error_{REGION}_bin{BIN}".format(**replacement),outfile, functype=functype)
 
 
 def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False):
