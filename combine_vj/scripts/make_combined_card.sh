@@ -1,4 +1,4 @@
-TAG=2020-04-20_monojetv_v2
+TAG=2020-05-20_monojet_photon_update_newhem
 SUBTAG=default
 JDIR=$(readlink -e ../monojet/${TAG}/${SUBTAG}/)
 VDIR=$(readlink -e ../monov/${TAG}/${SUBTAG}/)
