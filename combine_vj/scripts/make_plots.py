@@ -1,7 +1,7 @@
 #!/bin/env python
 import os
 import sys
-sys.path.append(os.path.abspath("../plotter"))
+sys.path.append(os.path.abspath("../../../plotter"))
 from plot_PreFitPostFit import plotPreFitPostFit
 from plot_datavalidation import dataValidation
 from plot_ratio import plot_ratio
