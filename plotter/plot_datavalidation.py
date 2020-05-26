@@ -221,7 +221,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                     )
                 # Uncertainty representing the average uncertainty associated to 
                 # one additional lepton for combined regions
-                one_lepton_unc = 0.5 * quadsum(
+                one_lepton_unc = 1/sqrt(2) * quadsum(
                     one_muon_unc,
                     one_electron_unc
                 )
@@ -229,15 +229,15 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 if regions==("combined","combinedW") or regions==("combinedW","gjets"):
                     value = one_lepton_unc
                 elif regions==("combined","gjets"):
-                    value = one_lepton_unc**2
+                    value = one_lepton_unc*sqrt(2)
                 elif regions==("dimuon","singlemuon") or regions == ("singlemuon","gjets"):
                     value = one_muon_unc
                 elif regions==("dielectron","singleelectron") or regions==("singleelectron","gjets"):
                     value = one_electron_unc
                 elif regions==("dielectron","gjets"):
-                    value = one_electron_unc**2
+                    value = one_electron_unc*sqrt(2)
                 elif regions==("dimuon","gjets"):
-                    value = one_muon_unc**2
+                    value = one_muon_unc*sqrt(2)
 
                 sumw2 += pow(h_prefit[region1].GetBinContent(iBin) * value,2)
             elif 'mono' in category:
