@@ -147,6 +147,21 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 uncFile.ZG_MIX_met,
                 uncFile.ZG_PDF_met,
                 ]
+            uncFile_photon = TFile(os.path.join(DIR,'../makeWorkspace/sys/photon_id_unc.root'))
+            if 'monojet' in category:
+                if year == 2017:
+                    uncertainties.append(uncFile_photon.monojet_2017_photon_id_extrap_up)
+                    uncertainties.append(uncFile_photon.monojet_2017_photon_id_up)
+                elif year == 2018:
+                    uncertainties.append(uncFile_photon.monojet_2018_photon_id_extrap_up)
+                    uncertainties.append(uncFile_photon.monojet_2018_photon_id_up)
+            elif 'monov' in category:
+                if year == 2017:
+                    uncertainties.append(uncFile_photon.monov_2017_photon_id_extrap_up)
+                    uncertainties.append(uncFile_photon.monov_2017_photon_id_up)
+                elif year == 2018:
+                    uncertainties.append(uncFile_photon.monov_2018_photon_id_extrap_up)
+                    uncertainties.append(uncFile_photon.monov_2018_photon_id_up)
         else:
             uncFile     = TFile(os.path.join(DIR,'../makeWorkspace/sys/theory_unc_ZW.root'))
             uncertainties = [
@@ -190,7 +205,6 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 # Photon ID / trig
                 if "gjets" in regions:
                     value = quadsum(
-                                        flat_uncertainties[year]["eff_pho"],
                                         flat_uncertainties[year]["eff_photrig"],
                                     )
                     sumw2 += pow(h_prefit[region1].GetBinContent(iBin) * value,2)
@@ -207,7 +221,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                     )
                 # Uncertainty representing the average uncertainty associated to 
                 # one additional lepton for combined regions
-                one_lepton_unc = 0.5 * quadsum(
+                one_lepton_unc = 1/sqrt(2) * quadsum(
                     one_muon_unc,
                     one_electron_unc
                 )
@@ -215,21 +229,24 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 if regions==("combined","combinedW") or regions==("combinedW","gjets"):
                     value = one_lepton_unc
                 elif regions==("combined","gjets"):
-                    value = one_lepton_unc**2
+                    value = one_lepton_unc*sqrt(2)
                 elif regions==("dimuon","singlemuon") or regions == ("singlemuon","gjets"):
                     value = one_muon_unc
                 elif regions==("dielectron","singleelectron") or regions==("singleelectron","gjets"):
                     value = one_electron_unc
                 elif regions==("dielectron","gjets"):
-                    value = one_electron_unc**2
+                    value = one_electron_unc*sqrt(2)
                 elif regions==("dimuon","gjets"):
-                    value = one_muon_unc**2
+                    value = one_muon_unc*sqrt(2)
 
                 sumw2 += pow(h_prefit[region1].GetBinContent(iBin) * value,2)
             elif 'mono' in category:
                 ### Theory uncertainties for monojet / mono-V
                 findbin =  uncert.FindBin(h_prefit[region1].GetBinCenter(iBin))
-                sumw2 += pow(h_prefit[region1].GetBinContent(iBin) * uncert.GetBinContent(findbin),2)
+                unc = uncert.GetBinContent(findbin)
+                if unc > 0.5:
+                    unc = unc - 1
+                sumw2 += pow(h_prefit[region1].GetBinContent(iBin) * unc,2)
             elif 'vbf' in category:
                 ### Theory uncertainties for VBF
                 # For VBF, we calculate the uncertainty separately for EWK and QCD

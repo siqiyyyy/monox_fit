@@ -1,15 +1,16 @@
-from ROOT import *
+import ROOT as r
 from array import array
 from tdrStyle import *
 setTDRStyle()
 import os
-import math
+from math import sqrt
+import numpy as np
+from collections import defaultdict
 
 def plot_ratio(process,category, model_file, outdir, lumi, year):
 
     highest = {}
     highest2 = {}
-    lowest = {}
 
     if 'mono' in category:
         bgtypes = ['']
@@ -18,9 +19,9 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
         bgtypes = ['qcd_' ,'ewk_']
         tag = "withphoton_"
 
+    assert(os.path.exists(model_file))
     for bgtype in bgtypes:
-        assert(os.path.exists(model_file))
-        f = TFile(model_file,'READ')
+        f = r.TFile(model_file,'READ')
 
         replacements = {
                         "TYPE" : bgtype,
@@ -34,13 +35,13 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
             dirname = "Z_constraints_{TYPE}{TAG}category_{CAT}"
             base    = "{TYPE}zmm_weights_"+category
             label = "R_{Z(#mu#mu)}"
-            addsys  = math.sqrt(0.04*0.04 + 0.02*0.02)
+            addsys  = sqrt(0.02**2 + 0.02**2 + 0.02**2)
 
         if (process=='zee'):
             dirname = "Z_constraints_{TYPE}{TAG}category_{CAT}"
             base    = "{TYPE}zee_weights_"+category
             label   = "R_{Z(ee)}"
-            addsys  = math.sqrt(0.04*0.04 + 0.02*0.02 + 0.01*0.01)
+            addsys  = sqrt(0.05**2 + 0.02**2 + 0.01**2)
 
         if (process=='photon'):
             dirname = "Z_constraints_{TYPE}{TAG}category_{CAT}"
@@ -52,22 +53,19 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
             dirname = "Z_constraints_{TYPE}{TAG}category_{CAT}"
             base    = "{TYPE}w_weights_"+category
             label   = "R_{Z/W}"
-            addsys  = 0.01
+            addsys  = 0
 
         if (process=='wen'):
             dirname = "W_constraints_{TYPE}category_"+category
             base    = "{TYPE}wen_weights_"+category
             label   = "R_{W(e#nu)}"
-            #addsys  = math.sqrt(0.02*0.02 + 0.02*0.02 + 0.01*0.01 + 0.02*0.02)
-            addsys  = 0.02
+            addsys  = sqrt(0.025**2 + 0.01**2 + 0.01**2)
 
         if (process=='wmn'):
             dirname = "W_constraints_{TYPE}category_{CAT}"
             base    = "{TYPE}wmn_weights_{CAT}"
             label   = "R_{W(#mu#nu)}"
-            #addsys  = math.sqrt(0.03*0.03)
-            #addsys  = math.sqrt(0.03*0.03 + 0.01*0.01)
-            addsys  = 0.02
+            addsys  = sqrt(0.01**2 + 0.01**2 + 0.01**2)
         dirname = dirname.format(**replacements)
         base = base.format(**replacements)
         print(dirname+"/"+base)
@@ -82,116 +80,100 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
             down_final.SetBinContent(b,0.0)
             highest[b] = 0
             highest2[b] = 0
-            lowest [b] = 100.0
 
         f.cd(dirname)
-        for key in gDirectory.GetListOfKeys():
-            if (key.GetClassName(),"TH1"):
-                if process in key.GetName():
-                    #print key.GetName()
-                    if ('Up' in key.GetName()):
-                        #print key.GetName()
-                        up = f.Get(dirname+"/"+key.GetName())
-                        for b in range(ratio.GetNbinsX()+1):
-                            diff = up.GetBinContent(b) - ratio.GetBinContent(b)
-                            highest[b] =  math.sqrt(highest[b]**2 + diff**2)
-                            #bin =  ratio.GetXaxis().FindBin(1000)
-                            #if b >= bin and 'scale' in key.GetName():
-                            #    print key.GetName(), bin
-                            #    highest[b] = math.sqrt(highest[b]**2 + (ratio.GetBinContent(b)*0.1)**2)
-                            up_final.SetBinContent(b,highest[b])
-                            #print diff, highest[b]
+        # Unertainties are stored in to dictionaries
+        # unc_up/dn[type][bin number] = value
+        unc_dict = defaultdict(lambda:defaultdict(int))
+        for b in range(ratio.GetNbinsX()+1):
+            for key in r.gDirectory.GetListOfKeys():
+                name = key.GetName()
 
-                            if ('ewk' in key.GetName() or 'sudakov' in key.GetName() or 'nnlo' in key.GetName() or 'stat' in key.GetName()):
-                                diff2 = up.GetBinContent(b) - ratio.GetBinContent(b)
-                                highest2[b] =  math.sqrt(highest2[b]**2 + diff2**2)
-                                up_ewk.SetBinContent(b,highest2[b])
+                # Skip unrelated stuff
+                if not (key.GetClassName(),"TH1"):
+                    continue
+                if not (process in name):
+                    continue
+                if not ('Up' in name):
+                    continue
+                up = f.Get(dirname+"/"+name)
+                diff = up.GetBinContent(b) - ratio.GetBinContent(b)
 
-                    if ('Down' in key.GetName()):
-                        down = f.Get(dirname+"/"+key.GetName())
-                        for b in range(ratio.GetNbinsX()+1):
-                            if down.GetBinContent(b) < lowest[b]:
-                                lowest[b] = down.GetBinContent(b)
-                            else:
-                                lowest[b] = lowest[b]
-                            down_final.SetBinContent(b,lowest[b])
+                if (any([x in name for x in ['stat']])):
+                    unc_dict['stat'][b] = np.hypot(unc_dict['stat'][b], diff)
+                elif (any([x in name for x in ['trig','prefiring','veto','eff']])):
+                    unc_dict['exp'][b] = np.hypot(unc_dict['exp'][b], diff)
+                elif (any([x in name for x in ['cross', 'pdf', 'qcd']])):
+                    unc_dict['qcd'][b] = np.hypot(unc_dict['ewk'][b], diff)
+                elif (any([x in name for x in ['ewk', 'sudakov', 'nnlo']])):
+                    unc_dict['ewk'][b] = np.hypot(unc_dict['ewk'][b], diff)
 
         gStyle.SetOptStat(0)
 
-        c = TCanvas("c","c",600,600)
+        c = r.TCanvas("c","c",600,600)
         c.SetTopMargin(0.06)
         c.cd()
         c.SetRightMargin(0.04)
         c.SetTopMargin(0.07)
         c.SetLeftMargin(0.12)
 
-
-        uncertband    = ratio.Clone("ratio")
-        uncertband2   = ratio.Clone("ratio2")
-        uncertband3   = ratio.Clone("ratio3")
+        # Construct the bands
+        band_ewkqcdunc    = ratio.Clone("ratio")
+        band_ewkunc   = ratio.Clone("ratio2")
+        band_fullunc   = ratio.Clone("ratio3")
         for b in range(ratio.GetNbinsX()+1):
-            #err1 = abs(down_final.GetBinContent(b) -  ratio.GetBinContent(b))
-            err1 = abs(up_final.GetBinContent(b) -  ratio.GetBinContent(b))
-            #uncertband.SetBinError(b,max(err1,err2))
-            #uncertband.SetBinError(b,err1)
-            #print up_final.GetBinContent(b), addsys
-            #uncertband.SetBinError(b,up_final.GetBinContent(b) + addsys*uncertband.GetBinContent(b))
-            uncertband.SetBinError(b,up_final.GetBinContent(b))
-            uncertband2.SetBinError(b,up_ewk.GetBinContent(b))
-            uncertband3.SetBinError(b,up_final.GetBinContent(b) + addsys*uncertband.GetBinContent(b))
-
-            #HACK
-            #if b == ratio.GetNbinsX():
-            #    uncertband.SetBinError(b,up_final.GetBinContent(b-1) + addsys)
-            #    uncertband2.SetBinError(b,up_ewk.GetBinContent(b-1))
-
-            #print "Uncert",b,ratio.GetBinContent(b),down_final.GetBinContent(b),up_final.GetBinContent(b), max(err1,err2)
-
-        #uncertband.SetFillStyle(3144);
-        #uncertband.SetFillColor(33);
-
-        #uncertband.SetFillStyle(0);
-        #uncertband2.SetFillColor(ROOT.kOrange+1);
-        uncertband2.SetFillColor(33);
-        uncertband3.SetFillColor(ROOT.kBlue+1);
-        #uncertband2.SetFillColor(ROOT.kGray);
+            band_ewkunc.SetBinError(b, sqrt(
+                                            unc_dict['ewk'][b]**2 + 
+                                            unc_dict['stat'][b]**2
+                                            ))
+            band_ewkqcdunc.SetBinError(b, sqrt(
+                                               unc_dict['ewk'][b]**2 + 
+                                               unc_dict['qcd'][b]**2 + 
+                                               unc_dict['stat'][b]**2
+                                               ))
+            band_fullunc.SetBinError(b, sqrt(
+                                             unc_dict['ewk'][b]**2 + 
+                                             unc_dict['qcd'][b]**2 + 
+                                             unc_dict['stat'][b]**2 +
+                                             unc_dict['exp'][b]**2 + 
+                                             (addsys*band_ewkqcdunc.GetBinContent(b))**2
+                                             ))
+        
+        band_ewkunc.SetFillColor(33);
+        band_fullunc.SetFillColor(r.kBlue+1);
 
         if process == "photon" or process == "w_weights":
-            #uncertband.SetFillColor(ROOT.kGreen+1);
-            uncertband.SetFillColor(ROOT.kAzure+1);
-            #uncertband.SetFillColor(ROOT.kMagenta+3);
+            band_ewkqcdunc.SetFillColor(r.kAzure+1);
         else:
-            #uncertband.SetFillColor(ROOT.kOrange+1);
-            uncertband.SetFillColor(33);
-            #uncertband.SetFillColor(ROOT.kGray);
+            band_ewkqcdunc.SetFillColor(33);
 
-        uncertband3.GetYaxis().SetTitle(label)
-        uncertband3.GetYaxis().CenterTitle()
-        uncertband3.GetYaxis().SetTitleSize(0.4*c.GetLeftMargin())
-        uncertband3.GetXaxis().SetTitle("U [GeV]"  if "mono" in category else  "M_{jj} [GeV]")
-        uncertband3.GetXaxis().SetTitleSize(0.4*c.GetBottomMargin())
-        uncertband3.SetMaximum(2.0*ratio.GetMaximum())
-        uncertband3.SetMinimum(0.5*ratio.GetMinimum())
-        uncertband3.GetYaxis().SetTitleOffset(1.15)
+        band_fullunc.GetYaxis().SetTitle(label)
+        band_fullunc.GetYaxis().CenterTitle()
+        band_fullunc.GetYaxis().SetTitleSize(0.4*c.GetLeftMargin())
+        band_fullunc.GetXaxis().SetTitle("U [GeV]"  if "mono" in category else  "M_{jj} [GeV]")
+        band_fullunc.GetXaxis().SetTitleSize(0.4*c.GetBottomMargin())
+        band_fullunc.SetMaximum(2.0*ratio.GetMaximum())
+        band_fullunc.SetMinimum(0.5*ratio.GetMinimum())
+        band_fullunc.GetYaxis().SetTitleOffset(1.15)
 
         ratio.SetMarkerStyle(20)
         ratio.SetLineColor(1)
         ratio.SetLineWidth(2)
 
-        uncertband3.Draw("e2")
-        uncertband.Draw("e2same")
-        uncertband2.Draw("e2same")
+        band_fullunc.Draw("e2")
+        band_ewkqcdunc.Draw("e2same")
+        band_ewkunc.Draw("e2same")
         ratio.Draw("same")
 
-        legend = TLegend(.45,.75,.82,.92)
+        legend = r.TLegend(.45,.75,.82,.92)
         legend.AddEntry(ratio,"Transfer Factor (Stat Uncert)" , "p")
         if process == "photon" or process == "w_weights":
-            legend.AddEntry(uncertband2 ,"Stat + Syst. (EWK)" , "f")
-            legend.AddEntry(uncertband  ,"Stat + Syst. (EWK+QCD)" , "f")
-            legend.AddEntry(uncertband3 ,"Stat + Syst. (EWK+QCD+Exp)" , "f")
+            legend.AddEntry(band_ewkunc ,"Stat + Syst. (EWK)" , "f")
+            legend.AddEntry(band_ewkqcdunc  ,"Stat + Syst. (EWK+QCD)" , "f")
+            legend.AddEntry(band_fullunc ,"Stat + Syst. (EWK+QCD+Exp)" , "f")
         else:
-            uncertband3.SetFillColor(33)
-            legend.AddEntry(uncertband3 ,"Stat + Syst. (Exp)" , "f")
+            band_fullunc.SetFillColor(33)
+            legend.AddEntry(band_fullunc ,"Stat + Syst. (Exp)" , "f")
 
 
         legend.SetShadowColor(0);
@@ -200,13 +182,13 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
 
         legend.Draw("same")
 
-        latex2 = TLatex()
+        latex2 = r.TLatex()
         latex2.SetNDC()
         latex2.SetTextSize(0.035)
         latex2.SetTextAlign(31) # align right
         latex2.DrawLatex(0.87, 0.95, "{LUMI:.1f} fb^{{-1}} (13 TeV)".format(LUMI=lumi))
 
-        latex3 = TLatex()
+        latex3 = r.TLatex()
         latex3.SetNDC()
         latex3.SetTextSize(0.75*c.GetTopMargin())
         latex3.SetTextFont(62)
@@ -217,7 +199,7 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
         latex3.SetTextAlign(11)
         latex3.DrawLatex(0.20, 0.8, "Preliminary");
 
-        gPad.RedrawAxis()
+        r.gPad.RedrawAxis()
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
