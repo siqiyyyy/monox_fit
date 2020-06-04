@@ -123,6 +123,12 @@ vbf_@YEAR_stat_error_ewkqcdzCR_bin8 param 0.0 1
 ZnunuWJets_QCD_renscale_vbf param 0.0 1
 ZnunuWJets_QCD_facscale_vbf param 0.0 1
 ZnunuWJets_QCD_pdf_vbf param 0.0 1
+ZnunuWJets_QCD_renscale_cheb1_vbf param 0.0 1
+ZnunuWJets_QCD_facscale_cheb1_vbf param 0.0 1
+ZnunuWJets_QCD_pdf_cheb1_vbf param 0.0 1
+ZnunuWJets_QCD_renscale_cheb2_vbf param 0.0 1
+ZnunuWJets_QCD_facscale_cheb2_vbf param 0.0 1
+ZnunuWJets_QCD_pdf_cheb2_vbf param 0.0 1
 qcd_ewk_vbf_bin0 param 0.0 1
 qcd_ewk_vbf_bin1 param 0.0 1
 qcd_ewk_vbf_bin2 param 0.0 1
@@ -135,6 +141,12 @@ qcd_ewk_vbf_bin8 param 0.0 1
 Photon_QCD_renscale_vbf param 0.0 1
 Photon_QCD_facscale_vbf param 0.0 1
 Photon_QCD_pdf_vbf param 0.0 1
+Photon_QCD_renscale_cheb1_vbf param 0.0 1
+Photon_QCD_renscale_cheb1_vbf param 0.0 1
+Photon_QCD_pdf_cheb1_vbf param 0.0 1
+Photon_QCD_facscale_cheb2_vbf param 0.0 1
+Photon_QCD_facscale_cheb2_vbf param 0.0 1
+Photon_QCD_pdf_cheb2_vbf param 0.0 1
 qcd_photon_ewk_vbf_bin0 param 0.0 1
 qcd_photon_ewk_vbf_bin1 param 0.0 1
 qcd_photon_ewk_vbf_bin2 param 0.0 1

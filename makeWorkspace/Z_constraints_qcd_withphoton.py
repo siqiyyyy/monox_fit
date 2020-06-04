@@ -5,6 +5,47 @@ from W_constraints import do_stat_unc
 # First define simple string which will be used for the datacard
 model = "qcd_zjets"
 
+def variation_to_cheb(variation, degree=1, scale=1, center=1):
+  """
+  Converts a "normal" variation to a "shape" variation for correlation testing.
+  The original variation histogram is multiplied by a chebyshev polynominal.
+
+  :param degree:  Degree of the chebyshev function.
+  :type degree:   integer
+  :param scale:   Overall scaling parameter to reduce, increase or flip uncertainty.
+  :type scale:    float
+  :param center:  Value around which the variation is centered, typically one.
+                  Only the difference to this center will be scaled.
+  :type center:   float
+  """
+
+  # Clone the original variation histogram for modifications
+  new = variation.Clone(variation.GetName() + "_cheb{DEGREE}_scale{SCALE}".format(DEGREE=degree, SCALE=scale))
+
+  # Set up the chebyshev function
+  cheb =  ROOT.TF1("cheb","cheb{DEGREE}".format(DEGREE=degree))
+  cheb.SetParameter(degree, 1)
+
+  # Cheb x range is -1 to 1, so we need to rescale the x values
+  # of the histogram
+  xmin = new.GetBinCenter(1)
+  xmax = new.GetBinCenter(new.GetNbinsX())
+
+  for i in range(1, new.GetNbinsX()+1):
+    # Rescaling
+    # xmin -> -1
+    # xmax -> +1
+    x = -1 + 2 * (new.GetBinCenter(i)-xmin) / (xmax-xmin)
+
+    content = new.GetBinContent(i)
+
+    # Rescale only the difference of the variation
+    # relative to the center value, usually 1
+    # scale allows you to change the overall size of the unc
+    new.SetBinContent(i, center + scale * (content-center) * cheb.Eval(x))
+
+  return new
+
 def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
 
   # Some setup
@@ -18,7 +59,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
   # example below for creating shape systematic for photon which is just every bin up/down 30%
 
   metname    = 'mjj'          # Observable variable name
-  gvptname   = "genBosonPt"    # Weights are in generator pT
 
   target             = _fin.Get("signal_qcdzjets")      # define monimal (MC) of which process this config will model
   controlmc          = _fin.Get("Zmm_qcdzll")           # defines Zmm MC of which process will be controlled by
@@ -74,7 +114,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
   CRs[2].add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     -0.015)
   CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.03)
 
-  # JES / JER for Z/Z is 1% 
+  # JES / JER for Z/Z is 1%
   CRs[0].add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.01)
   CRs[1].add_nuisance('CMS_scale{YEAR}_j_vbf'.format(YEAR=year),0.01)
   CRs[0].add_nuisance('CMS_res{YEAR}_j_vbf'.format(YEAR=year),0.01)
@@ -129,7 +169,13 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
   for b in range(target.GetNbinsX()):
     CRs[3].add_nuisance_shape("qcd_photon_ewk_%s_bin%d"%(re.sub("_201(\d)","",cid),b),_fOut)
 
-
+  for degree in [1,2]:
+    CRs[2].add_nuisance_shape("ZnunuWJets_QCD_renscale_vbf_cheb{DEGREE}".format(DEGREE=degree),_fOut)
+    CRs[2].add_nuisance_shape("ZnunuWJets_QCD_facscale_vbf_cheb{DEGREE}".format(DEGREE=degree),_fOut)
+    CRs[2].add_nuisance_shape("ZnunuWJets_QCD_pdf_vbf_cheb{DEGREE}".format(DEGREE=degree),_fOut)
+    CRs[3].add_nuisance_shape("Photon_QCD_renscale_vbf_cheb{DEGREE}".format(DEGREE=degree),_fOut)
+    CRs[3].add_nuisance_shape("Photon_QCD_facscale_vbf_cheb{DEGREE}".format(DEGREE=degree),_fOut)
+    CRs[3].add_nuisance_shape("Photon_QCD_pdf_vbf_cheb{DEGREE}".format(DEGREE=degree),_fOut)
   #######################################################################################################
 
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag,convention=convention)
@@ -140,13 +186,13 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
 def my_function(_wspace,_fin,_fOut,nam,diag, year):
 
   metname    = "mjj"   # Observable variable name
-  gvptname   = "genBosonPt"    # Weights are in generator pT
 
   target             = _fin.Get("signal_qcdzjets")      # define monimal (MC) of which process this config will model
   controlmc          = _fin.Get("Zmm_qcdzll")           # defines Zmm MC of which process will be controlled by
   controlmc_w        = _fin.Get("signal_qcdwjets")
   controlmc_photon   = _fin.Get("gjets_qcdgjets")
 
+  chebscale = 0.5
   #################################################################################################################
 
 
@@ -184,57 +230,75 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
   uncertainty_zoverg_pdf_up   = vbf_sys.Get("uncertainty_ratio_gjets_qcd_mjj_unc_goverz_nlo_pdf_up_"+str(year))
   uncertainty_zoverg_pdf_down = vbf_sys.Get("uncertainty_ratio_gjets_qcd_mjj_unc_goverz_nlo_pdf_down_"+str(year))
 
-  wratio_ren_scale_up = Zvv_w.Clone();  wratio_ren_scale_up.SetName("qcd_w_weights_%s_ZnunuWJets_QCD_renscale_vbf_Up"%nam);
-  wratio_ren_scale_up.Divide(Wsig)
-  wratio_ren_scale_up.Multiply(uncertainty_zoverw_mur_up)
-  _fOut.WriteTObject(wratio_ren_scale_up)
+  def add_var(num, denom, name, factor):
+    new = num.Clone(name)
+    new.Divide(denom)
+    new.Multiply(factor)
+    _fOut.WriteTObject(new)
 
-  wratio_ren_scale_down = Zvv_w.Clone();  wratio_ren_scale_down.SetName("qcd_w_weights_%s_ZnunuWJets_QCD_renscale_vbf_Down"%nam);
-  wratio_ren_scale_down.Divide(Wsig)
-  wratio_ren_scale_down.Multiply(uncertainty_zoverw_mur_down)
-  _fOut.WriteTObject(wratio_ren_scale_down)
+  # QCD uncertainties
+  add_var(num=Zvv_w, denom=Wsig, name="qcd_w_weights_%s_ZnunuWJets_QCD_renscale_vbf_Up"%nam,   factor=uncertainty_zoverw_mur_up)
+  add_var(num=Zvv_w, denom=Wsig, name="qcd_w_weights_%s_ZnunuWJets_QCD_renscale_vbf_Down"%nam, factor=uncertainty_zoverw_mur_down)
+  add_var(num=Zvv_w, denom=Wsig, name="qcd_w_weights_%s_ZnunuWJets_QCD_facscale_vbf_Up"%nam,   factor=uncertainty_zoverw_muf_up)
+  add_var(num=Zvv_w, denom=Wsig, name="qcd_w_weights_%s_ZnunuWJets_QCD_facscale_vbf_Down"%nam, factor=uncertainty_zoverw_muf_down)
+  # PDF Uncertainty
+  add_var(num=Zvv_w, denom=Wsig, name="qcd_w_weights_%s_ZnunuWJets_QCD_pdf_vbf_Up"%nam, factor=uncertainty_zoverw_pdf_up)
+  add_var(num=Zvv_w, denom=Wsig, name="qcd_w_weights_%s_ZnunuWJets_QCD_pdf_vbf_Down"%nam, factor=uncertainty_zoverw_pdf_down)
 
-  wratio_fac_scale_up = Zvv_w.Clone(); wratio_fac_scale_up.SetName("qcd_w_weights_%s_ZnunuWJets_QCD_facscale_vbf_Up"%nam);
-  wratio_fac_scale_up.Divide(Wsig)
-  wratio_fac_scale_up.Multiply(uncertainty_zoverw_muf_up)
-  _fOut.WriteTObject(wratio_fac_scale_up)
+  # Chebyshev scaled variations
+  for degree in [1,2]:
+    add_var(
+            num=Zvv_w,
+            denom=Wsig,
+            name="qcd_w_weights_%s_ZnunuWJets_QCD_renscale_vbf_cheb%i_Up"  %(nam,degree),
+            factor=variation_to_cheb(uncertainty_zoverw_mur_up, degree=degree, scale=chebscale)
+            )
+    add_var(
+            num=Zvv_w,
+            denom=Wsig,
+            name="qcd_w_weights_%s_ZnunuWJets_QCD_renscale_vbf_cheb%i_Down"%(nam,degree),
+            factor=variation_to_cheb(uncertainty_zoverw_mur_down, degree=degree, scale=chebscale)
+            )
+    add_var(
+            num=Zvv_w,
+            denom=Wsig,
+            name="qcd_w_weights_%s_ZnunuWJets_QCD_facscale_vbf_cheb%i_Up"  %(nam,degree),
+            factor=variation_to_cheb(uncertainty_zoverw_muf_up, degree=degree, scale=chebscale)
+            )
+    add_var(
+            num=Zvv_w,
+            denom=Wsig,
+            name="qcd_w_weights_%s_ZnunuWJets_QCD_facscale_vbf_cheb%i_Down"%(nam,degree),
+            factor=variation_to_cheb(uncertainty_zoverw_muf_down, degree=degree, scale=chebscale)
+    )
+    add_var(
+            num=Zvv_w,
+            denom=Wsig,
+            name="qcd_w_weights_%s_ZnunuWJets_QCD_pdf_vbf_cheb%i_Up"%(nam,degree),
+            factor=variation_to_cheb(uncertainty_zoverw_pdf_up, degree=degree, scale=chebscale)
+            )
+    add_var(
+            num=Zvv_w,
+            denom=Wsig,
+            name="qcd_w_weights_%s_ZnunuWJets_QCD_pdf_vbf_cheb%i_Down"%(nam,degree),
+            factor=variation_to_cheb(uncertainty_zoverw_pdf_down, degree=degree, scale=chebscale)
+            )
 
-  wratio_fac_scale_down = Zvv_w.Clone();  wratio_fac_scale_down.SetName("qcd_w_weights_%s_ZnunuWJets_QCD_facscale_vbf_Down"%nam);
-  wratio_fac_scale_down.Divide(Wsig)
-  wratio_fac_scale_down.Multiply(uncertainty_zoverw_muf_down)
-  _fOut.WriteTObject(wratio_fac_scale_down)
 
-  wratio_pdf_up = Zvv_w.Clone();  wratio_pdf_up.SetName("qcd_w_weights_%s_ZnunuWJets_QCD_pdf_vbf_Up"%nam);
-  wratio_pdf_up.Divide(Wsig)
-  wratio_pdf_up.Multiply(uncertainty_zoverw_pdf_up)
-  _fOut.WriteTObject(wratio_pdf_up)
 
-  wratio_pdf_down = Zvv_w.Clone();  wratio_pdf_down.SetName("qcd_w_weights_%s_ZnunuWJets_QCD_pdf_vbf_Down"%nam);
-  wratio_pdf_down.Divide(Wsig)
-  wratio_pdf_down.Multiply(uncertainty_zoverw_pdf_down)
-  _fOut.WriteTObject(wratio_pdf_down)
 
+  # EWK uncertainty (decorrelated among bins)
   wratio_ewk_up = Zvv_w.Clone();  wratio_ewk_up.SetName("qcd_w_weights_%s_ewk_Up"%nam);
   wratio_ewk_up.Divide(Wsig)
   wratio_ewk_up.Multiply(uncertainty_zoverw_ewk_up)
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_up)
 
   wratio_ewk_down = Zvv_w.Clone();  wratio_ewk_down.SetName("qcd_w_weights_%s_ewk_Down"%nam);
   wratio_ewk_down.Divide(Wsig)
   wratio_ewk_down.Multiply(uncertainty_zoverw_ewk_down)
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_down)
-
-  ############### GET SOMETHING CENTRAL PLEASE ############################
-  #Wsig = controlmc_w.Clone(); Wsig.SetName("w_weights_denom_%s"%nam)
-  #Zvv_w = target.Clone(); Zvv_w.SetName("w_weights_nom_%s"%nam)
 
   Zvv_w.Divide(Wsig)
 
-  #Now lets uncorrelate the bins:
   for b in range(target.GetNbinsX()):
-    #print "HELLO trying to fill up / down"
     ewk_up_w = Zvv_w.Clone(); ewk_up_w.SetName("qcd_w_weights_%s_qcd_ewk_%s_bin%d_Up"%(nam,re.sub("_201(\d)","",nam),b))
     ewk_down_w = Zvv_w.Clone(); ewk_down_w.SetName("qcd_w_weights_%s_qcd_ewk_%s_bin%d_Down"%(nam,re.sub("_201(\d)","",nam),b))
     for i in range(target.GetNbinsX()):
@@ -242,8 +306,6 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
         ewk_up_w.SetBinContent(i+1,wratio_ewk_up.GetBinContent(i+1))
         ewk_down_w.SetBinContent(i+1,wratio_ewk_down.GetBinContent(i+1))
         break
-
-    #print "HELLO filled up / down ",ewk_up.GetBinContent(b+1), ewk_down.GetBinContent(b+1)
 
     _fOut.WriteTObject(ewk_up_w)
     _fOut.WriteTObject(ewk_down_w)
@@ -256,55 +318,68 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
   Photon = controlmc_photon.Clone(); Photon.SetName("qcd_photon_weights_denom_%s"%nam)
   Zvv_g = target.Clone(); Zvv_g.SetName("qcd_photon_weights_nom_%s"%nam)
 
-  ###temporarily using W uncertainties on the Zs.
+  # QCD Uncertainties
+  add_var(num=target, denom=controlmc_photon, name="qcd_photon_weights_%s_Photon_QCD_renscale_vbf_Up"%nam, factor=uncertainty_zoverg_mur_up)
+  add_var(num=target, denom=controlmc_photon, name="qcd_photon_weights_%s_Photon_QCD_renscale_vbf_Down"%nam, factor=uncertainty_zoverg_mur_down)
+  add_var(num=target, denom=controlmc_photon, name="qcd_photon_weights_%s_Photon_QCD_facscale_vbf_Up"%nam, factor=uncertainty_zoverg_muf_up)
+  add_var(num=target, denom=controlmc_photon, name="qcd_photon_weights_%s_Photon_QCD_facscale_vbf_Down"%nam, factor=uncertainty_zoverg_muf_down)
 
-  gratio_ren_scale_up = Zvv_g.Clone();  gratio_ren_scale_up.SetName("qcd_photon_weights_%s_Photon_QCD_renscale_vbf_Up"%nam);
-  gratio_ren_scale_up.Divide(Photon)
-  gratio_ren_scale_up.Multiply(uncertainty_zoverg_mur_up)
-  _fOut.WriteTObject(gratio_ren_scale_up)
+  # PDF Uncertainty
+  add_var(num=target, denom=controlmc_photon, name="qcd_photon_weights_%s_Photon_QCD_pdf_vbf_Up"%nam, factor=uncertainty_zoverg_pdf_up)
+  add_var(num=target, denom=controlmc_photon, name="qcd_photon_weights_%s_Photon_QCD_pdf_vbf_Down"%nam, factor=uncertainty_zoverg_pdf_down)
 
-  gratio_ren_scale_down = Zvv_g.Clone();  gratio_ren_scale_down.SetName("qcd_photon_weights_%s_Photon_QCD_renscale_vbf_Down"%nam);
-  gratio_ren_scale_down.Divide(Photon)
-  gratio_ren_scale_down.Multiply(uncertainty_zoverg_mur_down)
-  _fOut.WriteTObject(gratio_ren_scale_down)
+  for degree in [1,2]:
+      add_var(
+              num=target,
+              denom=controlmc_photon,
+              name="qcd_photon_weights_%s_Photon_QCD_renscale_vbf_cheb%i_Up"  %(nam,degree),
+              factor=variation_to_cheb(uncertainty_zoverg_mur_up,degree=degree, scale=chebscale)
+      )
+      add_var(
+              num=target,
+              denom=controlmc_photon,
+              name="qcd_photon_weights_%s_Photon_QCD_renscale_vbf_cheb%i_Down"%(nam,degree),
+              factor=variation_to_cheb(uncertainty_zoverg_mur_down,degree=degree, scale=chebscale)
+      )
+      add_var(
+              num=target,
+              denom=controlmc_photon,
+              name="qcd_photon_weights_%s_Photon_QCD_facscale_vbf_cheb%i_Up"  %(nam,degree),
+              factor=variation_to_cheb(uncertainty_zoverg_muf_up,degree=degree, scale=chebscale)
+      )
+      add_var(
+              num=target,
+              denom=controlmc_photon,
+              name="qcd_photon_weights_%s_Photon_QCD_facscale_vbf_cheb%i_Down"%(nam,degree),
+              factor=variation_to_cheb(uncertainty_zoverg_muf_down,degree=degree, scale=chebscale)
+              )
+      add_var(
+        num=target,
+        denom=controlmc_photon,
+        name="qcd_photon_weights_%s_Photon_QCD_pdf_vbf_cheb%i_Up"%(nam,degree),
+        factor=variation_to_cheb(uncertainty_zoverg_pdf_up, degree=degree, scale=chebscale)
+        )
+      add_var(
+        num=target,
+        denom=controlmc_photon,
+        name="qcd_photon_weights_%s_Photon_QCD_pdf_vbf_cheb%i_Down"%(nam, degree),
+        factor=variation_to_cheb(uncertainty_zoverg_pdf_down, degree=degree, scale=chebscale)
+        )
 
-  gratio_fac_scale_up = Zvv_g.Clone(); gratio_fac_scale_up.SetName("qcd_photon_weights_%s_Photon_QCD_facscale_vbf_Up"%nam);
-  gratio_fac_scale_up.Divide(Photon)
-  gratio_fac_scale_up.Multiply(uncertainty_zoverg_muf_up)
-  _fOut.WriteTObject(gratio_fac_scale_up)
 
-  gratio_fac_scale_down = Zvv_g.Clone();  gratio_fac_scale_down.SetName("qcd_photon_weights_%s_Photon_QCD_facscale_vbf_Down"%nam);
-  gratio_fac_scale_down.Divide(Photon)
-  gratio_fac_scale_down.Multiply(uncertainty_zoverg_muf_down)
-  _fOut.WriteTObject(gratio_fac_scale_down)
-
-  gratio_pdf_up = Zvv_g.Clone();  gratio_pdf_up.SetName("qcd_photon_weights_%s_Photon_QCD_pdf_vbf_Up"%nam);
-  gratio_pdf_up.Divide(Photon)
-  gratio_pdf_up.Multiply(uncertainty_zoverg_pdf_up)
-  _fOut.WriteTObject(gratio_pdf_up)
-
-  gratio_pdf_down = Zvv_g.Clone();  gratio_pdf_down.SetName("qcd_photon_weights_%s_Photon_QCD_pdf_vbf_Down"%nam);
-  gratio_pdf_down.Divide(Photon)
-  gratio_pdf_down.Multiply(uncertainty_zoverg_pdf_down)
-  _fOut.WriteTObject(gratio_pdf_down)
-
+  # EWK uncertainty (decorrelated among bins)
   gratio_ewk_up = Zvv_g.Clone();  gratio_ewk_up.SetName("qcd_photon_weights_%s_ewk_Up"%nam);
   gratio_ewk_up.Divide(Photon)
   gratio_ewk_up.Multiply(uncertainty_zoverg_ewk_up)
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_up)
 
   gratio_ewk_down = Zvv_g.Clone();  gratio_ewk_down.SetName("qcd_photon_weights_%s_ewk_Down"%nam);
   gratio_ewk_down.Divide(Photon)
   gratio_ewk_down.Multiply(uncertainty_zoverg_ewk_down)
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_down)
 
   Zvv_g.Divide(Photon)
 
   #Now lets uncorrelate the bins:
   for b in range(target.GetNbinsX()):
-    #print "HELLO trying to fill up / down"
     ewk_up_g = Zvv_g.Clone(); ewk_up_g.SetName("qcd_photon_weights_%s_qcd_photon_ewk_%s_bin%d_Up"%(nam,re.sub("_201(\d)","",nam),b))
     ewk_down_g = Zvv_g.Clone(); ewk_down_g.SetName("qcd_photon_weights_%s_qcd_photon_ewk_%s_bin%d_Down"%(nam,re.sub("_201(\d)","",nam),b))
     for i in range(target.GetNbinsX()):
@@ -312,8 +387,6 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
         ewk_up_g.SetBinContent(i+1,gratio_ewk_up.GetBinContent(i+1))
         ewk_down_g.SetBinContent(i+1,gratio_ewk_down.GetBinContent(i+1))
         break
-
-    #print "HELLO filled up / down ",ewk_up.GetBinContent(b+1), ewk_down.GetBinContent(b+1)
 
     _fOut.WriteTObject(ewk_up_g)
     _fOut.WriteTObject(ewk_down_g)
