@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-06-11_skimcompare_05Jun20v5
-TAG='default'
+INDIR=../input/2020-05-20_monojet_photon_update_newhem_v2_metphi_dyn/
+TAG='testqcd'
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monojet/$(basename $INDIR)/${TAG}/root"
@@ -27,6 +27,7 @@ md5sum ${INFILE} >> ${INFOFILE}
 ./runModel.py ${WSFILE} --categories monojet_2017,monojet_2018 \
                         --out ${OUTDIR}/combined_model_monojet.root
 
+cp sys/monojet_qcd_ws.root ${OUTDIR}
 
 # Save the check sums for the output
 echo "--- OUTPUT ---" >> ${INFOFILE}
