@@ -14,7 +14,7 @@ for YEAR in 2017 2018; do
         sed -i "s|@LUMI|1.025|g" ${CARD}
     fi
     sed -i "s|combined_model.root|../root/combined_model_vbf.root|g" ${CARD}
-    sed -i "s|vbf_qcd_nckw_ws_2017.root|../root/vbf_qcd_nckw_ws_2017.root|g" ${CARD}
+    sed -i "s|vbf_qcd_nckw_ws_${YEAR}.root|../root/vbf_qcd_nckw_ws_${YEAR}.root|g" ${CARD}
     text2workspace.py ${CARD} --channel-masks
     python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${YEAR}.html
 done
