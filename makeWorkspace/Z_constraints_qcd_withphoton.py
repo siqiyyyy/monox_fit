@@ -85,7 +85,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
     CRs[2].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),-0.025)
   elif year==2018:
     CRs[2].add_nuisance('CMS_VBF_scale_j'.format(YEAR=year),-0.02)
-    CRs[2].add_nuisance('CMS_res{YEAR}_j'.format(YEAR=year),-0.01)
+    CRs[2].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),-0.01)
   else:
     raise RuntimeError("Year not recognized: " + str(year))
 
