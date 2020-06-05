@@ -18,7 +18,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
   # example below for creating shape systematic for photon which is just every bin up/down 30%
 
   metname    = 'mjj'           # Observable variable name
-  gvptname   = "genBosonPt"    # Weights are in generator pT
 
   target             = _fin.Get("signal_ewkzjets")      # define monimal (MC) of which process this config will model
   controlmc          = _fin.Get("Zmm_ewkzll")           # defines Zmm MC of which process will be controlled by
@@ -136,7 +135,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
 def my_function(_wspace,_fin,_fOut,nam,diag, year):
 
   metname    = "mjj"   # Observable variable name
-  gvptname   = "genBosonPt"    # Weights are in generator pT
 
   target             = _fin.Get("signal_ewkzjets")      # define monimal (MC) of which process this config will model
   controlmc          = _fin.Get("Zmm_ewkzll")           # defines Zmm MC of which process will be controlled by
@@ -183,35 +181,20 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
   Wsig = controlmc_w.Clone(); Wsig.SetName("ewk_w_weights_denom_%s"%nam)
   Zvv_w = target.Clone(); Zvv_w.SetName("ewk_w_weights_nom_%s"%nam)
 
-  wratio_ren_scale_up = Zvv_w.Clone();  wratio_ren_scale_up.SetName("ewk_w_weights_%s_ZnunuWJets_EWK_renscale_vbf_Up"%nam);
-  wratio_ren_scale_up.Multiply(uncertainty_zoverw_mur_up)
-  wratio_ren_scale_up.Divide(Wsig)
-  _fOut.WriteTObject(wratio_ren_scale_up)
+  def add_var(num, denom, name, factor):
+    new = num.Clone(name)
+    new.Divide(denom)
+    new.Multiply(factor)
+    _fOut.WriteTObject(new)
 
-  wratio_ren_scale_down = Zvv_w.Clone();  wratio_ren_scale_down.SetName("ewk_w_weights_%s_ZnunuWJets_EWK_renscale_vbf_Down"%nam);
-  wratio_ren_scale_down.Multiply(uncertainty_zoverw_mur_down)
-  wratio_ren_scale_down.Divide(Wsig)
-  _fOut.WriteTObject(wratio_ren_scale_down)
-
-  wratio_fac_scale_up = Zvv_w.Clone(); wratio_fac_scale_up.SetName("ewk_w_weights_%s_ZnunuWJets_EWK_facscale_vbf_Up"%nam);
-  wratio_fac_scale_up.Divide(Wsig)
-  wratio_fac_scale_up.Multiply(uncertainty_zoverw_muf_up)
-  _fOut.WriteTObject(wratio_fac_scale_up)
-
-  wratio_fac_scale_down = Zvv_w.Clone();  wratio_fac_scale_down.SetName("ewk_w_weights_%s_ZnunuWJets_EWK_facscale_vbf_Down"%nam);
-  wratio_fac_scale_down.Divide(Wsig)
-  wratio_fac_scale_down.Multiply(uncertainty_zoverw_muf_down)
-  _fOut.WriteTObject(wratio_fac_scale_down)
-
-  wratio_pdf_up = Zvv_w.Clone();  wratio_pdf_up.SetName("ewk_w_weights_%s_ZnunuWJets_EWK_pdf_vbf_Up"%nam);
-  wratio_pdf_up.Divide(Wsig)
-  wratio_pdf_up.Multiply(uncertainty_zoverw_pdf_up)
-  _fOut.WriteTObject(wratio_pdf_up)
-
-  wratio_pdf_down = Zvv_w.Clone();  wratio_pdf_down.SetName("ewk_w_weights_%s_ZnunuWJets_EWK_pdf_vbf_Down"%nam);
-  wratio_pdf_down.Divide(Wsig)
-  wratio_pdf_down.Multiply(uncertainty_zoverw_pdf_down)
-  _fOut.WriteTObject(wratio_pdf_down)
+  # QCD uncertainties
+  add_var(num=Zvv_w, denom=Wsig, name="ewk_w_weights_%s_ZnunuWJets_EWK_renscale_vbf_Up"%nam,   factor=uncertainty_zoverw_mur_up)
+  add_var(num=Zvv_w, denom=Wsig, name="ewk_w_weights_%s_ZnunuWJets_EWK_renscale_vbf_Down"%nam, factor=uncertainty_zoverw_mur_down)
+  add_var(num=Zvv_w, denom=Wsig, name="ewk_w_weights_%s_ZnunuWJets_EWK_facscale_vbf_Up"%nam,   factor=uncertainty_zoverw_muf_up)
+  add_var(num=Zvv_w, denom=Wsig, name="ewk_w_weights_%s_ZnunuWJets_EWK_facscale_vbf_Down"%nam, factor=uncertainty_zoverw_muf_down)
+  # PDF Uncertainty
+  add_var(num=Zvv_w, denom=Wsig, name="ewk_w_weights_%s_ZnunuWJets_EWK_pdf_vbf_Up"%nam, factor=uncertainty_zoverw_pdf_up)
+  add_var(num=Zvv_w, denom=Wsig, name="ewk_w_weights_%s_ZnunuWJets_EWK_pdf_vbf_Down"%nam, factor=uncertainty_zoverw_pdf_down)
 
   uncertainty_zoverw_ewk_up= vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_up_"+str(year))
   uncertainty_zoverw_ewk_down = vbf_sys.Get("uncertainty_ratio_z_ewk_mjj_unc_w_ewkcorr_overz_common_down_"+str(year))
@@ -220,20 +203,10 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
   wratio_ewk_up.Divide(Wsig)
   wratio_ewk_up.Multiply(uncertainty_zoverw_ewk_up)
 
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_up)
-
+  # EWK uncertainty (decorrelated among bins)
   wratio_ewk_down = Zvv_w.Clone();  wratio_ewk_down.SetName("ewk_w_weights_%s_ewk_Down"%nam);
   wratio_ewk_down.Divide(Wsig)
   wratio_ewk_down.Multiply(uncertainty_zoverw_ewk_down)
-
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_down)
-
-
-  ############### GET SOMETHING CENTRAL PLEASE ############################
-  #Wsig = controlmc_w.Clone(); Wsig.SetName("w_weights_denom_%s"%nam)
-  #Zvv_w = target.Clone(); Zvv_w.SetName("w_weights_nom_%s"%nam)
 
   Zvv_w.Divide(Wsig)
 
@@ -261,54 +234,24 @@ def my_function(_wspace,_fin,_fOut,nam,diag, year):
   Photon = controlmc_photon.Clone(); Photon.SetName("ewk_photon_weights_denom_%s"%nam)
   Zvv_g = target.Clone(); Zvv_g.SetName("ewk_photon_weights_nom_%s"%nam)
 
-  gratio_ren_scale_up = Zvv_g.Clone();  gratio_ren_scale_up.SetName("ewk_photon_weights_%s_Photon_EWK_renscale_vbf_Up"%nam);
-  gratio_ren_scale_up.Multiply(uncertainty_zoverg_mur_up)
-  gratio_ren_scale_up.Divide(Photon)
-  _fOut.WriteTObject(gratio_ren_scale_up)
+  # QCD Uncertainties
+  add_var(num=target, denom=controlmc_photon, name="ewk_photon_weights_%s_Photon_EWK_renscale_vbf_Up"%nam, factor=uncertainty_zoverg_mur_up)
+  add_var(num=target, denom=controlmc_photon, name="ewk_photon_weights_%s_Photon_EWK_renscale_vbf_Down"%nam, factor=uncertainty_zoverg_mur_down)
+  add_var(num=target, denom=controlmc_photon, name="ewk_photon_weights_%s_Photon_EWK_facscale_vbf_Up"%nam, factor=uncertainty_zoverg_muf_up)
+  add_var(num=target, denom=controlmc_photon, name="ewk_photon_weights_%s_Photon_EWK_facscale_vbf_Down"%nam, factor=uncertainty_zoverg_muf_down)
 
-  gratio_ren_scale_down = Zvv_g.Clone();  gratio_ren_scale_down.SetName("ewk_photon_weights_%s_Photon_EWK_renscale_vbf_Down"%nam);
-  gratio_ren_scale_down.Multiply(uncertainty_zoverg_mur_down)
-  gratio_ren_scale_down.Divide(Photon)
-  _fOut.WriteTObject(gratio_ren_scale_down)
+  # PDF Uncertainty
+  add_var(num=target, denom=controlmc_photon, name="ewk_photon_weights_%s_Photon_EWK_pdf_vbf_Up"%nam, factor=uncertainty_zoverg_pdf_up)
+  add_var(num=target, denom=controlmc_photon, name="ewk_photon_weights_%s_Photon_EWK_pdf_vbf_Down"%nam, factor=uncertainty_zoverg_pdf_down)
 
-  gratio_fac_scale_up = Zvv_g.Clone(); gratio_fac_scale_up.SetName("ewk_photon_weights_%s_Photon_EWK_facscale_vbf_Up"%nam);
-  gratio_fac_scale_up.Divide(Photon)
-  gratio_fac_scale_up.Multiply(uncertainty_zoverg_muf_up)
-  _fOut.WriteTObject(gratio_fac_scale_up)
-
-  gratio_fac_scale_down = Zvv_g.Clone();  gratio_fac_scale_down.SetName("ewk_photon_weights_%s_Photon_EWK_facscale_vbf_Down"%nam);
-  gratio_fac_scale_down.Divide(Photon)
-  gratio_fac_scale_down.Multiply(uncertainty_zoverg_muf_down)
-  _fOut.WriteTObject(gratio_fac_scale_down)
-
-  gratio_pdf_up = Zvv_g.Clone();  gratio_pdf_up.SetName("ewk_photon_weights_%s_Photon_EWK_pdf_vbf_Up"%nam);
-  gratio_pdf_up.Divide(Photon)
-  gratio_pdf_up.Multiply(uncertainty_zoverg_pdf_up)
-  _fOut.WriteTObject(gratio_pdf_up)
-
-  gratio_pdf_down = Zvv_g.Clone();  gratio_pdf_down.SetName("ewk_photon_weights_%s_Photon_EWK_pdf_vbf_Down"%nam);
-  gratio_pdf_down.Divide(Photon)
-  gratio_pdf_down.Multiply(uncertainty_zoverg_pdf_down)
-  _fOut.WriteTObject(gratio_pdf_down)
-
+  # EWK uncertainty (decorrelated among bins)
   gratio_ewk_up = Zvv_g.Clone();  gratio_ewk_up.SetName("ewk_photon_weights_%s_ewk_Up"%nam);
   gratio_ewk_up.Divide(Photon)
   gratio_ewk_up.Multiply(uncertainty_zoverg_ewk_up)
 
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_up)
-
   gratio_ewk_down = Zvv_g.Clone();  gratio_ewk_down.SetName("ewk_photon_weights_%s_ewk_Down"%nam);
   gratio_ewk_down.Divide(Photon)
   gratio_ewk_down.Multiply(uncertainty_zoverg_ewk_down)
-
-  # We are now going to uncorrelate the bins
-  #_fOut.WriteTObject(ratio_ewk_down)
-
-
-  ############### GET SOMETHING CENTRAL PLEASE ############################
-  #Photon = controlmc_w.Clone(); Photon.SetName("w_weights_denom_%s"%nam)
-  #Zvv_g = target.Clone(); Zvv_g.SetName("w_weights_nom_%s"%nam)
 
   Zvv_g.Divide(Photon)
 
