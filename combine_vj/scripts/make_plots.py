@@ -20,8 +20,8 @@ for year in [2017,2018]:
     diffnuis_file = 'diagnostics/diffnuisances_monojet_monov_combined_{year}.root'.format(year=year)
     category='monojet_{year}'.format(year=year)
     outdir = './plots/{year}/'.format(year=year)
-    for region in regions:
-        plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
+    # for region in regions:
+    #     plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
     for proc in procs:
         plot_ratio(proc, category, 'root/combined_model_monojet.root'.format(year=year), outdir, lumi[year],year)
 
@@ -37,7 +37,7 @@ for year in [2017,2018]:
     dataValidation("dielectron",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
     dataValidation("dimuon",        "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
 
-    plot_nuis(diffnuis_file, outdir)
+    # plot_nuis(diffnuis_file, outdir)
 
 
 ### Years fit together

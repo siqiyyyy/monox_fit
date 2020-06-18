@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-05-20_monojet_photon_update_newhem
+INDIR=../input/2020-06-11_skimcompare_05Jun20v5
 TAG='default'
 INDIR="$(readlink -e $INDIR)"
 

@@ -26,8 +26,8 @@ for year in [2017,2018]:
     diffnuis_file = 'diagnostics/diffnuisances_nominal_{category}.root'.format(**filler)
 
     outdir = './plots/{year}/'.format(**filler)
-    for region in regions:
-        plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
+    # for region in regions:
+    #     plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
     for proc in procs:
         plot_ratio(proc, category, model_file, outdir, lumi[year], year)
 
@@ -42,7 +42,7 @@ for year in [2017,2018]:
     dataValidation("singlemuon",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
     dataValidation("dielectron",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
     dataValidation("dimuon",        "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
-    plot_nuis(diffnuis_file, outdir)
+    # plot_nuis(diffnuis_file, outdir)
 
 
 ### Years fit together
