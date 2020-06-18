@@ -24,6 +24,7 @@ for YEAR in 2017 2018; do
         sed -i "s|@LUMIBCC|1.02|g" ${CARD}
         sed -i "s|@LUMIGS|1.00|g" ${CARD}
         sed -i "s|@LUMI|1.015|g" ${CARD}
+        sed -i "/prefir/d" ${CARD}
     fi
     sed -i "s|combined_model.root|../root/combined_model_vbf.root|g" ${CARD}
     sed -i "s|vbf_qcd_nckw_ws_${YEAR}.root|../root/vbf_qcd_nckw_ws_${YEAR}.root|g" ${CARD}
