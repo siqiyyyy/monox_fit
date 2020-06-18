@@ -84,11 +84,11 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
     'ewk_zll'    :"#9A9EAB",
     'ewkzll'    :"#9A9EAB",
     'wjets'  :"#FAAF08",
-    'qcd_wjets'  :"#FAAF08",
-    'ewk_wjets'  :"#FAAF08",
+    'qcd_wjets'  :"#feb24c",
+    'ewk_wjets'  :"#ffeda0",
     'zjets'  :"#258039",
-    'ewk_zjets'  :"#258039",
-    'qcd_zjets'  :"#258039"
+    'ewk_zjets'  :"#74c476",
+    'qcd_zjets'  :"#00441b"
   }
 
   binLowE = []
@@ -258,13 +258,23 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
     legend.SetFillStyle(0);
     legend.SetBorderSize(0);
     legend.AddEntry(h_data, "Data", "elp")
-    legend.AddEntry(h_postfit['zjets'], "Z(#nu#nu)+jets", "f")
-    legend.AddEntry(h_postfit['wjets'], "W(l#nu)+jets", "f")
-    legend.AddEntry(h_postfit['diboson'], "WW/ZZ/WZ", "f")
-    legend.AddEntry(h_postfit['top'], "Top quark", "f")
-    #legend.AddEntry(h_postfit['gjets'], "Z/#gamma(ll)+jets, #gamma+jets", "f")
-    legend.AddEntry(h_postfit['gjets'], "Z(ll)+jets, #gamma+jets", "f")
-    legend.AddEntry(h_postfit['qcd'], "QCD", "f")
+    if 'mono' in category:
+      legend.AddEntry(h_postfit['zjets'], "Z(#nu#nu)+jets", "f")
+      legend.AddEntry(h_postfit['wjets'], "W(l#nu)+jets", "f")
+      legend.AddEntry(h_postfit['diboson'], "WW/ZZ/WZ", "f")
+      legend.AddEntry(h_postfit['top'], "Top quark", "f")
+      legend.AddEntry(h_postfit['gjets'], "Z(ll)+jets, #gamma+jets", "f")
+      legend.AddEntry(h_postfit['qcd'], "QCD", "f")
+    else:
+      # pass
+      legend.AddEntry(h_postfit['qcd_zjets'], "QCD Z(#nu#nu)+jets", "f")
+      legend.AddEntry(h_postfit['qcd_wjets'], "QCD W(l#nu)+jets", "f")
+      legend.AddEntry(h_postfit['ewk_zjets'], "EWK Z(#nu#nu)+jets", "f")
+      legend.AddEntry(h_postfit['ewk_wjets'], "EWK W(l#nu)+jets", "f")
+      legend.AddEntry(h_postfit['diboson'], "WW/ZZ/WZ", "f")
+      legend.AddEntry(h_postfit['top'], "Top quark", "f")
+      # legend.AddEntry(h_postfit['gjets'], "Z(ll)+jets, #gamma+jets", "f")
+      legend.AddEntry(h_postfit['qcd'], "QCD", "f")
     if sb:
       legend.AddEntry(h_postfit['totalsig'], "S+B post-fit", "f")
 
