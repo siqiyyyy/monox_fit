@@ -20,6 +20,15 @@ for YEAR in 2017 2018; do
             fi
 
             sed -i "s|combined_model.root|../root/combined_model_monov_${TAGGER}_${WP}.root|g" ${CARD}
+            # only for the nominal tight tagger we apply the data-driven qcd, otherwise use the old qcd prediction
+            if [ "$TAGGER" == nominal ] && [ "$WP" == tight ]; then
+                sed -i "s|monovtight_qcd_ws.root|../root/monovtight_qcd_ws.root|g" ${CARD}
+                sed -i "/QCD_NormSignal/d" ${CARD}
+            else
+                sed -i "/qcd_ws/d" ${CARD}
+                sed -i "/qcdfit/d" ${CARD}
+                sed -i "/qcdclosure/d" ${CARD}
+            fi
             text2workspace.py ${CARD} --channel-masks
             python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${TAGGER}_monov${WP}_${YEAR}.html
         done
@@ -43,6 +52,9 @@ for YEAR in 2017 2018; do
     sed -i "s/@WP//g" ${CARD}
     sed -i "s|@YEAR|${YEAR}|g" ${CARD}
     sed -i "s|combined_model.root|../root/combined_model_monov_tau21.root|g" ${CARD}
+    sed -i "/qcd_ws/d" ${CARD}
+    sed -i "/qcdfit/d" ${CARD}
+    sed -i "/qcdclosure/d" ${CARD}
     if [ $YEAR -eq 2017 ]; then
         sed -i "s|@LUMI|1.025|g" ${CARD}
     elif [ $YEAR -eq 2018 ]; then
