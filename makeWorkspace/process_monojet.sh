@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-06-11_skimcompare_05Jun20v5
-TAG='default'
+INDIR=../input/merged_2020_06_22_monojv_all-electron-stuff_ntuple05Jun20v5
+TAG='test-updateEleSF'
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monojet/$(basename $INDIR)/${TAG}/root"
