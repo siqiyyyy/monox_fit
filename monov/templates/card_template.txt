@@ -124,7 +124,8 @@ monov@WP_@YEAR_stat_error_singleelectronCR_bin3 param 0.0 1
 monov@WP_@YEAR_stat_error_singleelectronCR_bin4 param 0.0 1
 monov@WP_@YEAR_stat_error_singleelectronCR_bin5 param 0.0 1
 monov@WP_@YEAR_stat_error_singleelectronCR_bin6 param 0.0 1
-eveto_@YEAR param 0.0 1
+eveto_id_@YEAR param 0.0 1
+eveto_reco_@YEAR param 0.0 1
 muveto_@YEAR param 0.0 1
 tauveto_@YEAR param 0.0 1
 prefiring  param  0.0 1
