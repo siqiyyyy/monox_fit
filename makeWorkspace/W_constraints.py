@@ -131,19 +131,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
   CRs[1].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
-  # PDF unc
-  fwtowpdf = r.TFile.Open("sys/wtow_pdf_sys.root")
-
-  # PDF single muon
-  add_variation(WScales, fwtowpdf, "ratio_Down"+tag, "wmn_weights_%s_wtowpdf_Down"%cid, _fOut)
-  add_variation(WScales, fwtowpdf, "ratio"+tag, "wmn_weights_%s_wtowpdf_Up"%cid, _fOut)
-  CRs[0].add_nuisance_shape("wtowpdf",_fOut)
-
-  # PDF single electron
-  add_variation(WScales_e, fwtowpdf, "ratio_Down"+tag, "wen_weights_%s_wtowpdf_Down"%cid, _fOut)
-  add_variation(WScales_e, fwtowpdf, "ratio"+tag, "wen_weights_%s_wtowpdf_Up"%cid, _fOut)
-  CRs[1].add_nuisance_shape("wtowpdf",_fOut)
-
   ## Veto uncertainties
   fwtowveto = r.TFile.Open("sys/veto_sys.root") # 250 - 1400 binning
 
