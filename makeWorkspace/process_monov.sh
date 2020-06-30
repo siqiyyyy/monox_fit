@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-05-20_monojet_photon_update_newhem
-TAG='default'
+INDIR=../input/merged_20200611_monov_ntuple19Feb20
+TAG='testqcd'
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
@@ -38,6 +38,7 @@ md5sum ${INFILE} >> ${INFOFILE}
 ./make_ws.py ${INFILE} --out ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018
 ./runModel.py ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018 --out ${OUTDIR}/combined_model_monov_tau21.root
 
+cp sys/monovtight_qcd_ws.root ${OUTDIR}
 
 # Save the check sums for the output
 echo "--- OUTPUT ---" >> ${INFOFILE}
