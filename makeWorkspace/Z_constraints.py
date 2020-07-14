@@ -188,6 +188,14 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut)
   CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho_extrap".format(**filler),_fOut)
 
+  felectronid = r.TFile.Open("sys/ele_id_unc.root")
+  add_variation(ZeeScales, felectronid, "monoj_1e_id_up_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_Up"%(cid, year), _fOut)
+  add_variation(ZeeScales, felectronid, "monoj_1e_id_dn_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_Down"%(cid, year), _fOut)
+  CRs[2].add_nuisance_shape("CMS_eff{YEAR}_ele".format(**filler),_fOut)
+  add_variation(ZeeScales, felectronid, "monoj_1e_reco_up_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_reco_Up"%(cid, year), _fOut)
+  add_variation(ZeeScales, felectronid, "monoj_1e_reco_dn_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_reco_Down"%(cid, year), _fOut)
+  CRs[2].add_nuisance_shape("CMS_eff{YEAR}_ele_reco".format(**filler),_fOut)
+
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course
   return cat
