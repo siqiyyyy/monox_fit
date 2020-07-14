@@ -186,11 +186,11 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
 
   felectronid = r.TFile.Open("sys/ele_id_unc.root")
-  add_variation(WScales_e, felectronid, "monoj_1e_id_up_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_Up"%(cid, year), _fOut)
-  add_variation(WScales_e, felectronid, "monoj_1e_id_dn_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_Down"%(cid, year), _fOut)
+  add_variation(WScales_e, felectronid, "monoj_1e_id_up_{YEAR}".format(**filler), "wen_weights_%s_CMS_eff%s_ele_Up"%(cid, year), _fOut, invert=True)
+  add_variation(WScales_e, felectronid, "monoj_1e_id_dn_{YEAR}".format(**filler), "wen_weights_%s_CMS_eff%s_ele_Down"%(cid, year), _fOut, invert=True)
   CRs[1].add_nuisance_shape("CMS_eff{YEAR}_ele".format(**filler),_fOut)
-  add_variation(WScales_e, felectronid, "monoj_1e_reco_up_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_reco_Up"%(cid, year), _fOut)
-  add_variation(WScales_e, felectronid, "monoj_1e_reco_dn_{YEAR}".format(**filler), "electron_weights_%s_CMS_eff%s_ele_reco_Down"%(cid, year), _fOut)
+  add_variation(WScales_e, felectronid, "monoj_1e_reco_up_{YEAR}".format(**filler), "wen_weights_%s_CMS_eff%s_ele_reco_Up"%(cid, year), _fOut, invert=True)
+  add_variation(WScales_e, felectronid, "monoj_1e_reco_dn_{YEAR}".format(**filler), "wen_weights_%s_CMS_eff%s_ele_reco_Down"%(cid, year), _fOut, invert=True)
   CRs[1].add_nuisance_shape("CMS_eff{YEAR}_ele_reco".format(**filler),_fOut)
 
   # Prefiring uncertainty
