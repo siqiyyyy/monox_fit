@@ -8,10 +8,8 @@ mkdir -p $WDIR
 pushd $WDIR
 
 mkdir -p root
-cp $JDIR/root/combined_model_monojet.root ./root
-cp $JDIR/root/ws_monojet.root ./root
-cp $VDIR/root/combined_model_monov_nominal_tight.root ./root
-cp $VDIR/root/ws_monov_nominal_tight.root ./root
+cp $JDIR/root/*.root ./root
+cp $VDIR/root/*.root ./root
 
 mkdir -p cards
 for YEAR in 2017 2018 combined; do
@@ -24,6 +22,7 @@ for YEAR in 2017 2018 combined; do
 
     # Fix input file names
     sed -i '/combined_model_/ s|[^ ]*\(combined_model_.*.root\)|root/\1|g' ${COMBINED}
+    sed -i '/_qcd_ws/ s|[^ ]*\(mono[^ ]*_qcd_ws.root\)|root/\1|g' ${COMBINED}
 
     text2workspace.py ${COMBINED} --channel-masks
 
@@ -36,6 +35,7 @@ for YEAR in 2017 2018 combined; do
     sed -i 's/ch\(1\|2\)_/    /g' ${INDIVIDUAL}
     sed -i 's/^bin    /bin/g' ${INDIVIDUAL}
     sed -i '/combined_model_/ s|[^ ]*\(combined_model_.*.root\)|root/\1|g' ${INDIVIDUAL}
+    sed -i '/_qcd_ws/ s|[^ ]*\(mono[^ ]*_qcd_ws.root\)|root/\1|g' ${INDIVIDUAL}
     text2workspace.py ${INDIVIDUAL} --channel-masks
 done
 popd
