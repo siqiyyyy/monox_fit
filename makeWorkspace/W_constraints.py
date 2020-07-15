@@ -212,11 +212,9 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
       continue
     jet_variations.add(var)
 
-  print "VARIATIONS"
-  print jet_variations
   for var in jet_variations:
-    add_variation(WScales, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Up"%(cid, var), _fOut)
-    add_variation(WScales, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Down"%(cid, var), _fOut)
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[0].add_nuisance_shape(var,_fOut)
 
     add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wen_weights_%s_%s_Up"%(cid, var), _fOut)
