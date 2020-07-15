@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 
-import ROOT
-ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
-from HiggsAnalysis.CombinedLimit.ModelTools import *
-import os
 import argparse
+import os
+import re
 from math import sqrt
+
+import ROOT
+from HiggsAnalysis.CombinedLimit.ModelTools import *
+
+ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
 pjoin = os.path.join
 
 def cli_args():
@@ -38,7 +41,7 @@ def main():
     os.makedirs(outdir)
 
   fin = ROOT.TFile(args.file,'READ')
-
+  f_jes = ROOT.TFile("sys/shape_jes_uncs_smooth.root")
   fout = ROOT.TFile(args.out,'RECREATE')
   dummy = []
   for category in args.categories:
@@ -51,6 +54,24 @@ def main():
 
     variable_name = "mjj" if ("vbf" in category) else "met"
     varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
+    # Helper function
+    def write_obj(obj, name):
+      '''Converts histogram to RooDataHist and writes to workspace + ROOT file'''
+      print "Creating Data Hist for ", name
+      dhist = ROOT.RooDataHist(
+                            name,
+                            "DataSet - %s, %s"%(category,name),
+                            ROOT.RooArgList(varl),
+                            obj
+                            )
+      wsin_combine._import(dhist)
+
+      # Write the individual histograms
+      # for easy transfer factor calculation
+      # later on
+      obj.SetDirectory(0)
+      foutdir.cd()
+      foutdir.WriteTObject(obj)
 
     # Loop over all keys in the input file
     # pick out the histograms, and add to
@@ -80,22 +101,20 @@ def main():
       obj.SetBinContent(obj.GetNbinsX()+1, 0)
       obj.SetBinError(obj.GetNbinsX()+1, 0)
 
+      write_obj(obj, name)
+      
+      # Systematic variations
+      if not 'data' in name:
+        channel = re.sub("(loose|tight)","", category)
+        for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
+          if not (channel in key):
+            continue
+          variation = key.replace(channel+"_","")
+          name = obj.GetName()+"_"+variation
+          varied_obj = obj.Clone(name)
+          varied_obj.Multiply(f_jes.Get(key))
+          write_obj(varied_obj, name)
 
-      print "Creating Data Hist for ", name
-      dhist = ROOT.RooDataHist(
-                              name,
-                              "DataSet - %s, %s"%(category,name),
-                              ROOT.RooArgList(varl),
-                              obj
-                              )
-      wsin_combine._import(dhist)
-
-      # Write the individual histograms
-      # for easy transfer factor calculation
-      # later on
-      obj.SetDirectory(0)
-      foutdir.cd()
-      foutdir.WriteTObject(obj)
 
     dummy.append(wsin_combine)
 

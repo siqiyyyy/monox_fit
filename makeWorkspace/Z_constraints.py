@@ -188,6 +188,39 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut)
   CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho_extrap".format(**filler),_fOut)
 
+
+  # JES uncertainties
+  fjes = r.TFile.Open("sys/monojet_tf_uncs.root")
+  
+  # Get the list of available JES/JER variations directly from the file
+  jet_variations = set()
+  for x in list(fjes.GetListOfKeys()):
+    var = re.sub("(.*qcd_|(Up|Down))","",x.GetName())
+    if '201' in var and not (str(year) in var):
+      continue
+    jet_variations.add(var)
+
+  print "VARIATIONS"
+  print jet_variations
+  for var in jet_variations:
+    add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "w_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "w_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[3].add_nuisance_shape(var,_fOut)
+    
+    add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "zmm_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "zmm_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[1].add_nuisance_shape(var,_fOut)
+
+    add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "zee_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "zee_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[2].add_nuisance_shape(var,_fOut)
+    
+    add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Up"%(cid, var), _fOut, invert=True)
+    add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Down"%(cid, var), _fOut, invert=True)
+    CRs[0].add_nuisance_shape(var,_fOut)
+
+
+
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course
   return cat

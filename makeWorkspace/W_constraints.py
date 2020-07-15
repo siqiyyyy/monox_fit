@@ -43,12 +43,18 @@ def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False
   factor = unc_file.Get(unc_name)
 
   if not factor:
-    raise IOError("Could not retrieve histogram '%s' from file '%s'."%(unc_name), unc_file)
+    raise IOError("Could not retrieve histogram '%s' from file '%s'."%(unc_name, unc_file))
 
-  if invert:
-    variation.Divide(factor)
+  if factor.GetNbinsX() == 1:
+    if invert:
+      variation.Scale(1 / factor.GetBinContent(1))
+    else:
+      variation.Scale(factor.GetBinContent(1))
   else:
-    variation.Multiply(factor)
+    if invert:
+      variation.Divide(factor)
+    else:
+      variation.Multiply(factor)
   outfile.WriteTObject(variation)
 
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
@@ -193,6 +199,27 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(WScales_e, fpref, "{CHANNEL}_pref_unc_w_over_e".format(**filler), "wen_weights_%s_prefiring_Up"%cid, _fOut, invert=True)
     add_variation(WScales_e, fpref, "{CHANNEL}_pref_unc_w_over_e".format(**filler), "wen_weights_%s_prefiring_Down"%cid, _fOut)
     CRs[1].add_nuisance_shape("prefiring",_fOut)
+
+
+    # JES uncertainties
+  fjes = r.TFile.Open("sys/monojet_tf_uncs.root")
+
+  # Get the list of available JES/JER variations directly from the file
+  jet_variations = set()
+  for x in list(fjes.GetListOfKeys()):
+    var = re.sub("(.*qcd_|(Up|Down))","",x.GetName())
+    if '201' in var and not (str(year) in var):
+      continue
+    jet_variations.add(var)
+
+  for var in jet_variations:
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[0].add_nuisance_shape(var,_fOut)
+
+    add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wen_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "wen_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[1].add_nuisance_shape(var,_fOut)
 
   #######################################################################################################
 
