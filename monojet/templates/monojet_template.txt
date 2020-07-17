@@ -73,8 +73,8 @@ qcdbinning_monojet_@YEAR        shape        -                     -            
 qcdclosure_monojet_@YEAR        lnN          -                     -                     -                     -                     -                     -                     -                     1.25                  -                     -                     -                     -                     -                     -                     -                     -                     -                     -                       -                       -                       -                       -                       -                       -                       -                       -                       -                       -        
 CMS_eff@YEAR_pho param 0.0 1
 CMS_eff@YEAR_pho_extrap param 0.0 1
-CMS_eff@YEAR_ele param 0.0 1
-CMS_eff@YEAR_ele_reco param 0.0 1
+CMS_eff@YEAR_e param 0.0 1
+CMS_eff@YEAR_e_reco param 0.0 1
 wewk          param  0.0 1
 wqcdshape     param  0.0 1
 monojet_@YEAR_stat_error_singleelectronCR_bin17  param  0.0 1
