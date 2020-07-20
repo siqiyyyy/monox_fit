@@ -1,9 +1,10 @@
 TAG=2020-05-20_monojet_photon_update_newhem_v2_metphi_dyn
 SUBTAG=default
+SUBSUBTAG=default
 JDIR=$(readlink -e ../monojet/${TAG}/${SUBTAG}/)
 VDIR=$(readlink -e ../monov/${TAG}/${SUBTAG}/)
 
-WDIR=./${TAG}/${SUBTAG}/
+WDIR=./${TAG}/${SUBTAG}_${SUBSUBTAG}/
 mkdir -p $WDIR
 pushd $WDIR
 
