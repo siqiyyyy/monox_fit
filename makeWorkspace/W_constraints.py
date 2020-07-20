@@ -115,7 +115,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   do_stat_unc(WScales, "wmn", cid, "singlemuonCR", CRs[0],_fOut)
   do_stat_unc(WScales_e, "wen", cid, "singleelectronCR", CRs[1],_fOut)
 
-  filler = {"YEAR":year}
+  filler = {"YEAR":year,"CID":cid}
   if "monov" in cid:
     tag = "_monov"
     filler["CHANNEL"] = "monov"
@@ -228,6 +228,28 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wen_weights_%s_%s_Up"%(cid, var), _fOut)
     add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "wen_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[1].add_nuisance_shape(var,_fOut)
+
+  # PDF uncertainties
+    fpdf = ROOT.TFile("sys/tf_pdf_unc.root")
+
+  for direction in 'up', 'down':
+    add_variation(
+      WScales,
+      fpdf,
+      "{CHANNEL}_w_over_wmn_pdf_{YEAR}_{DIR}".format(DIR=direction,**filler),
+      "wmn_weights_{CID}_w_over_w_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      _fOut
+    )
+    add_variation(
+      WScales_e,
+      fpdf,
+      "{CHANNEL}_w_over_wen_pdf_{YEAR}_{DIR}".format(DIR=direction,**filler),
+      "wen_weights_{CID}_w_over_w_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      _fOut
+    )
+
+  CRs[0].add_nuisance_shape("w_over_w_pdf",_fOut)
+  CRs[1].add_nuisance_shape("w_over_w_pdf",_fOut)
 
   #######################################################################################################
 
