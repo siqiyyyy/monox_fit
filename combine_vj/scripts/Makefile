@@ -5,6 +5,9 @@ TOPDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 diag:
 	bash $(TOPDIR)/diagnostics.sh
 
+gof:
+	bash $(TOPDIR)/gof.sh
+
 printdiag:
 	cat $(TOPDIR)/diagnostics.sh
 
