@@ -6,7 +6,7 @@ mkdir -p cards
 for YEAR in 2017 2018; do
     ### INDIVIDUAL CARDS FOR DEEPAK8 WPS
     for WP in loose tight; do
-        for TAGGER in nominal MD; do
+        for TAGGER in nominal; do
             CARD=cards/card_${TAGGER}_monov${WP}_${YEAR}.txt
             cp ../../templates/card_template.txt ${CARD}
             sed -i "s/@WP/${WP}/g" ${CARD}
