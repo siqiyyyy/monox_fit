@@ -133,24 +133,16 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                            ('mix', 'cross')
                            ]:
     # Flip nuisance directions for compatibility with 2016
-    flip = variation in ['d2kappa','d3kappa']
-
-    add_variation(
-                  PhotonScales,
-                  ftheo,
-                  "{CHANNEL}_z_over_g_{VARIATION}_up".format(VARIATION=variation,**filler),
-                  "photon_weights_{CID}_{NAME}_Up".format(NAME=name,**filler),
-                  _fOut,
-                  flip=flip
-                  )
-    add_variation(
-                  PhotonScales,
-                  ftheo,
-                  "{CHANNEL}_z_over_g_{VARIATION}_dn".format(VARIATION=variation,**filler),
-                  "photon_weights_{CID}_{NAME}_Down".format(NAME=name,**filler),
-                  _fOut,
-                  flip=flip
-                  )
+    invert = variation in ['d2kappa','d3kappa']
+    for direction in 'up', 'down':
+      add_variation(
+                    PhotonScales,
+                    ftheo,
+                    "{CHANNEL}_z_over_g_{VARIATION}_{DIR}".format(VARIATION=variation,DIR=direction,**filler),
+                    "photon_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
+                    _fOut,
+                    invert=invert
+                    )
 
     CRs[0].add_nuisance_shape(name, _fOut)
 
@@ -167,24 +159,17 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                            ('mix', 'cross')
                            ]:
     # Flip nuisance directions for compatibility with 2016
-    flip = variation in ['d1k','d3k','d1kappa','d2kappa_w','d3kappa_w']
-    add_variation(
-                WZScales,
-                ftheo,
-                "{CHANNEL}_z_over_w_{VARIATION}_up".format(VARIATION=variation,**filler),
-                "w_weights_{CID}_{NAME}_Up".format(NAME=name,**filler),
-                _fOut,
-                flip=flip
-                )
-    add_variation(
-                WZScales,
-                ftheo,
-                "{CHANNEL}_z_over_w_{VARIATION}_dn".format(VARIATION=variation,**filler),
-                "w_weights_{CID}_{NAME}_Down".format(NAME=name,**filler),
-                _fOut,
-                flip=flip
-                )
-    CRs[3].add_nuisance_shape("TF_"+variation, _fOut)
+    invert = variation in ['d1k','d3k','d1kappa','d2kappa_w','d3kappa_w']
+    for direction in 'up', 'down':
+      add_variation(
+                  WZScales,
+                  ftheo,
+                  "{CHANNEL}_z_over_w_{VARIATION}_{DIR}".format(VARIATION=variation,DIR=direction,**filler),
+                  "w_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
+                  _fOut,
+                  invert=invert
+                  )
+    CRs[3].add_nuisance_shape(name, _fOut)
 
   # PDF uncertainties
   fpdf = ROOT.TFile("sys/tf_pdf_unc.root")
@@ -193,28 +178,28 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(
       PhotonScales,
       fpdf,
-      "{CHANNEL}_z_over_g_pdf_{DIR}".format(DIR=direction,**filler),
+      "{CHANNEL}_z_over_g_pdf_{YEAR}_{DIR}".format(DIR=direction,**filler),
       "photon_weights_{CID}_z_over_g_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
       _fOut
     )
     add_variation(
       ZmmScales,
       fpdf,
-      "{CHANNEL}_z_over_zmm_pdf_{DIR}".format(DIR=direction,**filler),
-      "photon_weights_{CID}_z_over_z_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      "{CHANNEL}_z_over_zmm_pdf_{YEAR}_{DIR}".format(DIR=direction,**filler),
+      "zmm_weights_{CID}_z_over_z_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
       _fOut
     )
     add_variation(
       ZeeScales,
       fpdf,
-      "{CHANNEL}_z_over_zee_pdf_{DIR}".format(DIR=direction,**filler),
-      "photon_weights_{CID}_z_over_z_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      "{CHANNEL}_z_over_zee_pdf_{YEAR}_{DIR}".format(DIR=direction,**filler),
+      "zee_weights_{CID}_z_over_z_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
       _fOut
     )
     add_variation(
       WZScales,
       fpdf,
-      "{CHANNEL}_z_over_w_pdf_{DIR}".format(DIR=direction,**filler),
+      "{CHANNEL}_z_over_w_pdf_{YEAR}_{DIR}".format(DIR=direction,**filler),
       "w_weights_{CID}_z_over_w_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
       _fOut
     )
