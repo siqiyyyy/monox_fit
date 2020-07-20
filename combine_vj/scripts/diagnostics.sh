@@ -8,7 +8,7 @@ for YEAR in 2017 2018 combined; do
                 --saveShapes \
                 --saveWithUncertainties \
                 --robustFit 1 \
-                --setParameters mask_monojet_2017_signal=1,mask_monovtight_2017_signal=1,mask_monojet_2018_signal=1,mask_monovtight_2018_signal=1 \
+                --setParameters 'rgx{mask_.*_signal}'=1 \
                 -n _monojet_monov_${YEAR} \
                 ../cards/card_monojet_monov_nominal_tight_${YEAR}.root \
                 | tee diag_${YEAR}.log
