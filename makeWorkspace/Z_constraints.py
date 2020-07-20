@@ -119,32 +119,110 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   #######################################################################################################
 
   ftheo = ROOT.TFile("sys/vjets_reco_theory_unc.root")
-  
+
   # Theory uncertainties on Z/Gamma
-  for variation in ['d1k','d2k','d3k','d1kappa','d2kappa_g','d2kappa_z','d3kappa_g','d3kappa_z','mix']:
+  for variation, name in [
+                           ('d1k', 'qcd'),
+                           ('d2k', 'qcdshape'),
+                           ('d3k', 'qcdprocess'),
+                           ('d1kappa', 'ewk'),
+                           ('d2kappa_g', 'nnlomissG'),
+                           ('d2kappa_z', 'nnlomissZ'),
+                           ('d3kappa_g', 'sudakovG'),
+                           ('d3kappa_z', 'sudakovZ'),
+                           ('mix', 'cross')
+                           ]:
+    # Flip nuisance directions for compatibility with 2016
+    flip = variation in ['d2kappa','d3kappa']
+
     add_variation(
-                  PhotonScales, 
-                  ftheo, 
-                  "{CHANNEL}_z_over_g_TF_{VARIATION}_up".format(VARIATION=variation,**filler), 
-                  "photon_weights_{CID}_TF_{VARIATION}_Up".format(VARIATION=variation,**filler), 
-                  _fOut
+                  PhotonScales,
+                  ftheo,
+                  "{CHANNEL}_z_over_g_{VARIATION}_up".format(VARIATION=variation,**filler),
+                  "photon_weights_{CID}_{NAME}_Up".format(NAME=name,**filler),
+                  _fOut,
+                  flip=flip
                   )
-    CRs[0].add_nuisance_shape("TF_"+variation, _fOut)
+    add_variation(
+                  PhotonScales,
+                  ftheo,
+                  "{CHANNEL}_z_over_g_{VARIATION}_dn".format(VARIATION=variation,**filler),
+                  "photon_weights_{CID}_{NAME}_Down".format(NAME=name,**filler),
+                  _fOut,
+                  flip=flip
+                  )
+
+    CRs[0].add_nuisance_shape(name, _fOut)
 
   # Theory uncertainties on Z/W
-  for variation in ['d1k','d2k','d3k','d1kappa','d2kappa_w','d2kappa_z','d3kappa_w','d3kappa_z','mix']:
+  for variation, name in [
+                           ('d1k', 'qcd'),
+                           ('d2k', 'qcdshape'),
+                           ('d3k', 'qcdprocess'),
+                           ('d1kappa', 'ewk'),
+                           ('d2kappa_w', 'nnlomissW'),
+                           ('d2kappa_z', 'nnlomissZ'),
+                           ('d3kappa_w', 'sudakovW'),
+                           ('d3kappa_z', 'sudakovZ'),
+                           ('mix', 'cross')
+                           ]:
+    # Flip nuisance directions for compatibility with 2016
+    flip = variation in ['d1k','d3k','d1kappa','d2kappa_w','d3kappa_w']
     add_variation(
-                  WZScales, 
-                  ftheo, 
-                  "{CHANNEL}_z_over_g_TF_{VARIATION}_up".format(VARIATION=variation,**filler), 
-                  "photon_weights_{CID}_TF_{VARIATION}_Up".format(VARIATION=variation,**filler), 
-                  _fOut
-                  )
+                WZScales,
+                ftheo,
+                "{CHANNEL}_z_over_w_{VARIATION}_up".format(VARIATION=variation,**filler),
+                "w_weights_{CID}_{NAME}_Up".format(NAME=name,**filler),
+                _fOut,
+                flip=flip
+                )
+    add_variation(
+                WZScales,
+                ftheo,
+                "{CHANNEL}_z_over_w_{VARIATION}_dn".format(VARIATION=variation,**filler),
+                "w_weights_{CID}_{NAME}_Down".format(NAME=name,**filler),
+                _fOut,
+                flip=flip
+                )
     CRs[3].add_nuisance_shape("TF_"+variation, _fOut)
 
+  # PDF uncertainties
+  fpdf = ROOT.TFile("sys/tf_pdf_unc.root")
 
-  CRs[0].add_nuisance_shape("pdf",_fOut)
-  CRs[3].add_nuisance_shape("wpdf",_fOut)
+  for direction in 'up', 'down':
+    add_variation(
+      PhotonScales,
+      fpdf,
+      "{CHANNEL}_z_over_g_pdf_{DIR}".format(DIR=direction,**filler),
+      "photon_weights_{CID}_z_over_g_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      _fOut
+    )
+    add_variation(
+      ZmmScales,
+      fpdf,
+      "{CHANNEL}_z_over_zmm_pdf_{DIR}".format(DIR=direction,**filler),
+      "photon_weights_{CID}_z_over_z_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      _fOut
+    )
+    add_variation(
+      ZeeScales,
+      fpdf,
+      "{CHANNEL}_z_over_zee_pdf_{DIR}".format(DIR=direction,**filler),
+      "photon_weights_{CID}_z_over_z_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      _fOut
+    )
+    add_variation(
+      WZScales,
+      fpdf,
+      "{CHANNEL}_z_over_w_pdf_{DIR}".format(DIR=direction,**filler),
+      "w_weights_{CID}_z_over_w_pdf_{DIR}".format(DIR=direction.capitalize(), **filler),
+      _fOut
+    )
+
+  CRs[0].add_nuisance_shape("z_over_g_pdf",_fOut)
+  CRs[1].add_nuisance_shape("z_over_z_pdf",_fOut)
+  CRs[2].add_nuisance_shape("z_over_z_pdf",_fOut)
+  CRs[3].add_nuisance_shape("z_over_w_pdf",_fOut)
 
 
 
@@ -206,7 +284,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   # JES uncertainties
   fjes = r.TFile.Open("sys/monojet_tf_uncs.root")
-  
+
   # Get the list of available JES/JER variations directly from the file
   jet_variations = set()
   for x in list(fjes.GetListOfKeys()):
@@ -221,7 +299,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "w_weights_%s_%s_Up"%(cid, var), _fOut)
     add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "w_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[3].add_nuisance_shape(var,_fOut)
-    
+
     add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "zmm_weights_%s_%s_Up"%(cid, var), _fOut)
     add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "zmm_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[1].add_nuisance_shape(var,_fOut)
@@ -229,7 +307,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "zee_weights_%s_%s_Up"%(cid, var), _fOut)
     add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "zee_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[2].add_nuisance_shape(var,_fOut)
-    
+
     add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Up"%(cid, var), _fOut, invert=True)
     add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Down"%(cid, var), _fOut, invert=True)
     CRs[0].add_nuisance_shape(var,_fOut)
