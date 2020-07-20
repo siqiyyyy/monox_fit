@@ -281,6 +281,13 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut)
   CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho_extrap".format(**filler),_fOut)
 
+  felectronid = r.TFile.Open("sys/ele_id_unc.root")
+  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_id_up".format(**filler), "zee_weights_%s_CMS_eff%s_e_Up"%(cid, year), _fOut, invert=True)
+  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_id_dn".format(**filler), "zee_weights_%s_CMS_eff%s_e_Down"%(cid, year), _fOut, invert=True)
+  CRs[2].add_nuisance_shape("CMS_eff{YEAR}_e".format(**filler),_fOut)
+  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_reco_up".format(**filler), "zee_weights_%s_CMS_eff%s_e_reco_Up"%(cid, year), _fOut, invert=True)
+  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_reco_dn".format(**filler), "zee_weights_%s_CMS_eff%s_e_reco_Down"%(cid, year), _fOut, invert=True)
+  CRs[2].add_nuisance_shape("CMS_eff{YEAR}_e_reco".format(**filler),_fOut)
 
   # JES uncertainties
   fjes = r.TFile.Open("sys/monojet_tf_uncs.root")
@@ -311,8 +318,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Up"%(cid, var), _fOut, invert=True)
     add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Down"%(cid, var), _fOut, invert=True)
     CRs[0].add_nuisance_shape(var,_fOut)
-
-
 
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course
