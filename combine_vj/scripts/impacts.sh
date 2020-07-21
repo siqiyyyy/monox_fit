@@ -21,7 +21,7 @@ do_impacts(){
                    --doFits \
                    --job-mode condor \
                    --task-name ${TAG} \
-                   --sub-opts '+MaxRuntime=3600' \
+                   --sub-opts '+MaxRuntime=7200' \
                     ${COMMON_OPTS}
 
     # Wait for condor jobs to return
