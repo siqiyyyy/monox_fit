@@ -20,7 +20,7 @@ def convertToCombineWorkspace(wsin_combine, f_simple_hists, categories, cmb_cate
         samplehistos = fdir.GetListOfKeys()
         for s in samplehistos:
             obj = s.ReadObj()
-            if type(obj) != type(ROOT.TH1D()):
+            if not type(obj) in [ROOT.TH1D,ROOT.TH1F]:
                 continue
             # if obj.GetTitle() != "base": continue # Forget all of the histos which aren't the observable variable
             samplehist = obj
@@ -45,7 +45,7 @@ def convertToCombineWorkspace(wsin_combine, f_simple_hists, categories, cmb_cate
         for key in keys_local:
             obj = key.ReadObj()
             print obj.GetName(), obj.GetTitle(), type(obj)
-            if type(obj) != type(ROOT.TH1D()):
+            if not type(obj) in [ROOT.TH1D,ROOT.TH1F]:
                 continue
             title = obj.GetTitle()
             # if title != "base": continue # Forget all of the histos which aren't the observable variable
