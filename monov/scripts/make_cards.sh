@@ -36,7 +36,7 @@ for YEAR in 2017 2018; do
 
     pushd cards
     ### COMBINED TAGGER CARDS
-    for TAGGER in nominal MD; do
+    for TAGGER in nominal; do
         COMBINED=card_${TAGGER}_monov_${YEAR}.txt
         combineCards.py  card_${TAGGER}_monovloose_${YEAR}.txt \
                         card_${TAGGER}_monovtight_${YEAR}.txt \
@@ -70,7 +70,7 @@ done
 
 pushd cards
 # Combine across years
-for TAGGER in nominal MD; do
+for TAGGER in nominal; do
     COMBINED=card_${TAGGER}_monov_combined.txt
     combineCards.py card_${TAGGER}_monov_201*.txt > ${COMBINED}
     sed -i 's/ch\(1\|2\)_//g' ${COMBINED}

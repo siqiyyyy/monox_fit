@@ -79,7 +79,7 @@ def main():
     keys_local = fdir.GetListOfKeys()
     for key in keys_local:
       obj = key.ReadObj()
-      if type(obj)!=type(ROOT.TH1D()):
+      if type(obj) not in [ROOT.TH1D, ROOT.TH1F]:
         continue
       title = obj.GetTitle()
       name = obj.GetName()
