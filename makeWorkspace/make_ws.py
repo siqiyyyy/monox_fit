@@ -42,6 +42,7 @@ def main():
 
   fin = ROOT.TFile(args.file,'READ')
   f_jes = ROOT.TFile("sys/shape_jes_uncs_smooth.root")
+  f_diboson = ROOT.TFile("sys/shape_diboson_unc.root")
   fout = ROOT.TFile(args.out,'RECREATE')
   dummy = []
   for category in args.categories:
@@ -105,16 +106,35 @@ def main():
       
       # Systematic variations
       if not 'data' in name:
-        channel = re.sub("(loose|tight)","", category)
-        for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
-          if not (channel in key):
+        category = re.sub("(loose|tight)","", category)
+        channel = re.sub("_201\d", "", category)
+        # JES / JER variations
+        for jeskey in [x.GetName() for x in f_jes.GetListOfKeys()]:
+          if not (category in jeskey):
             continue
-          variation = key.replace(channel+"_","")
+          variation = jeskey.replace(category+"_","")
           name = obj.GetName()+"_"+variation
           varied_obj = obj.Clone(name)
-          varied_obj.Multiply(f_jes.Get(key))
+          varied_obj.Multiply(f_jes.Get(jeskey))
           write_obj(varied_obj, name)
 
+        # Diboson variations
+        vvprocs = ['wz','ww','zz','zgamma','wgamma']
+
+        process = "_".join(key.GetName().split("_")[1:])
+        if process in vvprocs:
+          for vvkey in [x.GetName() for x in f_diboson.GetListOfKeys()]:
+            if not process in vvkey:
+              continue
+            if not channel in vvkey:
+              continue
+            variation = vvkey.replace(channel + "_" + process + "_", "")
+
+            name = obj.GetName()+"_"+variation
+            print("TEST ", key, variation, name)
+            varied_obj = obj.Clone(name)
+            varied_obj.Multiply(f_diboson.Get(vvkey))
+            write_obj(varied_obj, name)
 
     dummy.append(wsin_combine)
 
