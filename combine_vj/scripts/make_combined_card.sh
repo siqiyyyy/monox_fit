@@ -1,5 +1,5 @@
-TAG=2020-05-20_monojet_photon_update_newhem_v2_metphi_dyn
-SUBTAG=default
+TAG=2020-07-19_master
+SUBTAG=fixvgamma
 SUBSUBTAG=default
 JDIR=$(readlink -e ../monojet/${TAG}/${SUBTAG}/)
 VDIR=$(readlink -e ../monov/${TAG}/${SUBTAG}/)

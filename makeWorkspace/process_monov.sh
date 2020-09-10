@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/merged_20200611_monov_ntuple19Feb20
-TAG='testqcd'
+INDIR=../input/2020-08-26_nano_v7_v2
+TAG='default'
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
@@ -15,7 +15,7 @@ echo "Input directory: ${INDIR}" > ${INFOFILE}
 echo "--- INPUT ---" > ${INFOFILE}
 
 ### Start by making workspaces split by working point and tagger type
-for TAGGER in nominal MD; do
+for TAGGER in nominal; do
     for WP in tight loose; do
         WSFILE=${OUTDIR}/ws_monov_${TAGGER}_${WP}.root
         INFILE=${INDIR}/merged_legacy_limit_${TAGGER}_monov.root

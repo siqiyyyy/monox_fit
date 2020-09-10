@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-TAG='v4_fixpref'
-INDIR=../input/vbf/2020-06-12_vbf_unblind
+TAG='default'
+INDIR=../input/vbf/2020-07-16_vbf_eemitigation_jerfix_circular_nohfhf_v2
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../vbf/$(basename $INDIR)/${TAG}/root"
@@ -22,9 +22,9 @@ md5sum ${INFILE} >> ${INFOFILE}
 ./make_ws.py ${INFILE} --out ${WSFILE} --categories vbf_2017,vbf_2018
 ./runModel.py ${WSFILE} --categories vbf_2017,vbf_2018 --out ${OUTDIR}/combined_model_vbf.root
 
-# # Split for IC
-# ./runModel.py ${WSFILE} --categories vbf_2017 --out ${OUTDIR}/combined_model_vbf_forIC_2017.root --rename "mjj_MTR_2017"
-# ./runModel.py ${WSFILE} --categories vbf_2018 --out ${OUTDIR}/combined_model_vbf_forIC_2018.root --rename "mjj_MTR_2018"
+# Split for IC
+./runModel.py ${WSFILE} --categories vbf_2017 --out ${OUTDIR}/combined_model_vbf_forIC_2017.root --rename "mjj_MTR_2017"
+./runModel.py ${WSFILE} --categories vbf_2018 --out ${OUTDIR}/combined_model_vbf_forIC_2018.root --rename "mjj_MTR_2018"
 
 cp sys/vbf_qcd_nckw_ws_201*.root ${OUTDIR}
 
