@@ -31,6 +31,24 @@ def cli_args():
 
     return args
 
+def get_jes_variations(obj, f_jes, category):
+  '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
+  channel = re.sub("(loose|tight)","", category)
+  # Save varied histograms for all JES variations and the histogram names in this dictionary
+  varied_hists = {}
+  for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
+    if not (channel in key):
+      continue
+    variation = key.replace(channel+"_","")
+    varied_name = obj.GetName()+"_"+variation
+    varied_obj = obj.Clone(varied_name)
+    # Multiply by JES factor to get the varied yields
+    varied_obj.Multiply(f_jes.Get(key))
+    # Save the varied histogram into a dict
+    varied_hists[varied_name] = varied_obj
+
+  return varied_hists
+
 def create_workspace(fin, f_jes, fout, category):
   '''Create workspace and write the relevant histograms in it for the given category, returns the workspace.'''
   fdir = fin.Get("category_"+category)
@@ -41,6 +59,7 @@ def create_workspace(fin, f_jes, fout, category):
 
   variable_name = "mjj" if ("vbf" in category) else "met"
   varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
+  
   # Helper function
   def write_obj(obj, name):
     '''Converts histogram to RooDataHist and writes to workspace + ROOT file'''
@@ -90,17 +109,11 @@ def create_workspace(fin, f_jes, fout, category):
 
     write_obj(obj, name)
     
-    # Systematic variations
     if not 'data' in name:
-      channel = re.sub("(loose|tight)","", category)
-      for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
-        if not (channel in key):
-          continue
-        variation = key.replace(channel+"_","")
-        name = obj.GetName()+"_"+variation
-        varied_obj = obj.Clone(name)
-        varied_obj.Multiply(f_jes.Get(key))
-        write_obj(varied_obj, name)
+      # JES variations: Get them from the source file and save them to workspace
+      jes_varied_hists = get_jes_variations(obj, f_jes, category)
+      for varied_name, varied_obj in jes_varied_hists.items():
+        write_obj(varied_obj, varied_name)
 
   # Write the workspace
   foutdir.cd()
