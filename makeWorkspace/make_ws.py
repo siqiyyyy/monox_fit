@@ -31,6 +31,147 @@ def cli_args():
 
     return args
 
+def get_jes_file(category):
+  '''Get the relevant JES source file for the given category.'''
+  # JES shape files for each category
+  f_jes_dict = {
+    '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth.root"),
+    'vbf.*': ROOT.TFile("sys/vbf_shape_jes_uncs_smooth.root")
+  }
+  # Determine the relevant JES source file
+  f_jes = None
+  for regex, f in f_jes_dict.items():
+    if re.match(regex, category):
+      f_jes = f
+  if not f_jes:
+    raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
+
+  return f_jes    
+
+def get_jes_variations(obj, f_jes, category):
+  '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
+  channel = re.sub("(loose|tight)","", category)
+  # Save varied histograms for all JES variations and the histogram names in this dictionary
+  varied_hists = {}
+  for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
+    if not (channel in key):
+      continue
+    variation = key.replace(channel+"_","")
+    varied_name = obj.GetName()+"_"+variation
+    varied_obj = obj.Clone(varied_name)
+    # Multiply by JES factor to get the varied yields
+    varied_obj.Multiply(f_jes.Get(key))
+    # Save the varied histogram into a dict
+    varied_hists[varied_name] = varied_obj
+
+  return varied_hists
+
+def get_diboson_variations(obj, category, process):
+  '''Return list of varied histograms from diboson histogram file'''
+  channel = re.sub("(loose|tight)","", category)
+  varied_hists = {}
+
+  f = ROOT.TFile("sys/shape_diboson_unc.root")
+  for key in [x.GetName() for x in f.GetListOfKeys()]:
+    if not process in key:
+      continue
+    if not channel in key:
+      continue
+    variation = key.replace(channel + "_" + process + "_", "")
+
+    name = obj.GetName()+"_"+variation
+    varied_obj = obj.Clone(name)
+    varied_obj.Multiply(f.Get(key))
+    varied_hists[name] = varied_obj
+
+  return varied_hists
+
+
+
+def create_workspace(fin, fout, category):
+  '''Create workspace and write the relevant histograms in it for the given category, returns the workspace.'''
+  fdir = fin.Get("category_"+category)
+  foutdir = fout.mkdir("category_"+category)
+  # Get the relevant JES source file for the given category
+  f_jes = get_jes_file(category)
+
+  wsin_combine = ROOT.RooWorkspace("wspace_"+category,"wspace_"+category)
+  wsin_combine._import = SafeWorkspaceImporter(wsin_combine)
+
+  variable_name = "mjj" if ("vbf" in category) else "met"
+  varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
+  
+  # Helper function
+  def write_obj(obj, name):
+    '''Converts histogram to RooDataHist and writes to workspace + ROOT file'''
+    print "Creating Data Hist for ", name
+    dhist = ROOT.RooDataHist(
+                          name,
+                          "DataSet - %s, %s"%(category,name),
+                          ROOT.RooArgList(varl),
+                          obj
+                          )
+    wsin_combine._import(dhist)
+
+    # Write the individual histograms
+    # for easy transfer factor calculation
+    # later on
+    obj.SetDirectory(0)
+    foutdir.cd()
+    foutdir.WriteTObject(obj)
+
+  # Loop over all keys in the input file
+  # pick out the histograms, and add to
+  # the work space.
+  keys_local = fdir.GetListOfKeys()
+  for key in keys_local:
+    obj = key.ReadObj()
+    if type(obj) not in [ROOT.TH1D, ROOT.TH1F]:
+      continue
+    title = obj.GetTitle()
+    name = obj.GetName()
+
+    # Ensure non-zero integral for combine
+    if not obj.Integral() > 0:
+      obj.SetBinContent(1,0.0001)
+
+    # Add overflow to last bin
+    overflow        = obj.GetBinContent(obj.GetNbinsX()+1)
+    overflow_err    = obj.GetBinError(obj.GetNbinsX()+1)
+    lastbin         = obj.GetBinContent(obj.GetNbinsX())
+    lastbin_err     = obj.GetBinError(obj.GetNbinsX())
+    new_lastbin     = overflow + lastbin
+    new_lastbin_err = sqrt(overflow_err**2 + lastbin_err**2)
+
+    obj.SetBinContent(obj.GetNbinsX(), new_lastbin)
+    obj.SetBinError(obj.GetNbinsX(), new_lastbin_err)
+    obj.SetBinContent(obj.GetNbinsX()+1, 0)
+    obj.SetBinError(obj.GetNbinsX()+1, 0)
+
+    write_obj(obj, name)
+    
+    if not 'data' in name:
+      # JES variations: Get them from the source file and save them to workspace
+      jes_varied_hists = get_jes_variations(obj, f_jes, category)
+      for varied_name, varied_obj in jes_varied_hists.items():
+        write_obj(varied_obj, varied_name)
+
+      # Diboson variations
+      vvprocs = ['wz','ww','zz','zgamma','wgamma']
+      process = "_".join(key.GetName().split("_")[1:])
+      if process in vvprocs:
+        diboson_varied_hists = get_diboson_variations(obj, category, process)
+        for varied_name, varied_obj in diboson_varied_hists.items():
+          write_obj(varied_obj, varied_name)
+
+  # Write the workspace
+  foutdir.cd()
+  foutdir.WriteTObject(wsin_combine)
+  foutdir.Write()
+  fout.Write()
+
+  return wsin_combine
+
 def main():
   # Commandline arguments
   args = cli_args()
@@ -41,109 +182,11 @@ def main():
     os.makedirs(outdir)
 
   fin = ROOT.TFile(args.file,'READ')
-  f_jes = ROOT.TFile("sys/shape_jes_uncs_smooth.root")
-  f_diboson = ROOT.TFile("sys/shape_diboson_unc.root")
   fout = ROOT.TFile(args.out,'RECREATE')
   dummy = []
   for category in args.categories:
-    fdir = fin.Get("category_"+category)
-
-    foutdir = fout.mkdir("category_"+category)
-
-    wsin_combine = ROOT.RooWorkspace("wspace_"+category,"wspace_"+category)
-    wsin_combine._import = SafeWorkspaceImporter(wsin_combine)#getattr(wsin_combine,"import")
-
-    variable_name = "mjj" if ("vbf" in category) else "met"
-    varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
-    # Helper function
-    def write_obj(obj, name):
-      '''Converts histogram to RooDataHist and writes to workspace + ROOT file'''
-      print "Creating Data Hist for ", name
-      dhist = ROOT.RooDataHist(
-                            name,
-                            "DataSet - %s, %s"%(category,name),
-                            ROOT.RooArgList(varl),
-                            obj
-                            )
-      wsin_combine._import(dhist)
-
-      # Write the individual histograms
-      # for easy transfer factor calculation
-      # later on
-      obj.SetDirectory(0)
-      foutdir.cd()
-      foutdir.WriteTObject(obj)
-
-    # Loop over all keys in the input file
-    # pick out the histograms, and add to
-    # the work space.
-    keys_local = fdir.GetListOfKeys()
-    for key in keys_local:
-      obj = key.ReadObj()
-      if type(obj) not in [ROOT.TH1D, ROOT.TH1F]:
-        continue
-      title = obj.GetTitle()
-      name = obj.GetName()
-
-      # Ensure non-zero integral for combine
-      if not obj.Integral() > 0:
-        obj.SetBinContent(1,0.0001)
-
-      # Add overflow to last bin
-      overflow        = obj.GetBinContent(obj.GetNbinsX()+1)
-      overflow_err    = obj.GetBinError(obj.GetNbinsX()+1)
-      lastbin         = obj.GetBinContent(obj.GetNbinsX())
-      lastbin_err     = obj.GetBinError(obj.GetNbinsX())
-      new_lastbin     = overflow + lastbin
-      new_lastbin_err = sqrt(overflow_err**2 + lastbin_err**2)
-
-      obj.SetBinContent(obj.GetNbinsX(), new_lastbin)
-      obj.SetBinError(obj.GetNbinsX(), new_lastbin_err)
-      obj.SetBinContent(obj.GetNbinsX()+1, 0)
-      obj.SetBinError(obj.GetNbinsX()+1, 0)
-
-      write_obj(obj, name)
-      
-      # Systematic variations
-      if not 'data' in name:
-        category = re.sub("(loose|tight)","", category)
-        channel = re.sub("_201\d", "", category)
-        # JES / JER variations
-        for jeskey in [x.GetName() for x in f_jes.GetListOfKeys()]:
-          if not (category in jeskey):
-            continue
-          variation = jeskey.replace(category+"_","")
-          name = obj.GetName()+"_"+variation
-          varied_obj = obj.Clone(name)
-          varied_obj.Multiply(f_jes.Get(jeskey))
-          write_obj(varied_obj, name)
-
-        # Diboson variations
-        vvprocs = ['wz','ww','zz','zgamma','wgamma']
-
-        process = "_".join(key.GetName().split("_")[1:])
-        if process in vvprocs:
-          for vvkey in [x.GetName() for x in f_diboson.GetListOfKeys()]:
-            if not process in vvkey:
-              continue
-            if not channel in vvkey:
-              continue
-            variation = vvkey.replace(channel + "_" + process + "_", "")
-
-            name = obj.GetName()+"_"+variation
-            print("TEST ", key, variation, name)
-            varied_obj = obj.Clone(name)
-            varied_obj.Multiply(f_diboson.Get(vvkey))
-            write_obj(varied_obj, name)
-
+    wsin_combine = create_workspace(fin, fout, category)
     dummy.append(wsin_combine)
-
-    # Write the workspace
-    foutdir.cd()
-    foutdir.WriteTObject(wsin_combine)
-    foutdir.Write()
-    fout.Write()
-
 
   # For reasons unknown, if we do not return
   # the workspace from this function, it goes
@@ -153,4 +196,4 @@ def main():
   return dummy
 
 if __name__ == "__main__":
-  a=main()
+  a = main()
