@@ -66,10 +66,12 @@ def get_jes_variations(obj, f_jes, category):
 
   return varied_hists
 
-def create_workspace(fin, f_jes, fout, category):
+def create_workspace(fin, fout, category):
   '''Create workspace and write the relevant histograms in it for the given category, returns the workspace.'''
   fdir = fin.Get("category_"+category)
   foutdir = fout.mkdir("category_"+category)
+  # Get the relevant JES source file for the given category
+  f_jes = get_jes_file(category)
 
   wsin_combine = ROOT.RooWorkspace("wspace_"+category,"wspace_"+category)
   wsin_combine._import = SafeWorkspaceImporter(wsin_combine)
@@ -153,8 +155,7 @@ def main():
   fout = ROOT.TFile(args.out,'RECREATE')
   dummy = []
   for category in args.categories:
-    f_jes = get_jes_file(category)
-    wsin_combine = create_workspace(fin, f_jes, fout, category)
+    wsin_combine = create_workspace(fin, fout, category)
     dummy.append(wsin_combine)
 
   # For reasons unknown, if we do not return
