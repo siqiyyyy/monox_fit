@@ -31,6 +31,23 @@ def cli_args():
 
     return args
 
+def get_jes_file(category):
+  '''Get the relevant JES source file for the given category.'''
+  # JES shape files for each category
+  f_jes_dict = {
+    '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth.root"),
+    'vbf.*': ROOT.TFile("sys/vbf_shape_jes_uncs_smooth.root")
+  }
+  # Determine the relevant JES source file
+  f_jes = None
+  for regex, f in f_jes_dict.items():
+    if re.match(regex, category):
+      f_jes = f
+  if not f_jes:
+    raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
+
+  return f_jes    
+
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
   channel = re.sub("(loose|tight)","", category)
@@ -133,22 +150,10 @@ def main():
     os.makedirs(outdir)
 
   fin = ROOT.TFile(args.file,'READ')
-  # JES shape files for each category
-  f_jes_dict = {
-    '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth.root"),
-    'vbf.*': ROOT.TFile("sys/vbf_shape_jes_uncs_smooth.root")
-  }
   fout = ROOT.TFile(args.out,'RECREATE')
   dummy = []
   for category in args.categories:
-    # Determine the relevant JES source file
-    f_jes = None
-    for regex, f in f_jes_dict.items():
-      if re.match(regex, category):
-        f_jes = f
-    if not f_jes:
-      raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
-    
+    f_jes = get_jes_file(category)
     wsin_combine = create_workspace(fin, f_jes, fout, category)
     dummy.append(wsin_combine)
 
