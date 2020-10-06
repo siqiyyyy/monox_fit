@@ -66,6 +66,29 @@ def get_jes_variations(obj, f_jes, category):
 
   return varied_hists
 
+def get_diboson_variations(obj, category, process):
+  '''Return list of varied histograms from diboson histogram file'''
+  channel = re.sub("(loose|tight|_201\d)","", category)
+  varied_hists = {}
+
+  f = ROOT.TFile("sys/shape_diboson_unc.root")
+  for key in [x.GetName() for x in f.GetListOfKeys()]:
+    if not process in key:
+      continue
+    if not channel in key:
+      continue
+    variation = key.replace(channel + "_" + process + "_", "")
+
+    name = obj.GetName()+"_"+variation
+    varied_obj = obj.Clone(name)
+    varied_obj.Multiply(f.Get(key))
+    varied_obj.SetDirectory(0)
+    varied_hists[name] = varied_obj
+
+  return varied_hists
+
+
+
 def create_workspace(fin, fout, category):
   '''Create workspace and write the relevant histograms in it for the given category, returns the workspace.'''
   fdir = fin.Get("category_"+category)
@@ -134,6 +157,14 @@ def create_workspace(fin, fout, category):
       for varied_name, varied_obj in jes_varied_hists.items():
         write_obj(varied_obj, varied_name)
 
+      # Diboson variations
+      vvprocs = ['wz','ww','zz','zgamma','wgamma']
+      process = "_".join(key.GetName().split("_")[1:])
+      if process in vvprocs:
+        diboson_varied_hists = get_diboson_variations(obj, category, process)
+        for varied_name, varied_obj in diboson_varied_hists.items():
+          write_obj(varied_obj, varied_name)
+
   # Write the workspace
   foutdir.cd()
   foutdir.WriteTObject(wsin_combine)
@@ -166,4 +197,4 @@ def main():
   return dummy
 
 if __name__ == "__main__":
-  a=main()
+  a = main()
