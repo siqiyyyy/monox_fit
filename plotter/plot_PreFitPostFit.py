@@ -43,7 +43,12 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
         'diboson',
         'ewk',
         'wjets',
-        'zjets'
+        'zjets',
+        'ww',
+        'wz',
+        'zz',
+        'wgamma',
+        'gamma'
     ]
   else:
     mainbkgs = {
@@ -72,6 +77,11 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
     ]
   colors = {
     'diboson':"#4897D8",
+    'ww':"#4897D8",
+    'wz':"#4897D8",
+    'zz':"#4897D8",
+    'wgamma':"#4897D8",
+    'zgamma':"#4897D8",
     'gjets'  :"#9A9EAB",
     'qcd_gjets'  :"#9A9EAB",
     'ewk_gjets'  :"#9A9EAB",
