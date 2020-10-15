@@ -34,8 +34,7 @@ for YEAR in 2017 2018; do
             sed -i "s|combined_model.root|../root/combined_model_monov_${TAGGER}_${WP}.root|g" ${CARD}
             # only for the nominal tagger we apply the data-driven qcd, otherwise use the old qcd prediction
             if [ "$TAGGER" == nominal ]; then
-                sed -i "s|monov$WP_qcd_ws.root|../root/monov$WP_qcd_ws.root|g" ${CARD}
-                sed -i "/QCD_NormSignal/d" ${CARD}
+                sed -i "s|monov${WP}_qcd_ws.root|../root/monov${WP}_qcd_ws.root|g" ${CARD}
             else
                 sed -i "/qcd_ws/d" ${CARD}
                 sed -i "/qcdclosure/d" ${CARD}
