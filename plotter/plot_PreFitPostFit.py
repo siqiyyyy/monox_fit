@@ -48,7 +48,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
         'wz',
         'zz',
         'wgamma',
-        'gamma'
+        'zgamma'
     ]
   else:
     mainbkgs = {
