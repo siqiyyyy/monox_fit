@@ -16,7 +16,6 @@ def cli_args():
     parser.add_argument('file', type=str, help='Input file to use.')
     parser.add_argument('--out', type=str, help='Path to save output under.', default='mono-x.root')
     parser.add_argument('--categories', type=str, default=None, help='Analysis category')
-    parser.add_argument('--not_jer_smeared', action='store_true', help='If specified, use the inputs without JER smearing applied.')
     args = parser.parse_args()
 
     args.file = os.path.abspath(args.file)
@@ -32,9 +31,10 @@ def cli_args():
 
     return args
 
-def get_jes_file(category, jer_smeared=True):
+def get_jes_file(category):
   '''Get the relevant JES source file for the given category.'''
-  jer_suffix = 'jer_smeared' if jer_smeared else 'not_jer_smeared'
+  # By default: Get the uncertainties with smearing for VBF, the opposite for monojet
+  jer_suffix = 'jer_smeared' if category == 'vbf' else 'not_jer_smeared'
   # JES shape files for each category
   f_jes_dict = {
     '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth_{}.root".format(jer_suffix) ),
@@ -89,12 +89,12 @@ def get_diboson_variations(obj, category, process):
 
   return varied_hists
 
-def create_workspace(fin, fout, category, jer_smeared=True):
+def create_workspace(fin, fout, category):
   '''Create workspace and write the relevant histograms in it for the given category, returns the workspace.'''
   fdir = fin.Get("category_"+category)
   foutdir = fout.mkdir("category_"+category)
   # Get the relevant JES source file for the given category
-  f_jes = get_jes_file(category, jer_smeared=jer_smeared)
+  f_jes = get_jes_file(category)
 
   wsin_combine = ROOT.RooWorkspace("wspace_"+category,"wspace_"+category)
   wsin_combine._import = SafeWorkspaceImporter(wsin_combine)
@@ -186,7 +186,7 @@ def main():
   fout = ROOT.TFile(args.out,'RECREATE')
   dummy = []
   for category in args.categories:
-    wsin_combine = create_workspace(fin, fout, category, jer_smeared=(not args.not_jer_smeared))
+    wsin_combine = create_workspace(fin, fout, category)
     dummy.append(wsin_combine)
 
   # For reasons unknown, if we do not return
