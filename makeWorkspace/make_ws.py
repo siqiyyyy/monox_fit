@@ -34,7 +34,7 @@ def cli_args():
 def get_jes_file(category):
   '''Get the relevant JES source file for the given category.'''
   # By default: Get the uncertainties with smearing for VBF, the opposite for monojet
-  jer_suffix = 'jer_smeared' if category == 'vbf' else 'not_jer_smeared'
+  jer_suffix = 'jer_smeared' if 'vbf' in category else 'not_jer_smeared'
   # JES shape files for each category
   f_jes_dict = {
     '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth_{}.root".format(jer_suffix) ),
@@ -47,6 +47,8 @@ def get_jes_file(category):
       f_jes = f
   if not f_jes:
     raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
+
+  print('Using JES/JER uncertainty file: {}'.format(f_jes))
 
   return f_jes    
 
