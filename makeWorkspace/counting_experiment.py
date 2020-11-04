@@ -6,12 +6,15 @@ from HiggsAnalysis.CombinedLimit.ModelTools import *
 
 MAXBINS = 100
 
-def get_jes_variations(fjes, year):
+def get_jes_variations(fjes, year, proc='qcd'):
     '''Given the JES file, get the list of JES variations.'''
     jet_variations = set()
     for key in list(fjes.GetListOfKeys()):
-        var = re.sub("(.*qcd_|(Up|Down))","",key.GetName())
-        if '201' in var and (not str(year) in var):
+        if proc not in key.GetName():
+            continue
+        # var = re.sub("(.*qcd_|(Up|Down))","",key.GetName())
+        var = get_nuisance_name(key.GetName(), year)
+        if '201' in var and (str(year) not in var):
             continue
         jet_variations.add(var)
     
@@ -37,6 +40,9 @@ def get_nuisance_name(nuisance, year):
     if not name:
         raise RuntimeError('Could not determine a valid name for nuisance: {}'.format(nuisance))
 
+    # Remove "up/down" tag from the nuisance name
+    name = re.sub('Up|Down', '', name)
+ 
     return name
 
 def get_jes_jer_source_file_for_tf(category):
