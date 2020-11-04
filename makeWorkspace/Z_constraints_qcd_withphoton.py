@@ -73,30 +73,28 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year,convention="BU"):
   CRs[2].add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     -0.015)
   CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.03)
 
-  # JES / JER for Z/Z is 1% 
-  CRs[0].add_nuisance('CMS_VBF_scale_j',0.01)
-  CRs[1].add_nuisance('CMS_VBF_scale_j',0.01)
-  CRs[0].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.01)
-  CRs[1].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.01)
+  # Get the JES/JER uncertainty file for transfer factors
+  # Read the split uncertainties from there
+  fjes = get_jes_jer_source_file_for_tf(category='vbf')
+  jet_variations = get_jes_variations(fjes, year)
 
-  # For Z/W, it goes the other direction
-  if year==2017:
-    CRs[2].add_nuisance('CMS_VBF_scale_j',-0.02)
-    CRs[2].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),-0.025)
-  elif year==2018:
-    CRs[2].add_nuisance('CMS_VBF_scale_j'.format(YEAR=year),-0.02)
-    CRs[2].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),-0.01)
-  else:
-    raise RuntimeError("Year not recognized: " + str(year))
+  for var in jet_variations:
+    add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "qcd_w_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "qcd_w_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[2].add_nuisance_shape(var, _fOut)
 
-  # Z/gamma
-  CRs[3].add_nuisance('CMS_VBF_scale_j',0.03)
-  if year==2017:
-    CRs[3].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.04)
-  elif year==2018:
-    CRs[3].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.015)
-  else:
-    raise RuntimeError("Year not recognized: " + str(year))
+    add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "qcd_zmm_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "qcd_zmm_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[0].add_nuisance_shape(var, _fOut)
+
+    add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "qcd_zee_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "qcd_zee_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[1].add_nuisance_shape(var, _fOut)
+
+    add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "qcd_photon_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "qcd_photon_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[3].add_nuisance_shape(var, _fOut)
+
   # ############################ USER DEFINED ###########################################################
   # Add systematics in the following, for normalisations use name, relative size (0.01 --> 1%)
   # for shapes use add_nuisance_shape with (name,_fOut)

@@ -50,15 +50,20 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
    Channel("ewk_singleelectron",_wspace,out_ws,cid+'_'+model,WScales_e, convention=convention),
   ]
 
-  # See https://docs.google.com/spreadsheets/d/15vq-c2xejGA-Nw6yzZU3mUDftter_l7OOcmJEwuCPyI/edit?usp=sharing
-  if year == 2017:
-    jes = 0.01
-    jer = 0.01
-  elif year==2018:
-    jes = 0.01
-    jer = 0.01
-  else:
-    raise RuntimeError("Year not recognized: " + str(year))
+  # Get the JES/JER unlcertainty file for transfer factors
+  # Read the split uncertainties from there
+  fjes = get_jes_jer_source_file_for_tf(category='vbf')
+  jet_variations = get_jes_variations(fjes, year)
+
+  for var in jet_variations:
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_wmn_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_wmn_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[0].add_nuisance_shape(var,_fOut)
+
+    add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_wen_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_wen_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[1].add_nuisance_shape(var,_fOut)
+
   for c in CRs:
     c.add_nuisance('CMS_VBF_scale_j'.format(YEAR=year), jes)
     c.add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year), jer)
