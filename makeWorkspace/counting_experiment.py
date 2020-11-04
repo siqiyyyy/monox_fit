@@ -10,7 +10,7 @@ def get_jes_variations(fjes, year):
     '''Given the JES file, get the list of JES variations.'''
     jet_variations = set()
     for key in list(fjes.GetListOfKeys()):
-        var = re.sub("(.*qcd_|(Up|Down))","",x.GetName())
+        var = re.sub("(.*qcd_|(Up|Down))","",key.GetName())
         if '201' in var and (not str(year) in var):
             continue
         jet_variations.add(var)
