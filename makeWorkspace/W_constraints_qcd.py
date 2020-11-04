@@ -53,7 +53,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
   # Get the JES/JER unlcertainty file for transfer factors
   # Read the split uncertainties from there
   fjes = get_jes_jer_source_file_for_tf(category='vbf')
-  jet_variations = get_jes_variations(fjes, year)
+  jet_variations = get_jes_variations(fjes, year, proc='qcd')
 
   for var in jet_variations:
     add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "qcd_wmn_weights_%s_%s_Up"%(cid, var), _fOut)

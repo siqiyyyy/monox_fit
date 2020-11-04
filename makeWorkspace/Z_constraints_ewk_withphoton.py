@@ -72,7 +72,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
   # Get the JES/JER uncertainty file for transfer factors
   # Read the split uncertainties from there
   fjes = get_jes_jer_source_file_for_tf(category='vbf')
-  jet_variations = get_jes_variations(fjes, year)
+  jet_variations = get_jes_variations(fjes, year, proc='ewk')
 
   for var in jet_variations:
     add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_w_weights_%s_%s_Up"%(cid, var), _fOut)
@@ -87,8 +87,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
     add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_zee_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[1].add_nuisance_shape(var, _fOut)
 
-    add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_photon_weights_%s_%s_Up"%(cid, var), _fOut)
-    add_variation(PhotonScales, fjes, 'gjets_over_znunu{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_photon_weights_%s_%s_Down"%(cid, var), _fOut)
+    add_variation(PhotonScales, fjes, 'znunu_over_gjets{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_photon_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(PhotonScales, fjes, 'znunu_over_gjets{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_photon_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[3].add_nuisance_shape(var, _fOut)
 
   # ############################ USER DEFINED ###########################################################
