@@ -64,16 +64,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
     add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "qcd_wen_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[1].add_nuisance_shape(var,_fOut)
 
-  # See https://docs.google.com/spreadsheets/d/15vq-c2xejGA-Nw6yzZU3mUDftter_l7OOcmJEwuCPyI/edit?usp=sharing
-  if year == 2017:
-    jes = 0.015
-    jer = 0.015
-  elif year==2018:
-    jes = 0.01
-    jer = 0.01
   for c in CRs:
-    c.add_nuisance('CMS_VBF_scale_j'.format(YEAR=year), jes)
-    c.add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year), jer)
     c.add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),      0.01)
     c.add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),      0.015)
     c.add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),      0.03)
