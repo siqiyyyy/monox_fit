@@ -33,10 +33,12 @@ def cli_args():
 
 def get_jes_file(category):
   '''Get the relevant JES source file for the given category.'''
+  # By default: Get the uncertainties with smearing for VBF, the opposite for monojet
+  jer_suffix = 'jer_smeared' if 'vbf' in category else 'not_jer_smeared'
   # JES shape files for each category
   f_jes_dict = {
-    '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth.root"),
-    'vbf.*': ROOT.TFile("sys/vbf_shape_jes_uncs_smooth.root")
+    '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth_{}.root".format(jer_suffix) ),
+    'vbf.*': ROOT.TFile("sys/vbf_shape_jes_uncs_smooth_{}.root".format(jer_suffix) )
   }
   # Determine the relevant JES source file
   f_jes = None
@@ -45,6 +47,8 @@ def get_jes_file(category):
       f_jes = f
   if not f_jes:
     raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
+
+  print('Using JES/JER uncertainty file: {}'.format(f_jes))
 
   return f_jes    
 
@@ -86,8 +90,6 @@ def get_diboson_variations(obj, category, process):
     varied_hists[name] = varied_obj
 
   return varied_hists
-
-
 
 def create_workspace(fin, fout, category):
   '''Create workspace and write the relevant histograms in it for the given category, returns the workspace.'''
