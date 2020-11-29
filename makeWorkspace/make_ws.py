@@ -16,6 +16,8 @@ def cli_args():
     parser.add_argument('file', type=str, help='Input file to use.')
     parser.add_argument('--out', type=str, help='Path to save output under.', default='mono-x.root')
     parser.add_argument('--categories', type=str, default=None, help='Analysis category')
+    parser.add_argument('--standalone', default=False, action='store_true', help='Treat this as a standalone conversion.')
+    parser.add_argument('--indir', default=None, type=str, help='Input directory in the input file.')
     args = parser.parse_args()
 
     args.file = os.path.abspath(args.file)
@@ -87,11 +89,35 @@ def get_diboson_variations(obj, category, process):
 
   return varied_hists
 
+def treat_empty(obj):
+  # Ensure non-zero integral for combine
+  if not obj.Integral() > 0:
+    obj.SetBinContent(1,0.0001)
 
 
-def create_workspace(fin, fout, category):
+def treat_overflow(obj):
+  # Add overflow to last bin
+  overflow        = obj.GetBinContent(obj.GetNbinsX()+1)
+  overflow_err    = obj.GetBinError(obj.GetNbinsX()+1)
+  lastbin         = obj.GetBinContent(obj.GetNbinsX())
+  lastbin_err     = obj.GetBinError(obj.GetNbinsX())
+  new_lastbin     = overflow + lastbin
+  new_lastbin_err = sqrt(overflow_err**2 + lastbin_err**2)
+
+  obj.SetBinContent(obj.GetNbinsX(), new_lastbin)
+  obj.SetBinError(obj.GetNbinsX(), new_lastbin_err)
+  obj.SetBinContent(obj.GetNbinsX()+1, 0)
+  obj.SetBinError(obj.GetNbinsX()+1, 0)
+
+def create_workspace(fin, fout, category, args):
   '''Create workspace and write the relevant histograms in it for the given category, returns the workspace.'''
-  fdir = fin.Get("category_"+category)
+  if args.indir:
+    if args.indir=='.':
+      fdir = fin
+    else:
+      fdir = fin.Get(args.indir)
+  else:
+    fdir = fin.Get("category_"+category)
   foutdir = fout.mkdir("category_"+category)
   # Get the relevant JES source file for the given category
   f_jes = get_jes_file(category)
@@ -99,7 +125,10 @@ def create_workspace(fin, fout, category):
   wsin_combine = ROOT.RooWorkspace("wspace_"+category,"wspace_"+category)
   wsin_combine._import = SafeWorkspaceImporter(wsin_combine)
 
-  variable_name = "mjj" if ("vbf" in category) else "met"
+  if args.standalone:
+    variable_name = ("mjj_{0}" if ("vbf" in category) else "met_{0}").format(category)
+  else:
+    variable_name = "mjj" if ("vbf" in category) else "met"
   varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
   
   # Helper function
@@ -132,23 +161,8 @@ def create_workspace(fin, fout, category):
     title = obj.GetTitle()
     name = obj.GetName()
 
-    # Ensure non-zero integral for combine
-    if not obj.Integral() > 0:
-      obj.SetBinContent(1,0.0001)
-
-    # Add overflow to last bin
-    overflow        = obj.GetBinContent(obj.GetNbinsX()+1)
-    overflow_err    = obj.GetBinError(obj.GetNbinsX()+1)
-    lastbin         = obj.GetBinContent(obj.GetNbinsX())
-    lastbin_err     = obj.GetBinError(obj.GetNbinsX())
-    new_lastbin     = overflow + lastbin
-    new_lastbin_err = sqrt(overflow_err**2 + lastbin_err**2)
-
-    obj.SetBinContent(obj.GetNbinsX(), new_lastbin)
-    obj.SetBinError(obj.GetNbinsX(), new_lastbin_err)
-    obj.SetBinContent(obj.GetNbinsX()+1, 0)
-    obj.SetBinError(obj.GetNbinsX()+1, 0)
-
+    treat_empty(obj)
+    treat_overflow(obj)
     write_obj(obj, name)
     
     if not 'data' in name:
@@ -186,7 +200,7 @@ def main():
   fout = ROOT.TFile(args.out,'RECREATE')
   dummy = []
   for category in args.categories:
-    wsin_combine = create_workspace(fin, fout, category)
+    wsin_combine = create_workspace(fin, fout, category, args)
     dummy.append(wsin_combine)
 
   # For reasons unknown, if we do not return
