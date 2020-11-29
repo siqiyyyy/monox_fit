@@ -27,7 +27,8 @@ combine -M FitDiagnostics \
 
 python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \
         fitDiagnostics_monojet_combined.root \
-        -g diffnuisances_monojet_combined.root
+        -g diffnuisances_monojet_combined.root \
+        --skipFitS
 popd
 
 
