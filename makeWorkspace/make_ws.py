@@ -136,7 +136,7 @@ def get_signal_theory_variations(obj, category):
 
       if unctype=='scale':
         name = 'signal_{REAL_PROCESS}_QCDscale_{REAL_PROCESS}_ACCEPT{DIRECTION}'.format(**filler)
-      elif unctype=='scale':
+      elif unctype=='pdf':
         name = 'signal_{REAL_PROCESS}_pdf_{REAL_PROCESS}_ACCEPT{DIRECTION}'.format(**filler)
 
       varname = '{CHANNEL}_{PROCESS_FOR_UNC}_{UNCTYPE}{DIRECTION}'.format(**filler)
