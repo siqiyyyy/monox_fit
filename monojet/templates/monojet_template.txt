@@ -1,6 +1,6 @@
 Combination of monojet_@YEAR.txt
 imax 6 number of bins
-jmax 12 number of processes minus 1
+jmax 13 number of processes minus 1
 kmax * number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
 shapes *                         monojet_@YEAR_dielec    combined_model.root combinedws:monojet_@YEAR_Zee_$PROCESS combinedws:monojet_@YEAR_Zee_$PROCESS_$SYSTEMATIC
