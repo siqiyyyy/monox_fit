@@ -48,7 +48,7 @@ def get_jes_file(category):
   if not f_jes:
     raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
 
-  return f_jes    
+  return f_jes
 
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
@@ -86,6 +86,64 @@ def get_diboson_variations(obj, category, process):
     varied_obj.Multiply(f.Get(key))
     varied_obj.SetDirectory(0)
     varied_hists[name] = varied_obj
+
+  return varied_hists
+
+def get_signal_theory_variations(obj, category):
+  '''Return list of varied histograms from signal theory histogram file'''
+  name = obj.GetName()
+  if not name.startswith("signal_"):
+    return {}
+
+  channel = re.sub("(loose|tight|_201\d)","", category)
+  varied_hists = {}
+
+  real_process = name.replace("signal_","")
+  process_for_unc = None
+
+  m = re.match('(vbf|ggh|ggzh|zh|wh)(\d+)?',real_process)
+  if m:
+    process_for_unc = m.groups()[0]
+
+  m = re.match('(vector|axial|pseudoscalar|scalar)_monow_.*',real_process)
+  if m:
+    process_for_unc = 'wh'
+
+  m = re.match('(vector|axial|pseudoscalar|scalar)_monoz_.*',real_process)
+  if m:
+    process_for_unc = 'zh'
+
+  m = re.match('(vector|axial|pseudoscalar|scalar)_monojet_.*',real_process)
+  if m:
+    process_for_unc = 'ggh'
+
+  m = re.match('add_md\d+_d\d',real_process)
+  if m:
+    process_for_unc = 'ggh'
+
+  m = re.match('lq_m\d+_d[\d,p]+',real_process)
+  if m:
+    process_for_unc = 'ggh'
+
+  if not process_for_unc:
+    return {}
+
+  f = ROOT.TFile("sys/signal_theory_unc.root")
+
+  for unctype in 'pdf','scale':
+    for direction in 'Up','Down':
+      filler={'CHANNEL':channel, 'PROCESS_FOR_UNC':process_for_unc, 'UNCTYPE':unctype,'DIRECTION':direction, 'REAL_PROCESS':real_process}
+      name = 'signal_{REAL_PROCESS}_{UNCTYPE}_{REAL_PROCESS}{DIRECTION}'.format(**filler)
+
+
+      varname = '{CHANNEL}_{PROCESS_FOR_UNC}_{UNCTYPE}{DIRECTION}'.format(**filler)
+      variation = f.Get(varname)
+      print varname, variation
+
+      varied_obj = obj.Clone(name)
+      varied_obj.Multiply(variation)
+      varied_obj.SetDirectory(0)
+      varied_hists[name] = varied_obj
 
   return varied_hists
 
@@ -130,7 +188,7 @@ def create_workspace(fin, fout, category, args):
   else:
     variable_name = "mjj" if ("vbf" in category) else "met"
   varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
-  
+
   # Helper function
   def write_obj(obj, name):
     '''Converts histogram to RooDataHist and writes to workspace + ROOT file'''
@@ -150,6 +208,11 @@ def create_workspace(fin, fout, category, args):
     foutdir.cd()
     foutdir.WriteTObject(obj)
 
+  # Helper function
+  def write_dict(variation_dict):
+    for k, v in variation_dict.items():
+      write_obj(v, k)
+
   # Loop over all keys in the input file
   # pick out the histograms, and add to
   # the work space.
@@ -164,20 +227,22 @@ def create_workspace(fin, fout, category, args):
     treat_empty(obj)
     treat_overflow(obj)
     write_obj(obj, name)
-    
+
     if not 'data' in name:
       # JES variations: Get them from the source file and save them to workspace
       jes_varied_hists = get_jes_variations(obj, f_jes, category)
-      for varied_name, varied_obj in jes_varied_hists.items():
-        write_obj(varied_obj, varied_name)
+      write_dict(jes_varied_hists)
 
       # Diboson variations
       vvprocs = ['wz','ww','zz','zgamma','wgamma']
       process = "_".join(key.GetName().split("_")[1:])
       if process in vvprocs:
         diboson_varied_hists = get_diboson_variations(obj, category, process)
-        for varied_name, varied_obj in diboson_varied_hists.items():
-          write_obj(varied_obj, varied_name)
+        write_dict(diboson_varied_hists)
+
+      # Signal theory variations
+      signal_theory_varied_hists = get_signal_theory_variations(obj, category)
+      write_dict(signal_theory_varied_hists)
 
   # Write the workspace
   foutdir.cd()
