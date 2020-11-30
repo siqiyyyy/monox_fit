@@ -48,7 +48,7 @@ def get_jes_file(category):
   if not f_jes:
     raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
 
-  return f_jes
+  return f_jes    
 
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
@@ -104,19 +104,19 @@ def get_signal_theory_variations(obj, category):
   m = re.match('(vbf|ggh|ggzh|zh|wh)(\d+)?',real_process)
   if m:
     process_for_unc = m.groups()[0]
-
+ 
   m = re.match('(vector|axial|pseudoscalar|scalar)_monow_.*',real_process)
   if m:
     process_for_unc = 'wh'
-
+  
   m = re.match('(vector|axial|pseudoscalar|scalar)_monoz_.*',real_process)
   if m:
     process_for_unc = 'zh'
-
+  
   m = re.match('(vector|axial|pseudoscalar|scalar)_monojet_.*',real_process)
   if m:
     process_for_unc = 'ggh'
-
+  
   m = re.match('add_md\d+_d\d',real_process)
   if m:
     process_for_unc = 'ggh'
@@ -133,13 +133,16 @@ def get_signal_theory_variations(obj, category):
   for unctype in 'pdf','scale':
     for direction in 'Up','Down':
       filler={'CHANNEL':channel, 'PROCESS_FOR_UNC':process_for_unc, 'UNCTYPE':unctype,'DIRECTION':direction, 'REAL_PROCESS':real_process}
-      name = 'signal_{REAL_PROCESS}_{UNCTYPE}_{REAL_PROCESS}{DIRECTION}'.format(**filler)
 
+      if unctype=='scale':
+        name = 'signal_{REAL_PROCESS}_QCDscale_{REAL_PROCESS}_ACCEPT{DIRECTION}'.format(**filler)
+      elif unctype=='scale':
+        name = 'signal_{REAL_PROCESS}_pdf_{REAL_PROCESS}_ACCEPT{DIRECTION}'.format(**filler)
 
       varname = '{CHANNEL}_{PROCESS_FOR_UNC}_{UNCTYPE}{DIRECTION}'.format(**filler)
       variation = f.Get(varname)
-      print varname, variation
-
+      print varname, variation 
+      
       varied_obj = obj.Clone(name)
       varied_obj.Multiply(variation)
       varied_obj.SetDirectory(0)
@@ -188,7 +191,7 @@ def create_workspace(fin, fout, category, args):
   else:
     variable_name = "mjj" if ("vbf" in category) else "met"
   varl = ROOT.RooRealVar(variable_name, variable_name, 0,100000);
-
+  
   # Helper function
   def write_obj(obj, name):
     '''Converts histogram to RooDataHist and writes to workspace + ROOT file'''
@@ -227,7 +230,7 @@ def create_workspace(fin, fout, category, args):
     treat_empty(obj)
     treat_overflow(obj)
     write_obj(obj, name)
-
+    
     if not 'data' in name:
       # JES variations: Get them from the source file and save them to workspace
       jes_varied_hists = get_jes_variations(obj, f_jes, category)
