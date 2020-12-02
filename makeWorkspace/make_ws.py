@@ -109,7 +109,7 @@ def get_signal_theory_variations(obj, category):
   if m:
     process_for_unc = 'wh'
   
-  m = re.match('(vector|axial|pseudoscalar|scalar)_monoz_.*',real_process)
+  m = re.match('(vector|axial|pseudoscalar|scalar)_(monoz|monov)_.*',real_process)
   if m:
     process_for_unc = 'zh'
   
