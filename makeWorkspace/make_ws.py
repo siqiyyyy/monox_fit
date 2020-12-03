@@ -68,6 +68,44 @@ def get_jes_variations(obj, f_jes, category):
 
   return varied_hists
 
+def get_photon_id_variations(obj, category):
+  '''Get photon ID variations from file, returns all the varied histograms stored in a dictionary.'''
+
+
+
+  channel = re.sub("(loose|tight)","", category)
+
+  m = re.match(".*(201(6|7|8)).*", category)
+  year = m.groups()[0]
+
+  filler = {
+    "CHANNEL" : channel,
+    "YEAR" : year,
+  }
+  name_map = {
+    "CMS_eff{YEAR}_phoUp"   : "{CHANNEL}_photon_id_up",
+    "CMS_eff{YEAR}_phoDown" : "{CHANNEL}_photon_id_dn",
+    "CMS_eff{YEAR}_pho_extrap_Up"   : "{CHANNEL}_photon_id_extrap_up",
+    "CMS_eff{YEAR}_pho_extrap_Down" : "{CHANNEL}_photon_id_extrap_dn",
+  }
+
+  varied_hists = {}
+  f = ROOT.TFile("sys/photon_id_unc.root")
+  for variation, histo_name in name_map.items():
+    variation = variation.format(**filler)
+    histo_name = histo_name.format(**filler)
+
+    varied_name = obj.GetName()+"_"+variation
+
+    varied_obj = obj.Clone(varied_name)
+    varied_obj.Multiply(f.Get(histo_name))
+    varied_obj.SetDirectory(0)
+    varied_hists[varied_name] = varied_obj
+
+  if(f): 
+    f.Close()
+  return varied_hists
+
 def get_diboson_variations(obj, category, process):
   '''Return list of varied histograms from diboson histogram file'''
   channel = re.sub("(loose|tight|_201\d)","", category)
@@ -86,7 +124,8 @@ def get_diboson_variations(obj, category, process):
     varied_obj.Multiply(f.Get(key))
     varied_obj.SetDirectory(0)
     varied_hists[name] = varied_obj
-
+  if(f): 
+    f.Close()
   return varied_hists
 
 def get_signal_theory_variations(obj, category):
@@ -227,6 +266,9 @@ def create_workspace(fin, fout, category, args):
     title = obj.GetTitle()
     name = obj.GetName()
 
+    if any([x in name for x in ['scalar','pseudo','lq','axial','vector','add']]):
+      continue
+
     treat_empty(obj)
     treat_overflow(obj)
     write_obj(obj, name)
@@ -242,6 +284,10 @@ def create_workspace(fin, fout, category, args):
       if process in vvprocs:
         diboson_varied_hists = get_diboson_variations(obj, category, process)
         write_dict(diboson_varied_hists)
+
+      if 'gjets' in key.GetName():
+        photon_id_varied_hists = get_photon_id_variations(obj, category)
+        write_dict(photon_id_varied_hists)
 
       # Signal theory variations
       signal_theory_varied_hists = get_signal_theory_variations(obj, category)
