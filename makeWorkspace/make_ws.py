@@ -107,13 +107,13 @@ def get_photon_id_variations(obj, category):
   return varied_hists
 
 def hist_apply(histogram, function):
-  for i in histogram.GetNbinsX():
+  for i in range(1,histogram.GetNbinsX()+1):
     content = histogram.GetBinContent(i)
     error = histogram.GetBinError(i)
 
     scale = function (histogram.GetBinCenter(i))
-    histogram.SetBinContent(content * scale)
-    histogram.SetBinError(error * scale)
+    histogram.SetBinContent(i, content * scale)
+    histogram.SetBinError(i, error * scale)
 
 def get_photon_qcd_variations(obj, category):
   m = re.match(".*(201(6|7|8)).*", category)
@@ -129,11 +129,15 @@ def get_photon_qcd_variations(obj, category):
 
   name = "{INITIAL}_{VARIATION}Up".format(INITIAL=obj.GetName(), VARIATION=varname)
   varied_obj = obj.Clone(name)
-  varied_hists[name] = hist_apply(varied_obj, func_up)
+  varied_obj.SetDirectory(0)
+  hist_apply(varied_obj, func_up)
+  varied_hists[name] = varied_obj
 
   name = "{INITIAL}_{VARIATION}Down".format(INITIAL=obj.GetName(), VARIATION=varname)
   varied_obj = obj.Clone(name)
-  varied_hists[name] = hist_apply(varied_obj, func_up)
+  varied_obj.SetDirectory(0)
+  hist_apply(varied_obj, func_dn)
+  varied_hists[name] = varied_obj
 
   return varied_hists
 
@@ -285,6 +289,8 @@ def create_workspace(fin, fout, category, args):
   # Helper function
   def write_dict(variation_dict):
     for k, v in variation_dict.items():
+      if not v:
+        raise RuntimeError("Could not write histogram for key: " + k)
       write_obj(v, k)
 
   # Loop over all keys in the input file
@@ -322,7 +328,7 @@ def create_workspace(fin, fout, category, args):
         write_dict(photon_id_varied_hists)
 
       if key.GetName() == 'gjets_qcd':
-        photon_qcd_varied_hists = get_photon_qcd_variations(obj)
+        photon_qcd_varied_hists = get_photon_qcd_variations(obj, category)
         write_dict(photon_qcd_varied_hists)
 
       # Signal theory variations
