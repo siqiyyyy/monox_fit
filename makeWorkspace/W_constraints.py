@@ -132,11 +132,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
   CRs[0].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
-  # Trigger single electron
-  add_variation(WScales_e, fztoz_trig, "trig_sys_down"+tag, "wen_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
-  add_variation(WScales_e, fztoz_trig, "trig_sys_up"+tag, "wen_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
-  CRs[1].add_nuisance_shape("mettrig_%s"%year,_fOut)
-
   ## Veto uncertainties
   ftauveto = r.TFile.Open("sys/tau_veto_unc.root")
   fmuveto = r.TFile.Open("sys/muon_veto_unc.root")
