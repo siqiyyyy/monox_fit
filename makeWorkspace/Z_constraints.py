@@ -283,6 +283,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     var = re.sub("(.*qcd_|(Up|Down))","",x.GetName())
     if '201' in var and not (str(year) in var):
       continue
+    if 'Total' in var:
+      continue
     jet_variations.add(var)
 
   print "VARIATIONS"
