@@ -2,6 +2,7 @@
 import ROOT as r
 import os
 import math
+import argparse
 
 r.gROOT.SetBatch(r.kTRUE)
 
@@ -23,8 +24,6 @@ def plot_nuis(fname, outdir):
     f = r.TFile(fname)
 
     c = f.Get("nuisances")
-
-
 
     c.SetBottomMargin(0.3)
     c.SetRightMargin(0.02)
@@ -70,4 +69,25 @@ def plot_nuis(fname, outdir):
         c.SetCanvasSize(1200,600)
         for extension in ['png','pdf']:
             c.SaveAs(os.path.join(outdir,"diffnuis_{name}_{i}.{ext}".format(name=name, i=i, ext=extension)))
-    
+
+def cli_args():
+    parser = argparse.ArgumentParser(prog='Make nice nuisance plots.')
+    parser.add_argument('file', type=str, help='Input file to use.')
+    parser.add_argument('--out', type=str, help='Path to save output under.', default='combined_model.root')
+    args = parser.parse_args()
+
+    args.file = os.path.abspath(args.file)
+    args.out = os.path.abspath(args.out)
+    if not os.path.exists(args.file):
+      raise IOError("Input file not found: " + args.file)
+    if not args.file.endswith('.root'):
+      raise IOError("Input file is not a ROOT file: " + args.file)
+
+    return args
+
+def main():
+    args = cli_args()
+    plot_nuis(args.file, args.out)
+
+if __name__ == "__main__":
+    main()
