@@ -1,5 +1,7 @@
 import ROOT
 from counting_experiment import *
+from utils.jes_utils import get_jes_variations, get_jes_jer_source_file_for_tf
+from utils.general import read_key_for_year, get_nuisance_name
 from W_constraints import do_stat_unc, add_variation
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard 

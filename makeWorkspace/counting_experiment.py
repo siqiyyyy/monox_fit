@@ -6,61 +6,6 @@ from HiggsAnalysis.CombinedLimit.ModelTools import *
 
 MAXBINS = 100
 
-def get_jes_variations(fjes, year, proc='qcd'):
-    '''Given the JES file, get the list of JES variations.'''
-    jet_variations = set()
-    for key in list(fjes.GetListOfKeys()):
-        if proc not in key.GetName():
-            continue
-        # var = re.sub("(.*qcd_|(Up|Down))","",key.GetName())
-        var = get_nuisance_name(key.GetName(), year)
-        if '201' in var and (str(year) not in var):
-            continue
-        jet_variations.add(var)
-    
-    return jet_variations
-
-def read_key_for_year(key, year):
-    '''Helper function to get if the given key is going to be used for the given year.'''
-    if year == 2017:
-      return '17' in key
-    elif year == 2018:
-      return '18' in key
-    raise RuntimeError('Year not recognized: {}'.format(year))
-
-def get_nuisance_name(nuisance, year):
-    '''Return the modified nuisance name for the given nuisance (to match with the content in datacard).'''
-    name=None
-    if str(year) in nuisance:
-        tmp = nuisance.split('_')[-2:]
-        name = '_'.join(tmp)
-    else:
-        name = nuisance.split('_')[-1]
-
-    if not name:
-        raise RuntimeError('Could not determine a valid name for nuisance: {}'.format(nuisance))
-
-    # Remove "up/down" tag from the nuisance name
-    name = re.sub('Up|Down', '', name)
- 
-    return name
-
-def get_jes_jer_source_file_for_tf(category):
-    '''For the given analysis (monojet, mono-V or VBF), get the JES/JER uncertainty source file for transfer factors.'''
-    f_jes_dict = {
-        '(monoj|monov).*' : r.TFile("sys/monojet_jes_jer_tf_uncs.root"),
-        'vbf.*' : r.TFile("sys/vbf_jes_jer_tf_uncs.root")
-    }
-    # Determine the relevant JES/JER source file
-    f_jes = None
-    for regex, f in f_jes_dict.items():
-        if re.match(regex, category):
-            f_jes = f
-    if not f_jes:
-        raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
-    
-    return f_jes    
-
 def naming_convention(id, catid, convention="BU"):
     if convention == "BU":
         return "model_mu_cat_%s_bin_%d" % (catid, id)
