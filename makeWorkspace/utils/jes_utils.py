@@ -16,6 +16,8 @@ def get_jes_variations(fjes, year, proc='qcd'):
         var = get_nuisance_name(key.GetName(), year)
         if '201' in var and (str(year) not in var):
             continue
+        if 'jesTotal' in var:
+            continue
         jet_variations.add(var)
     
     return jet_variations
