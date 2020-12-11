@@ -1,6 +1,8 @@
 import ROOT
 from counting_experiment import *
-from W_constraints import do_stat_unc
+from utils.jes_utils import get_jes_variations, get_jes_jer_source_file_for_tf
+from utils.general import read_key_for_year, get_nuisance_name
+from W_constraints import do_stat_unc, add_variation
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard 
 model = "qcd_wjets"
@@ -50,17 +52,21 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag,year, convention="BU"):
    Channel("qcd_singleelectron",_wspace,out_ws,cid+'_'+model,WScales_e, convention=convention),
   ]
 
+  # Get the JES/JER unlcertainty file for transfer factors
+  # Read the split uncertainties from there
+  fjes = get_jes_jer_source_file_for_tf(category='vbf')
+  jet_variations = get_jes_variations(fjes, year, proc='qcd')
 
-  # See https://docs.google.com/spreadsheets/d/15vq-c2xejGA-Nw6yzZU3mUDftter_l7OOcmJEwuCPyI/edit?usp=sharing
-  if year == 2017:
-    jes = 0.015
-    jer = 0.015
-  elif year==2018:
-    jes = 0.01
-    jer = 0.01
+  for var in jet_variations:
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "qcd_wmn_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "qcd_wmn_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[0].add_nuisance_shape(var,_fOut)
+
+    add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "qcd_wen_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "qcd_wen_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[1].add_nuisance_shape(var,_fOut)
+
   for c in CRs:
-    c.add_nuisance('CMS_VBF_scale_j'.format(YEAR=year), jes)
-    c.add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year), jer)
     c.add_nuisance('CMS_veto{YEAR}_t'.format(YEAR=year),      0.01)
     c.add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),      0.015)
     c.add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),      0.03)

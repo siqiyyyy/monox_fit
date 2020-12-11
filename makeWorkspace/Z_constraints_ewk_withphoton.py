@@ -1,6 +1,8 @@
 import ROOT
 from counting_experiment import *
-from W_constraints import do_stat_unc
+from utils.jes_utils import get_jes_variations, get_jes_jer_source_file_for_tf
+from utils.general import read_key_for_year, get_nuisance_name
+from W_constraints import do_stat_unc, add_variation
 # Define how a control region(s) transfer is made by defining *cmodel*, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard
 model = "ewk_zjets"
@@ -69,30 +71,28 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year, convention="BU"):
   CRs[2].add_nuisance('CMS_veto{YEAR}_m'.format(YEAR=year),     -0.02)
   CRs[2].add_nuisance('CMS_veto{YEAR}_e'.format(YEAR=year),     -0.03)
   
-  # JES / JER for Z/Z is 1% 
-  CRs[0].add_nuisance('CMS_VBF_scale_j'.format(YEAR=year),0.01)
-  CRs[1].add_nuisance('CMS_VBF_scale_j'.format(YEAR=year),0.01)
-  CRs[0].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.01)
-  CRs[1].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.01)
+  # Get the JES/JER uncertainty file for transfer factors
+  # Read the split uncertainties from there
+  fjes = get_jes_jer_source_file_for_tf(category='vbf')
+  jet_variations = get_jes_variations(fjes, year, proc='ewk')
 
-  # For Z/W, it goes the other direction
-  if year==2017:
-    CRs[2].add_nuisance('CMS_VBF_scale_j'.format(YEAR=year),-0.01)
-    CRs[2].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),-0.015)
-  elif year==2018:
-    CRs[2].add_nuisance('CMS_VBF_scale_j'.format(YEAR=year),-0.01)
-    CRs[2].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),-0.01)
-  else:
-    raise RuntimeError("Year not recognized: " + str(year))
+  for var in jet_variations:
+    add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_w_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(WZScales, fjes, 'znunu_over_wlnu{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_w_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[2].add_nuisance_shape(var, _fOut)
 
-  # Z/gamma
-  CRs[3].add_nuisance('CMS_VBF_scale_j'.format(YEAR=year),0.03)
-  if year==2017:
-    CRs[3].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.025)
-  elif year==2018:
-    CRs[3].add_nuisance('CMS_res_j_{YEAR}'.format(YEAR=year),0.01)
-  else:
-    raise RuntimeError("Year not recognized: " + str(year))
+    add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_zmm_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(ZmmScales, fjes, 'znunu_over_zmumu{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_zmm_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[0].add_nuisance_shape(var, _fOut)
+
+    add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_zee_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(ZeeScales, fjes, 'znunu_over_zee{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_zee_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[1].add_nuisance_shape(var, _fOut)
+
+    add_variation(PhotonScales, fjes, 'znunu_over_gjets{YEAR}_ewk_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "ewk_photon_weights_%s_%s_Up"%(cid, var), _fOut)
+    add_variation(PhotonScales, fjes, 'znunu_over_gjets{YEAR}_ewk_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "ewk_photon_weights_%s_%s_Down"%(cid, var), _fOut)
+    CRs[3].add_nuisance_shape(var, _fOut)
+
   # ############################ USER DEFINED ###########################################################
   # Add systematics in the following, for normalisations use name, relative size (0.01 --> 1%)
   # for shapes use add_nuisance_shape with (name,_fOut)

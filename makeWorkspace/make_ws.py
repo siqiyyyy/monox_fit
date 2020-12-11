@@ -60,6 +60,8 @@ def get_jes_variations(obj, f_jes, category):
   for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
     if not (channel in key):
       continue
+    if 'jesTotal' in key:
+      continue
     variation = key.replace(channel+"_","")
     varied_name = obj.GetName()+"_"+variation
     varied_obj = obj.Clone(varied_name)
