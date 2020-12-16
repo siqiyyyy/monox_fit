@@ -139,15 +139,15 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   # Theory uncertainties on Z/W
   for variation, name in [
-                           ('d1k', 'qcd'),
-                           ('d2k', 'qcdshape'),
-                           ('d3k', 'qcdprocess'),
-                           ('d1kappa', 'ewk'),
+                           ('d1k', 'wqcd'),
+                           ('d2k', 'wqcdshape'),
+                           ('d3k', 'wqcdprocess'),
+                           ('d1kappa', 'wewk'),
                            ('d2kappa_w', 'nnlomissW'),
                            ('d2kappa_z', 'nnlomissZ'),
                            ('d3kappa_w', 'sudakovW'),
                            ('d3kappa_z', 'sudakovZ'),
-                           ('mix', 'cross')
+                           ('mix', 'wcross')
                            ]:
     # Flip nuisance directions for compatibility with 2016
     invert = variation in ['d1k','d3k','d1kappa','d2kappa_w','d3kappa_w']
