@@ -104,19 +104,10 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   # We want to correlate experimental uncertainties between the loose and tight regions.
   cid_corr = re.sub("(loose|tight)","",cid)
 
-  add_variation(PhotonScales,fztoz_trig,"trig_sys_down"+tag,"photon_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
-  add_variation(PhotonScales,fztoz_trig,"trig_sys_up"+tag,"photon_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
-  CRs[0].add_nuisance_shape("mettrig_%s"%year,_fOut)
-
   # Take the square of the uncertainty because we are going from zero to two leptons
   add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_down"+tag,"zmm_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
   add_variation(ZmmScales,fztoz_trig,"trig_sys_sqr_up"+tag,"zmm_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
   CRs[1].add_nuisance_shape("mettrig_%s"%year,_fOut)
-
-  ## Here now adding the trigger uncertainty
-  add_variation(ZeeScales,fztoz_trig,"trig_sys_down"+tag,"zee_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
-  add_variation(ZeeScales,fztoz_trig,"trig_sys_up"+tag,"zee_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
-  CRs[2].add_nuisance_shape("mettrig_%s"%year,_fOut)
 
   #######################################################################################################
 
@@ -150,15 +141,15 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
   # Theory uncertainties on Z/W
   for variation, name in [
-                           ('d1k', 'qcd'),
-                           ('d2k', 'qcdshape'),
-                           ('d3k', 'qcdprocess'),
-                           ('d1kappa', 'ewk'),
+                           ('d1k', 'wqcd'),
+                           ('d2k', 'wqcdshape'),
+                           ('d3k', 'wqcdprocess'),
+                           ('d1kappa', 'wewk'),
                            ('d2kappa_w', 'nnlomissW'),
                            ('d2kappa_z', 'nnlomissZ'),
                            ('d3kappa_w', 'sudakovW'),
                            ('d3kappa_z', 'sudakovZ'),
-                           ('mix', 'cross')
+                           ('mix', 'wcross')
                            ]:
     # Flip nuisance directions for compatibility with 2016
     invert = variation in ['d1k','d3k','d1kappa','d2kappa_w','d3kappa_w']

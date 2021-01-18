@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-08-26_nano_v7_v2
-TAG='default'
+INDIR=../input/2020-10-04_03Sep20v7
+TAG='monovloose'
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
@@ -45,6 +45,7 @@ md5sum ${INFILE} >> ${INFOFILE}
 ./runModel.py ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018 --out ${OUTDIR}/combined_model_monov_tau21.root
 
 cp sys/monovtight_qcd_ws.root ${OUTDIR}
+cp sys/monovloose_qcd_ws.root ${OUTDIR}
 
 # Save the check sums for the output
 echo "--- OUTPUT ---" >> ${INFOFILE}

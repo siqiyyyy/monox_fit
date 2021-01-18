@@ -48,7 +48,7 @@ mkdir -p impacts
 pushd impacts
 for SIGNAL in "0.0"; do
     for YEAR in combined; do
-        nohup bash -c "do_impacts $YEAR  $SIGNAL $(readlink -e ../cards/card_monojet_monov_nominal_tight_${YEAR}.root)" >  impacts_${YEAR}_${SIGNAL}.log &
+        nohup bash -c "do_impacts $YEAR  $SIGNAL $(readlink -e ../cards/card_monojet_monov_nominal_${YEAR}.root)" >  impacts_${YEAR}_${SIGNAL}.log &
     done
 done
 popd

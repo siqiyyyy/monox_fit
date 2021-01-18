@@ -10,7 +10,7 @@ lumi ={
     2017 : 41.5,
     2018: 59.7
 }
-regions = ['singlemuon','dimuon','gjets','singleelectron','dielectron']
+regions = ['singlemuon','dimuon','gjets','singleelectron','dielectron','signal']
 procs = ['zmm','zee','w_weights','photon','wen','wmn']
 
 ### Years fit separately
@@ -53,29 +53,17 @@ for year in [2017,2018]:
     for region in regions:
         plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
 
-
-
-
-
-
-
-
-
-
-
-
-
-for wp in ['tight']:
+for wp in ['tight','loose']:
     ### Years fit separately
-    ws_file="root/ws_monov_nominal_tight.root"
-    model_file = "root/combined_model_monov_nominal_tight.root"
+    ws_file="root/ws_monov_nominal_{WP}.root".format(WP=wp)
+    model_file = "root/combined_model_monov_nominal_{WP}.root".format(WP=wp)
     for year in [2017,2018]:
-        category='monovtight_' + str(year)
+        category='monov{WP}_{YEAR}'.format(WP=wp,YEAR=year)
         filler = {
             "year" : year,
             "category" : category
         }
-        fitdiag_file = 'diagnostics/fitDiagnostics_monojet_monov_{year}.root'.format(year=year)
+        fitdiag_file = 'diagnostics/fitDiagnostics_monojet_monov_{year}.root'.format(**filler)
 
         outdir = './plots/{year}/'.format(**filler)
         for region in regions:
@@ -98,15 +86,17 @@ for wp in ['tight']:
 
     ### Years fit together
     filler = {
-        "category" : "monovtight"
+        "WP" : wp,
+        "category" : "monov{WP}".format(WP=wp),
     }
-    ws_file="root/ws_monov_nominal_tight.root"
+    ws_file="root/ws_monov_nominal_{WP}.root".format(**filler)
     fitdiag_file = 'diagnostics/fitDiagnostics_monojet_monov_combined.root'
-    model_file = "root/combined_model_monov_nominal_tight.root"
+    model_file = "root/combined_model_monov_nominal_{WP}.root".format(**filler)
 
     for year in [2017,2018]:
-        outdir = './plots/combined_{YEAR}/'.format(YEAR=year)
-        category = 'monovtight_{YEAR}'.format(YEAR=year)
+        filler["YEAR"]=year
+        outdir = './plots/combined_{YEAR}/'.format(**filler)
+        category = 'monov{WP}_{YEAR}'.format(**filler)
         for region in regions:
             plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
         for proc in procs:

@@ -1,6 +1,6 @@
-TAG=2020-07-19_master
-SUBTAG=fixvgamma
-SUBSUBTAG=default
+TAG=2020-11-30_monov_no_tight_mistag_sf
+SUBTAG=signalunc
+SUBSUBTAG=signalunc
 JDIR=$(readlink -e ../monojet/${TAG}/${SUBTAG}/)
 VDIR=$(readlink -e ../monov/${TAG}/${SUBTAG}/)
 
@@ -14,8 +14,8 @@ cp $VDIR/root/*.root ./root
 
 mkdir -p cards
 for YEAR in 2017 2018 combined; do
-    COMBINED="./cards/card_monojet_monov_nominal_tight_${YEAR}.txt"
-    combineCards.py $JDIR/cards/card_monojet_${YEAR}.txt $VDIR/cards/card_nominal_monovtight_${YEAR}.txt > ${COMBINED}
+    COMBINED="./cards/card_monojet_monov_nominal_${YEAR}.txt"
+    combineCards.py $JDIR/cards/card_monojet_${YEAR}.txt $VDIR/cards/card_nominal_monov_${YEAR}.txt > ${COMBINED}
 
     # Get rid of channel prefixes + fix white space
     sed -i 's/ch\(1\|2\)_/    /g' ${COMBINED}
@@ -26,8 +26,6 @@ for YEAR in 2017 2018 combined; do
     sed -i '/_qcd_ws/ s|[^ ]*\(mono[^ ]*_qcd_ws.root\)|root/\1|g' ${COMBINED}
 
     text2workspace.py ${COMBINED} --channel-masks
-
-
 
     ### DEBUG
     # individual channels
