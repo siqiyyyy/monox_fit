@@ -54,15 +54,16 @@ def get_jes_file(category):
 
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
-  channel = re.sub("(loose|tight)","", category)
+  # Use QCD Z(vv) shapes from the source file
+  tag = 'ZJetsToNuNu'
   # Save varied histograms for all JES variations and the histogram names in this dictionary
   varied_hists = {}
   for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
-    if not (channel in key):
+    if not (tag in key):
       continue
     if 'jesTotal' in key:
       continue
-    variation = key.replace(channel+"_","")
+    variation = re.sub('ZJetsToNuNu\d+_', '', key)
     varied_name = obj.GetName()+"_"+variation
     varied_obj = obj.Clone(varied_name)
     # Multiply by JES factor to get the varied yields
