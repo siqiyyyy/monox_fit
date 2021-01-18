@@ -26,6 +26,10 @@ for YEAR in 2017 2018; do
         sed -i "s|@LUMI|1.015|g" ${CARD}
         sed -i "/prefiring/d" ${CARD}
      fi
+     # affected by mistags in loose region with ratio of -1/20
+     sed -i "s|@MISTAGLOOSEW|0.999        |g"    ${CARD} 
+     sed -i "s|@MISTAGLOOSEZ|0.998        |g"    ${CARD} 
+     sed -i "s|@MISTAGLOOSEG|0.998        |g"    ${CARD} 
 
     sed -i "s|combined_model.root|../root/combined_model_monojet.root|g" ${CARD}
     sed -i "s|monojet_qcd_ws.root|../root/monojet_qcd_ws.root|g" ${CARD}
