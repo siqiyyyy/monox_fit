@@ -20,6 +20,12 @@ WSFILE=${OUTDIR}/ws_monojet.root
 # Save the check sum for the input
 md5sum ${INFILE} >> ${INFOFILE}
 
+# Save repo information to the info file
+echo "--- REPO INFO ---" >> ${INFOFILE}
+echo "Commit hash: $(git rev-parse HEAD)" >> ${INFOFILE}
+echo "Branch name: $(git rev-parse --abbrev-ref HEAD)" >> ${INFOFILE}
+git diff >> ${INFOFILE}
+
 ./make_ws.py ${INFILE} \
              --out ${WSFILE} \
              --categories monojet_2017,monojet_2018

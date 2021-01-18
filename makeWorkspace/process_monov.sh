@@ -31,6 +31,12 @@ for TAGGER in nominal; do
     done;
 done
 
+# Save repo information to the info file
+echo "--- REPO INFO ---" >> ${INFOFILE}
+echo "Commit hash: $(git rev-parse HEAD)" >> ${INFOFILE}
+echo "Branch name: $(git rev-parse --abbrev-ref HEAD)" >> ${INFOFILE}
+git diff >> ${INFOFILE}
+
 # Tau 21 has just one WP
 INFILE=${INDIR}/merged_legacy_limit_monov_tau21.root
 # Save the check sum for the input
