@@ -6,7 +6,6 @@ from HiggsAnalysis.CombinedLimit.ModelTools import *
 
 MAXBINS = 100
 
-
 def naming_convention(id, catid, convention="BU"):
     if convention == "BU":
         return "model_mu_cat_%s_bin_%d" % (catid, id)

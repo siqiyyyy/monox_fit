@@ -1,6 +1,8 @@
 import ROOT
 from counting_experiment import *
 from W_constraints import do_stat_unc, add_variation
+from utils.jes_utils import get_jes_variations, get_jes_jer_source_file_for_tf
+from utils.general import read_key_for_year, get_nuisance_name
 from parameters import flat_uncertainties
 import re
 ROOT.RooMsgService.instance().setSilentMode(True)
@@ -266,17 +268,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   CRs[2].add_nuisance_shape("CMS_eff{YEAR}_e_reco".format(**filler),_fOut)
 
   # JES uncertainties
-  fjes = r.TFile.Open("sys/monojet_tf_uncs.root")
-
-  # Get the list of available JES/JER variations directly from the file
-  jet_variations = set()
-  for x in list(fjes.GetListOfKeys()):
-    var = re.sub("(.*qcd_|(Up|Down))","",x.GetName())
-    if '201' in var and not (str(year) in var):
-      continue
-    if 'Total' in var:
-      continue
-    jet_variations.add(var)
+  fjes = get_jes_jer_source_file_for_tf(category='monojet')
+  jet_variations = get_jes_variations(fjes, year)
 
   print "VARIATIONS"
   print jet_variations

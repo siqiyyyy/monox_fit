@@ -35,10 +35,12 @@ def cli_args():
 
 def get_jes_file(category):
   '''Get the relevant JES source file for the given category.'''
+  # By default: Get the uncertainties with smearing for VBF, the opposite for monojet
+  jer_suffix = 'jer_smeared' if 'vbf' in category else 'not_jer_smeared'
   # JES shape files for each category
   f_jes_dict = {
-    '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth.root"),
-    'vbf.*': ROOT.TFile("sys/vbf_shape_jes_uncs_smooth.root")
+    '(monoj|monov).*': ROOT.TFile("sys/monoj_monov_shape_jes_uncs_smooth_{}.root".format(jer_suffix) ),
+    'vbf.*': ROOT.TFile("sys/vbf_shape_jes_uncs_smooth_{}.root".format(jer_suffix) )
   }
   # Determine the relevant JES source file
   f_jes = None
@@ -48,17 +50,22 @@ def get_jes_file(category):
   if not f_jes:
     raise RuntimeError('Could not find a JES source file for category: {}'.format(category))
 
-  return f_jes
+  print('Using JES/JER uncertainty file: {}'.format(f_jes))
+
+  return f_jes    
 
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
-  channel = re.sub("(loose|tight)","", category)
+  # Use QCD Z(vv) shapes from the source file
+  tag = 'ZJetsToNuNu'
   # Save varied histograms for all JES variations and the histogram names in this dictionary
   varied_hists = {}
   for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
-    if not (channel in key):
+    if not (tag in key):
       continue
-    variation = key.replace(channel+"_","")
+    if 'jesTotal' in key:
+      continue
+    variation = re.sub('ZJetsToNuNu\d+_', '', key)
     varied_name = obj.GetName()+"_"+variation
     varied_obj = obj.Clone(varied_name)
     # Multiply by JES factor to get the varied yields

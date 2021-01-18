@@ -1,5 +1,7 @@
 import ROOT
 from counting_experiment import *
+from utils.jes_utils import get_jes_variations, get_jes_jer_source_file_for_tf
+from utils.general import read_key_for_year, get_nuisance_name
 from parameters import flat_uncertainties
 import re
 # Tell RooFit to be quiet
@@ -203,19 +205,9 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(WScales_e, fpref, "{CHANNEL}_pref_unc_w_over_e".format(**filler), "wen_weights_%s_prefiring_Down"%cid, _fOut)
     CRs[1].add_nuisance_shape("prefiring",_fOut)
 
-
-    # JES uncertainties
-  fjes = r.TFile.Open("sys/monojet_tf_uncs.root")
-
-  # Get the list of available JES/JER variations directly from the file
-  jet_variations = set()
-  for x in list(fjes.GetListOfKeys()):
-    var = re.sub("(.*qcd_|(Up|Down))","",x.GetName())
-    if '201' in var and not (str(year) in var):
-      continue
-    if 'Total' in var:
-      continue
-    jet_variations.add(var)
+  # JES uncertainties
+  fjes = get_jes_jer_source_file_for_tf(category='monojet')
+  jet_variations = get_jes_variations(fjes, year)
 
   for var in jet_variations:
     add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Up"%(cid, var), _fOut)

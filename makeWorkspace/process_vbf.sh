@@ -19,6 +19,12 @@ WSFILE=${OUTDIR}/ws_vbf.root
 # Save the check sum for the input
 md5sum ${INFILE} >> ${INFOFILE}
 
+# Save repo information to the info file
+echo "--- REPO INFO ---" >> ${INFOFILE}
+echo "Commit hash: $(git rev-parse HEAD)" >> ${INFOFILE}
+echo "Branch name: $(git rev-parse --abbrev-ref HEAD)" >> ${INFOFILE}
+git diff >> ${INFOFILE}
+
 ./make_ws.py ${INFILE} --out ${WSFILE} --categories vbf_2017,vbf_2018
 ./runModel.py ${WSFILE} --categories vbf_2017,vbf_2018 --out ${OUTDIR}/combined_model_vbf.root
 
