@@ -31,6 +31,8 @@ for YEAR in 2017 2018; do
                 sed -i "/prefiring/d" ${CARD}
             fi
             if [ "$WP" == loose ]; then
+                sed -i "s|@VTAGLOOSE|1.10      |g"    ${CARD} 
+                sed -i "s|@VTAGTIGHT|0.99      |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEW|1.02         |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEZ|1.04         |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEG|1.03         |g"    ${CARD} 
@@ -47,6 +49,8 @@ for YEAR in 2017 2018; do
                 sed -i "s|@MISTAGTIGHTVVW|0.990          |g"  ${CARD} 
                 sed -i "s|@MISTAGTIGHTVG|0.999         |g"   ${CARD} 
             elif [ "$WP" == tight ]; then
+                sed -i "s|@VTAGLOOSE|-         |g"    ${CARD} 
+                sed -i "s|@VTAGTIGHT|1.10      |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEW|-            |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEZ|-            |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEG|-            |g"    ${CARD} 
