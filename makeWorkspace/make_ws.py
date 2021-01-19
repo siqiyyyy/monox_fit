@@ -57,18 +57,25 @@ def get_jes_file(category):
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
   # Use QCD Z(vv) shapes from the source file
-  tag = 'ZJetsToNuNu'
   # Save varied histograms for all JES variations and the histogram names in this dictionary
   varied_hists = {}
-  for key in [x.GetName() for x in f_jes.GetListOfKeys()]:
-    if not (tag in key):
-      continue
-    if 'jesTotal' in key:
-      continue
-    variation = re.sub('ZJetsToNuNu\d+_', '', key)
+
+  keynames = [x.GetName() for x in f_jes.GetListOfKeys()]
+
+  if 'vbf' in category:
+    tag = 'ZJetsToNuNu'
+    key_valid =lambda x: (tag in x) and (not 'jesTotal' in x), keynames
+    regex_to_remove = '{TAG}20\d\d_'.format(TAG=tag)
+  else:
+    channel = 'monov' if 'monov' in category else 'monojet'
+    key_valid = lambda x: x.startswith(channel)
+    regex_to_remove = "{CHANNEL}_20\d\d_".format(CHANNEL=channel)
+
+  for key in filter(key_valid, keynames):
+    variation = re.sub(regex_to_remove, '', key)
     varied_name = obj.GetName()+"_"+variation
     varied_obj = obj.Clone(varied_name)
-    # Multiply by JES factor to get the varied yields
+      # Multiply by JES factor to get the varied yields
     varied_obj.Multiply(f_jes.Get(key))
     # Save the varied histogram into a dict
     varied_hists[varied_name] = varied_obj
