@@ -119,6 +119,8 @@ for YEAR in 2017 2018; do
         sed -i "s|@LUMI|1.015|g" ${CARD}
         sed -i "/prefiring/d" ${CARD}
     fi
+    sed -i "s|@VTAGLOOSE|-         |g"    ${CARD} 
+    sed -i "s|@VTAGTIGHT|-         |g"    ${CARD} 
     sed -i "s|@MISTAGLOOSEW|-            |g"    ${CARD} 
     sed -i "s|@MISTAGLOOSEZ|-            |g"    ${CARD} 
     sed -i "s|@MISTAGLOOSEG|-            |g"    ${CARD} 
