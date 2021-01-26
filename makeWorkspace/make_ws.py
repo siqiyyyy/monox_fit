@@ -239,6 +239,26 @@ def get_signal_theory_variations(obj, category):
 
   return varied_hists
 
+def get_stat_variations(obj, category):
+  name = obj.GetName()
+  histograms = {}
+  for ibin in range(1,obj.GetNbinsX()+1):
+    variation_name_up =  "{NAME}_{category}_stat_bin{ibin}Up".format(category=category,NAME=name, ibin=ibin)
+    variation_name_dn =  "{NAME}_{category}_stat_bin{ibin}Down".format(category=category,NAME=name, ibin=ibin)
+    name_up = "{NAME}_{VARIATION}".format(NAME=name, VARIATION=variation_name_up)
+    name_dn = "{NAME}_{VARIATION}".format(NAME=name, VARIATION=variation_name_dn)
+
+    central = obj.GetBinContent(ibin)
+    error = obj.GetBinError(ibin)
+
+    h_up = obj.Clone(name_up)
+    h_up.SetBinContent(ibin, central+error)
+    histograms[name_up] = h_up
+    h_dn = obj.Clone(name_dn)
+    h_dn.SetBinContent(ibin, central-error)
+    histograms[name_dn] = h_dn
+  return histograms
+
 def treat_empty(obj):
   # Ensure non-zero integral for combine
   if not obj.Integral() > 0:
@@ -348,6 +368,10 @@ def create_workspace(fin, fout, category, args):
       # Signal theory variations
       signal_theory_varied_hists = get_signal_theory_variations(obj, category)
       write_dict(signal_theory_varied_hists)
+
+      stat_varied_hists = get_stat_variations(obj, category)
+      write_dict(stat_varied_hists)
+
 
   # Write the workspace
   foutdir.cd()

@@ -30,6 +30,43 @@ for YEAR in 2017 2018; do
                 sed -i "s|@LUMI|1.015|g" ${CARD}
                 sed -i "/prefiring/d" ${CARD}
             fi
+            if [ "$WP" == loose ]; then
+                sed -i "s|@VTAGLOOSE|1.10      |g"    ${CARD} 
+                sed -i "s|@VTAGTIGHT|0.99      |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSEW|1.02         |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSEZ|1.04         |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSEG|1.03         |g"    ${CARD} 
+                sed -i "s|@MISTAGTIGHTW|0.997        |g"    ${CARD} 
+                sed -i "s|@MISTAGTIGHTZ|0.994        |g"    ${CARD} 
+                sed -i "s|@MISTAGTIGHTG|0.996        |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSETOPZ|-               |g" ${CARD} 
+                sed -i "s|@MISTAGLOOSETOPW|1.004           |g" ${CARD} 
+                sed -i "s|@MISTAGLOOSEVVZ|1.001            |g"  ${CARD} 
+                sed -i "s|@MISTAGLOOSEVVW|1.003          |g"  ${CARD} 
+                sed -i "s|@MISTAGTIGHTTOPZ|0.999           |g" ${CARD} 
+                sed -i "s|@MISTAGTIGHTTOPW|0.985           |g" ${CARD} 
+                sed -i "s|@MISTAGTIGHTVVZ|0.995          |g"  ${CARD} 
+                sed -i "s|@MISTAGTIGHTVVW|0.990          |g"  ${CARD} 
+                sed -i "s|@MISTAGTIGHTVG|0.999         |g"   ${CARD} 
+            elif [ "$WP" == tight ]; then
+                sed -i "s|@VTAGLOOSE|-         |g"    ${CARD} 
+                sed -i "s|@VTAGTIGHT|1.10      |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSEW|-            |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSEZ|-            |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSEG|-            |g"    ${CARD} 
+                sed -i "s|@MISTAGTIGHTW|1.03         |g"    ${CARD} 
+                sed -i "s|@MISTAGTIGHTZ|1.06         |g"    ${CARD} 
+                sed -i "s|@MISTAGTIGHTG|1.04         |g"    ${CARD} 
+                sed -i "s|@MISTAGLOOSETOPZ|-               |g" ${CARD} 
+                sed -i "s|@MISTAGLOOSETOPW|-               |g" ${CARD} 
+                sed -i "s|@MISTAGLOOSEVVZ|-              |g"  ${CARD} 
+                sed -i "s|@MISTAGLOOSEVVW|-              |g"  ${CARD} 
+                sed -i "s|@MISTAGTIGHTTOPZ|1.01            |g" ${CARD} 
+                sed -i "s|@MISTAGTIGHTTOPW|1.15            |g" ${CARD} 
+                sed -i "s|@MISTAGTIGHTVVZ|1.05           |g"  ${CARD} 
+                sed -i "s|@MISTAGTIGHTVVW|1.10           |g"  ${CARD} 
+                sed -i "s|@MISTAGTIGHTVG|1.01          |g"   ${CARD} 
+            fi
 
             sed -i "s|combined_model.root|../root/combined_model_monov_${TAGGER}_${WP}.root|g" ${CARD}
             # only for the nominal tagger we apply the data-driven qcd, otherwise use the old qcd prediction
@@ -82,6 +119,23 @@ for YEAR in 2017 2018; do
         sed -i "s|@LUMI|1.015|g" ${CARD}
         sed -i "/prefiring/d" ${CARD}
     fi
+    sed -i "s|@VTAGLOOSE|-         |g"    ${CARD} 
+    sed -i "s|@VTAGTIGHT|-         |g"    ${CARD} 
+    sed -i "s|@MISTAGLOOSEW|-            |g"    ${CARD} 
+    sed -i "s|@MISTAGLOOSEZ|-            |g"    ${CARD} 
+    sed -i "s|@MISTAGLOOSEG|-            |g"    ${CARD} 
+    sed -i "s|@MISTAGTIGHTW|-            |g"    ${CARD} 
+    sed -i "s|@MISTAGTIGHTZ|-            |g"    ${CARD} 
+    sed -i "s|@MISTAGTIGHTG|-            |g"    ${CARD} 
+    sed -i "s|@MISTAGLOOSETOPZ|-               |g" ${CARD} 
+    sed -i "s|@MISTAGLOOSETOPW|-               |g" ${CARD} 
+    sed -i "s|@MISTAGLOOSEVVZ|-                |g"  ${CARD} 
+    sed -i "s|@MISTAGLOOSEVVW|-              |g"  ${CARD} 
+    sed -i "s|@MISTAGTIGHTTOPZ|-               |g" ${CARD} 
+    sed -i "s|@MISTAGTIGHTTOPW|-               |g" ${CARD} 
+    sed -i "s|@MISTAGTIGHTVVZ|-              |g"  ${CARD} 
+    sed -i "s|@MISTAGTIGHTVVW|-              |g"  ${CARD} 
+    sed -i "s|@MISTAGTIGHTVG|-             |g"   ${CARD} 
     text2workspace.py ${CARD} --channel-masks
     python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > systematics_tau21_monov_${YEAR}.html
 
