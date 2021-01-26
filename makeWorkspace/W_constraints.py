@@ -40,7 +40,7 @@ def do_stat_unc(histogram, proc,cid, region, CR, outfile, functype="lognorm"):
     CR.add_nuisance_shape("{CONSTRAINT}_stat_error_{REGION}_bin{BIN}".format(**replacement),outfile, functype=functype)
 
 
-def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False):
+def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False, scale=1):
   variation = histogram.Clone(new_name)
   factor = unc_file.Get(unc_name)
 
@@ -49,14 +49,15 @@ def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False
 
   if factor.GetNbinsX() == 1:
     if invert:
-      variation.Scale(1 / factor.GetBinContent(1))
+      variation.Scale(1 / (factor.GetBinContent(1)*scale))
     else:
-      variation.Scale(factor.GetBinContent(1))
+      variation.Scale(factor.GetBinContent(1) * scale)
+
   else:
     if invert:
-      variation.Divide(factor)
+      variation.Divide(scale * factor)
     else:
-      variation.Multiply(factor)
+      variation.Multiply(scale * factor)
   outfile.WriteTObject(variation)
 
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
