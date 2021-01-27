@@ -101,6 +101,7 @@ for YEAR in 2017 2018; do
     sed -i "s|combined_model.root|../root/combined_model_monov_tau21.root|g" ${CARD}
     sed -i "/qcd_ws/d" ${CARD}
     sed -i "/qcdfit/d" ${CARD}
+    sed -i '/.*vmistag.*stat.*/d' ${CARD}
     if [ $YEAR -eq 2017 ]; then
         sed -i "s|@LUMIXY|1.008|g" ${CARD}
         sed -i "s|@LUMILS|1.003|g" ${CARD}
