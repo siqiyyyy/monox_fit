@@ -46,7 +46,7 @@ def debug_file(filename):
         if not "constraints_category" in sub_dirname:
             continue
         sub_dir = rootfile[sub_dirname]
-        per_dir_outdir = os.path.join(per_file_outdir, sub_dirname)
+        per_dir_outdir = os.path.join(per_file_outdir, sub_dirname.split(';')[0])
         if not os.path.exists(per_dir_outdir):
             os.makedirs(per_dir_outdir)
         hist_names = []
