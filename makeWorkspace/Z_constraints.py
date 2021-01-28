@@ -178,7 +178,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
         add_variation(
           PhotonScales,
           fmistag,
-          'g_{SF_WP}_{YEAR}_var{INDEX}_{DIR}'.format(INDEX=variation_index,DIR=direction, SF_WP=sf_wp, **filler),
+          'g_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index,DIR=direction, SF_WP=sf_wp, **filler),
           "photon_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
           _fOut,
           invert = not flip,
@@ -193,7 +193,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
         add_variation(
           PhotonScales,
           fmistag,
-          'z_{SF_WP}_{YEAR}_var{INDEX}_{DIR}'.format(INDEX=variation_index,DIR=direction,  SF_WP=sf_wp, **filler),
+          'z_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index,DIR=direction,  SF_WP=sf_wp, **filler),
           "photon_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
           _fOut,
           invert=flip,
@@ -208,7 +208,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
         add_variation(
           WZScales,
           fmistag,
-          'z_{SF_WP}_{YEAR}_var{INDEX}_{DIR}'.format(INDEX=variation_index, DIR=direction,  SF_WP=sf_wp, **filler),
+          'z_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index, DIR=direction,  SF_WP=sf_wp, **filler),
           "w_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
           _fOut,
           invert=flip,
@@ -223,7 +223,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
         add_variation(
           WZScales,
           fmistag,
-          'w_{SF_WP}_{YEAR}_var{INDEX}_{DIR}'.format(INDEX=variation_index,  SF_WP=sf_wp, DIR=direction, **filler),
+          'w_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index,  SF_WP=sf_wp, DIR=direction, **filler),
           "w_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
           _fOut,
           invert=not flip,
