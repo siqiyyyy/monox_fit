@@ -48,7 +48,7 @@ def scale_variation_histogram(histogram, scale):
       new_content = 1 + (content-1)*scale
     else:
       new_content = 1 - (1-content)*scale
-    scaled.SetBinContent(i, content)
+    scaled.SetBinContent(i, new_content)
   return scaled
 
 def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False, scale=1):
