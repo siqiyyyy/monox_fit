@@ -7,6 +7,7 @@ from math import sqrt
 
 import ROOT
 from HiggsAnalysis.CombinedLimit.ModelTools import *
+from utils.general import extract_year, extract_channel
 
 ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
 pjoin = os.path.join
@@ -259,6 +260,58 @@ def get_stat_variations(obj, category):
     histograms[name_dn] = h_dn
   return histograms
 
+from utils.mistag import determine_region_wp, mistag_scale_and_flip
+from W_constraints import scale_variation_histogram
+
+
+def mistag_processes(name):
+  processes = []
+  if name.endswith("wjets") or name.startswith("Wen") or name.startswith("Wmn"):
+    processes.append('w')
+  if name.startswith('signal') or name.startswith("Zmm") or name.startswith("Zee"):
+    processes.append('z')
+  if name.startswith("gjets"):
+    processes.append('g')
+  return processes
+
+def get_mistag_variations(obj, category):
+  name = obj.GetName()
+  histograms = {}
+  region_wp = determine_region_wp(category)
+  year = extract_year(category)
+  channel = extract_channel(category)
+  f = ROOT.TFile("sys/mistag_sf_variations.root")
+
+  for sf_wp in 'loose','tight':
+    scale, flip = mistag_scale_and_flip(sf_wp, region_wp)
+    if scale == 0:
+      continue
+    if flip:
+      scale = - scale
+    for variation_index in range(2):
+
+      for proc in mistag_processes(name):
+        filler = {
+          "YEAR":year,
+          "PROC":proc,
+          "SF_WP":sf_wp,
+          "INDEX":variation_index,
+          "CHANNEL":channel
+        }
+
+        variation_name = "CMS_eff{YEAR}_vmistag_{PROC}_stat_{SF_WP}_{INDEX}".format(**filler)
+        for direction in 'up','down':
+          var = f.Get('{PROC}_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIRECTION}'.format(DIRECTION=direction, **filler))
+          var = scale_variation_histogram(var, scale)
+          varied_name = '{NAME}_{VARIATION}_{DIRECTION}'.format(NAME=name, VARIATION=variation_name, DIRECTION=direction.capitalize())
+          h_var = obj.Clone(varied_name)
+          h_var.Multiply(var)
+          h_var.SetDirectory(0)
+          histograms[varied_name] = h_var
+
+
+  return histograms
+
 def treat_empty(obj):
   # Ensure non-zero integral for combine
   if not obj.Integral() > 0:
@@ -365,6 +418,9 @@ def create_workspace(fin, fout, category, args):
         photon_qcd_varied_hists = get_photon_qcd_variations(obj, category)
         write_dict(photon_qcd_varied_hists)
 
+      # mistag variations
+      mistag_varied_hists = get_mistag_variations(obj, category)
+      write_dict(mistag_varied_hists)
       # Signal theory variations
       signal_theory_varied_hists = get_signal_theory_variations(obj, category)
       write_dict(signal_theory_varied_hists)
