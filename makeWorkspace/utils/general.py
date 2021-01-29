@@ -28,3 +28,16 @@ def get_nuisance_name(nuisance, year):
     name = re.sub('Up|Down', '', name)
  
     return name
+
+def extract_year(category):
+    m = re.match(".*(201\d).*", category)
+    assert(m)
+    groups = m.groups()
+    assert(len(groups)==1)
+    return groups[0]
+
+def extract_channel(category):
+    channels = ['monojet','monov','vbf']
+    matches = [c for c in channels if c in category]
+    assert(len(matches)==1)
+    return matches[0]
