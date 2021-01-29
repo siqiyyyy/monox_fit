@@ -268,9 +268,9 @@ def mistag_processes(name):
   processes = []
   if name.endswith("wjets") or name.startswith("Wen") or name.startswith("Wmn"):
     processes.append('w')
-  if name.startswith('signal') or name.startswith("Zmm") or name.startswith("Zee"):
+  if name.startswith('signal') or name.startswith("Zmm") or name.startswith("Zee") or name.endswith("zll"):
     processes.append('z')
-  if name.startswith("gjets"):
+  if 'gjets' in name:
     processes.append('g')
   return processes
 
@@ -303,7 +303,7 @@ def get_mistag_variations(obj, category):
         for direction in 'up','down':
           var = f.Get('{PROC}_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIRECTION}'.format(DIRECTION=direction, **filler))
           var = scale_variation_histogram(var, scale)
-          varied_name = '{NAME}_{VARIATION}_{DIRECTION}'.format(NAME=name, VARIATION=variation_name, DIRECTION=direction.capitalize())
+          varied_name = '{NAME}_{VARIATION}{DIRECTION}'.format(NAME=name, VARIATION=variation_name, DIRECTION=direction.capitalize())
           h_var = obj.Clone(varied_name)
           h_var.Multiply(var)
           h_var.SetDirectory(0)
