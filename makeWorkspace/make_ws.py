@@ -250,13 +250,13 @@ def get_stat_variations(obj, category):
     name_dn = "{NAME}_{VARIATION}".format(NAME=name, VARIATION=variation_name_dn)
 
     central = obj.GetBinContent(ibin)
-    error = obj.GetBinError(ibin)
+    error = abs(obj.GetBinError(ibin))
 
     h_up = obj.Clone(name_up)
-    h_up.SetBinContent(ibin, central+error)
+    h_up.SetBinContent(ibin, max(0, central+error))
     histograms[name_up] = h_up
     h_dn = obj.Clone(name_dn)
-    h_dn.SetBinContent(ibin, central-error)
+    h_dn.SetBinContent(ibin, max(0,central-error))
     histograms[name_dn] = h_dn
   return histograms
 
