@@ -53,7 +53,7 @@ def get_jes_file(category):
 
   print('Using JES/JER uncertainty file: {}'.format(f_jes))
 
-  return f_jes    
+  return f_jes
 
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
@@ -250,13 +250,26 @@ def get_stat_variations(obj, category):
     name_dn = "{NAME}_{VARIATION}".format(NAME=name, VARIATION=variation_name_dn)
 
     central = obj.GetBinContent(ibin)
-    error = abs(obj.GetBinError(ibin))
+    error = obj.GetBinError(ibin)
+    if central <= 0:
+      continue
+    if error <= 5e-3:
+      continue
+    if error / central <= 5e-3:
+      continue
+    error = max(1e-3,abs(obj.GetBinError(ibin)))
 
     h_up = obj.Clone(name_up)
     h_up.SetBinContent(ibin, max(0, central+error))
     histograms[name_up] = h_up
     h_dn = obj.Clone(name_dn)
-    h_dn.SetBinContent(ibin, max(0,central-error))
+    if central > 0:
+      h_dn.SetBinContent(ibin, max(0,central-error))
+    else:
+      # If central value is 0, we make
+      # both sides of the nuisance go the
+      # same direction
+      h_dn.SetBinContent(ibin, max(0,central+error))
     histograms[name_dn] = h_dn
   return histograms
 

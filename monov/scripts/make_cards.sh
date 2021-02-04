@@ -78,6 +78,20 @@ for YEAR in 2017 2018; do
                 sed -i "/qcd_ws/d" ${CARD}
                 sed -i "/qcdclosure/d" ${CARD}
             fi
+
+            # Remove useless stat uncertainties
+            # Uncertainties are removed if they do not have a variation histogram available
+            # The criteria for whether a variation histogram is present are defined in
+            # make_ws.py
+            rootls -1 root/ws_monov_nominal_${WP}.root:category_monov${WP}_${YEAR} > tmp_histdump
+            for NUIS in $(grep shape ${CARD} | awk '{print $1}' | grep stat); do
+              if [ $(grep -c ${NUIS}Up tmp_histdump) -eq 0 ]; then
+                 sed -i "/^${NUIS} .*/d" ${CARD}
+              fi
+            done
+            rm tmp_histdump
+
+
             text2workspace.py ${CARD} --channel-masks
             python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${TAGGER}_monov${WP}_${YEAR}.html
         done
@@ -163,10 +177,10 @@ for TAGGER in nominal; do
         python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > systematics_${TAGGER}_monov${WP}_combined.html
     done
 
-    COMBINED=card_tau21_monov_combined.txt
-    combineCards.py card_tau21_monov_201*.txt > ${COMBINED}
-    sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
-    text2workspace.py ${COMBINED} --channel-masks
-    python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > systematics_tau21_monov_combined.html
+    # COMBINED=card_tau21_monov_combined.txt
+    # combineCards.py card_tau21_monov_201*.txt > ${COMBINED}
+    # sed -i 's/ch\(1\|2\)_//g' ${COMBINED}
+    # text2workspace.py ${COMBINED} --channel-masks
+    # python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${COMBINED} > systematics_tau21_monov_combined.html
 done
 popd
