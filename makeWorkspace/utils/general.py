@@ -41,3 +41,20 @@ def extract_channel(category):
     matches = [c for c in channels if c in category]
     assert(len(matches)==1)
     return matches[0]
+
+def is_MC_bkg(name):
+    model_bkg_list = [
+            "signal_zjets",
+            "signal_wjets",
+            "gjets_gjets",
+            "wen_wjets",
+            "wmn_wjets",
+            "zee_zll",
+            "zmm_zll",
+            "signal_qcd",
+            "gjets_qcd",
+            ]
+    if name in model_bkg_list:
+        return False
+    else:
+        return True
