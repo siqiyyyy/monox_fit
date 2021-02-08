@@ -54,7 +54,17 @@ def is_MC_bkg(name):
             "signal_qcd",
             "gjets_qcd",
             ]
+    signal_list = [
+            "signal_ggh",
+            "signal_ggzh",
+            "signal_wh",
+            "signal_zh",
+            "signal_vbf",
+            "scalar", "pseudo", "lq", "axial", "vector", "add",
+            ]
     if name in model_bkg_list:
+        return False
+    if any([x in name for x in signal_list]):
         return False
     else:
         return True
