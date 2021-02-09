@@ -243,7 +243,12 @@ def get_signal_theory_variations(obj, category):
 
 def get_stat_variations(obj, category):
   name = obj.GetName()
+
+
   histograms = {}
+  if any([x in name for x in ['scalar','pseudo','lq','axial','vector','add','S3D','vbf','ggh','zh','wh','ggzh']]):
+    return {}
+
   for ibin in range(1,obj.GetNbinsX()+1):
     variation_name_up =  "{NAME}_{category}_stat_bin{ibin}Up".format(category=category,NAME=name, ibin=ibin)
     variation_name_dn =  "{NAME}_{category}_stat_bin{ibin}Down".format(category=category,NAME=name, ibin=ibin)
@@ -454,11 +459,7 @@ def create_workspace(fin, fout, category, args):
     obj = key.ReadObj()
     if type(obj) not in [ROOT.TH1D, ROOT.TH1F]:
       continue
-    title = obj.GetTitle()
     name = obj.GetName()
-
-    if any([x in name for x in ['scalar','pseudo','lq','axial','vector','add']]):
-      continue
 
     treat_empty(obj)
     treat_overflow(obj)
