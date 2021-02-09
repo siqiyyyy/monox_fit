@@ -37,12 +37,12 @@ echo "Commit hash: $(git rev-parse HEAD)" >> ${INFOFILE}
 echo "Branch name: $(git rev-parse --abbrev-ref HEAD)" >> ${INFOFILE}
 git diff >> ${INFOFILE}
 
-# Tau 21 has just one WP
-INFILE=${INDIR}/merged_legacy_limit_monov_tau21.root
-# Save the check sum for the input
-md5sum ${INFILE} >> ${INFOFILE}
-./make_ws.py ${INFILE} --out ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018
-./runModel.py ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018 --out ${OUTDIR}/combined_model_monov_tau21.root
+# # Tau 21 has just one WP
+# INFILE=${INDIR}/merged_legacy_limit_monov_tau21.root
+# # Save the check sum for the input
+# md5sum ${INFILE} >> ${INFOFILE}
+# ./make_ws.py ${INFILE} --out ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018
+# ./runModel.py ${OUTDIR}/ws_tau21.root --categories monov_2017,monov_2018 --out ${OUTDIR}/combined_model_monov_tau21.root
 
 cp sys/monovtight_qcd_ws.root ${OUTDIR}
 cp sys/monovloose_qcd_ws.root ${OUTDIR}

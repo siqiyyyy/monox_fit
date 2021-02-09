@@ -4,9 +4,11 @@ import argparse
 import os
 import re
 from math import sqrt
+from collections import defaultdict
 
 import ROOT
 from HiggsAnalysis.CombinedLimit.ModelTools import *
+from utils.general import extract_year, extract_channel, is_MC_bkg
 
 ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
 pjoin = os.path.join
@@ -52,7 +54,7 @@ def get_jes_file(category):
 
   print('Using JES/JER uncertainty file: {}'.format(f_jes))
 
-  return f_jes    
+  return f_jes
 
 def get_jes_variations(obj, f_jes, category):
   '''Get JES variations from JES source file, returns all the varied histograms stored in a dictionary.'''
@@ -250,13 +252,129 @@ def get_stat_variations(obj, category):
 
     central = obj.GetBinContent(ibin)
     error = obj.GetBinError(ibin)
+    if central <= 0:
+      continue
+    if error <= 5e-3:
+      continue
+    if error / central <= 5e-3:
+      continue
+    error = max(1e-3,abs(obj.GetBinError(ibin)))
 
     h_up = obj.Clone(name_up)
-    h_up.SetBinContent(ibin, central+error)
+    h_up.SetBinContent(ibin, max(0, central+error))
     histograms[name_up] = h_up
     h_dn = obj.Clone(name_dn)
-    h_dn.SetBinContent(ibin, central-error)
+    if central > 0:
+      h_dn.SetBinContent(ibin, max(0,central-error))
+    else:
+      # If central value is 0, we make
+      # both sides of the nuisance go the
+      # same direction
+      h_dn.SetBinContent(ibin, max(0,central+error))
     histograms[name_dn] = h_dn
+  return histograms
+
+'''
+Add a list of histograms into a new histogram with name new_name
+the '+' operator uses ROOT.TH1.Add
+
+'list_of_histograms' : [list of histograms to be added togather]
+'new_name' : string
+'''
+def add_histograms(list_of_histograms, new_name):
+    new_obj = list_of_histograms[0].Clone(new_name)
+    if len(list_of_histograms)>1:
+      for obj in list_of_histograms[1:]:
+          new_obj = new_obj + obj
+    return new_obj
+
+'''
+Create "autoMCstats"-like per-bin stat variations for multiple processes
+
+to_merge_mc_bkgs = {
+    'region1' : [list of per-process histograms to be considered],
+    'region2' : [...]
+}
+'''
+def get_mergedMC_stat_variations(to_merge_mc_bkgs, category):
+  histograms = {}
+  for region_name in to_merge_mc_bkgs.keys():
+    merged_name = str(region_name) + "_mergedMCBkg"
+    merged_obj = add_histograms(to_merge_mc_bkgs[region_name], merged_name)
+    for ibin in range(1,merged_obj.GetNbinsX()+1):
+      variation_name_up =  "{MERGED_NAME}_{category}_stat_bin{ibin}Up".format(  category=category, MERGED_NAME=merged_name, ibin=ibin)
+      variation_name_dn =  "{MERGED_NAME}_{category}_stat_bin{ibin}Down".format(category=category, MERGED_NAME=merged_name, ibin=ibin)
+      merged_central = merged_obj.GetBinContent(ibin)
+      merged_error = merged_obj.GetBinError(ibin)
+      if merged_central<=0:
+          continue
+      merged_ratio_up = 1.0 + merged_error/merged_central
+      merged_ratio_dn = max(0, 1.0 - merged_error/merged_central)
+
+      for obj in to_merge_mc_bkgs[region_name]:
+        name = obj.GetName()
+        name_up = "{NAME}_{VARIATION}".format(NAME=name, VARIATION=variation_name_up)
+        name_dn = "{NAME}_{VARIATION}".format(NAME=name, VARIATION=variation_name_dn)
+
+        central = obj.GetBinContent(ibin)
+        h_up = obj.Clone(name_up)
+        h_up.SetBinContent(ibin, max(0, central*merged_ratio_up))
+        histograms[name_up] = h_up
+        h_dn = obj.Clone(name_dn)
+        h_dn.SetBinContent(ibin, max(0, central*merged_ratio_dn))
+        histograms[name_dn] = h_dn
+  return histograms
+
+from utils.mistag import determine_region_wp, mistag_scale_and_flip
+from W_constraints import scale_variation_histogram
+
+
+def mistag_processes(name):
+  processes = []
+  if name.endswith("wjets") or name.startswith("Wen") or name.startswith("Wmn"):
+    processes.append('w')
+  if name.startswith('signal') or name.startswith("Zmm") or name.startswith("Zee") or name.endswith("zll"):
+    processes.append('z')
+  if 'gjets' in name:
+    processes.append('g')
+  return processes
+
+def get_mistag_variations(obj, category):
+  name = obj.GetName()
+  histograms = {}
+  region_wp = determine_region_wp(category)
+  year = extract_year(category)
+  channel = extract_channel(category)
+  f = ROOT.TFile("sys/mistag_sf_variations.root")
+
+  for sf_wp in 'loose','tight':
+    scale, flip = mistag_scale_and_flip(sf_wp, region_wp)
+    if scale == 0:
+      continue
+    if flip:
+      scale = - scale
+    for variation_index in range(2):
+
+      for proc in mistag_processes(name):
+        filler = {
+          "YEAR":year,
+          "PROC":proc,
+          "SF_WP":sf_wp,
+          "INDEX":variation_index,
+          "CHANNEL":channel
+        }
+
+        variation_name = "CMS_eff{YEAR}_vmistag_{PROC}_stat_{SF_WP}_{INDEX}".format(**filler)
+        for direction in 'up','down':
+          var = f.Get('{PROC}_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIRECTION}'.format(DIRECTION=direction, **filler))
+          var = scale_variation_histogram(var, scale)
+          varied_name = '{NAME}_{VARIATION}{DIRECTION}'.format(NAME=name, VARIATION=variation_name, DIRECTION=direction.capitalize())
+          h_var = obj.Clone(varied_name)
+          h_var.Multiply(var)
+          h_var.SetDirectory(0)
+          histograms[varied_name] = h_var
+
+
   return histograms
 
 def treat_empty(obj):
@@ -331,6 +449,7 @@ def create_workspace(fin, fout, category, args):
   # pick out the histograms, and add to
   # the work space.
   keys_local = fdir.GetListOfKeys()
+  to_merge_mc_bkgs = defaultdict(list)
   for key in keys_local:
     obj = key.ReadObj()
     if type(obj) not in [ROOT.TH1D, ROOT.TH1F]:
@@ -365,12 +484,22 @@ def create_workspace(fin, fout, category, args):
         photon_qcd_varied_hists = get_photon_qcd_variations(obj, category)
         write_dict(photon_qcd_varied_hists)
 
+      # mistag variations
+      mistag_varied_hists = get_mistag_variations(obj, category)
+      write_dict(mistag_varied_hists)
       # Signal theory variations
       signal_theory_varied_hists = get_signal_theory_variations(obj, category)
       write_dict(signal_theory_varied_hists)
 
-      stat_varied_hists = get_stat_variations(obj, category)
-      write_dict(stat_varied_hists)
+      # MC stat
+      if is_MC_bkg(name):
+        # for MC-based background, merge the stat unc into single nuisance
+        region_name = key.GetName().split("_")[0]
+        to_merge_mc_bkgs[region_name].append(obj)
+
+  # now do the merging of MC-based bkg
+  stat_varied_hists = get_mergedMC_stat_variations(to_merge_mc_bkgs, category)
+  write_dict(stat_varied_hists)
 
 
   # Write the workspace

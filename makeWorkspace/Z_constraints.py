@@ -2,8 +2,7 @@ import ROOT
 from counting_experiment import *
 from W_constraints import do_stat_unc, add_variation
 from utils.jes_utils import get_jes_variations, get_jes_jer_source_file_for_tf
-from utils.general import read_key_for_year, get_nuisance_name
-from parameters import flat_uncertainties
+from utils.mistag import determine_region_wp,mistag_scale_and_flip
 import re
 ROOT.RooMsgService.instance().setSilentMode(True)
 
@@ -163,6 +162,78 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                   invert=invert
                   )
     CRs[3].add_nuisance_shape(name, _fOut)
+
+
+  # Mistag nuisances
+  fmistag = ROOT.TFile("sys/mistag_sf_variations.root")
+  region_wp = determine_region_wp(cid)
+  for sf_wp in 'loose','tight':
+    scale, flip = mistag_scale_and_flip(sf_wp, region_wp)
+    if scale == 0:
+      continue
+    # Gamma uncertainty on Z/gamma ratio
+    for variation_index in range(2):
+      name = 'CMS_eff{YEAR}_vmistag_g_stat_{SF_WP}_{INDEX}'.format(INDEX=variation_index,  SF_WP=sf_wp, **filler)
+      for direction in 'up','down':
+        add_variation(
+          PhotonScales,
+          fmistag,
+          'g_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index,DIR=direction, SF_WP=sf_wp, **filler),
+          "photon_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
+          _fOut,
+          invert = not flip,
+          scale=scale
+        )
+      CRs[0].add_nuisance_shape(name, _fOut)
+
+    # Z uncertainty on Z/gamma ratio
+    for variation_index in range(2):
+      name = 'CMS_eff{YEAR}_vmistag_z_stat_{SF_WP}_{INDEX}'.format(INDEX=variation_index,  SF_WP=sf_wp, **filler)
+      for direction in 'up','down':
+        add_variation(
+          PhotonScales,
+          fmistag,
+          'z_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index,DIR=direction,  SF_WP=sf_wp, **filler),
+          "photon_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
+          _fOut,
+          invert=flip,
+          scale=scale
+        )
+      CRs[0].add_nuisance_shape(name, _fOut)
+
+    # Z uncertainty on Z/W ratio
+    for variation_index in range(2):
+      name = 'CMS_eff{YEAR}_vmistag_z_stat_{SF_WP}_{INDEX}'.format(INDEX=variation_index,  SF_WP=sf_wp, **filler)
+      for direction in 'up','down':
+        add_variation(
+          WZScales,
+          fmistag,
+          'z_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index, DIR=direction,  SF_WP=sf_wp, **filler),
+          "w_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
+          _fOut,
+          invert=flip,
+          scale=scale
+        )
+      CRs[3].add_nuisance_shape(name, _fOut)
+
+    # W uncertainty on Z/W ratio
+    for variation_index in range(2):
+      name = 'CMS_eff{YEAR}_vmistag_w_stat_{SF_WP}_{INDEX}'.format(INDEX=variation_index,  SF_WP=sf_wp, **filler)
+      for direction in 'up','down':
+        add_variation(
+          WZScales,
+          fmistag,
+          'w_{SF_WP}_{YEAR}_{CHANNEL}_var{INDEX}_{DIR}'.format(INDEX=variation_index,  SF_WP=sf_wp, DIR=direction, **filler),
+          "w_weights_{CID}_{NAME}_{DIR}".format(NAME=name,DIR=direction.capitalize(),**filler),
+          _fOut,
+          invert=not flip,
+          scale=scale
+        )
+      CRs[3].add_nuisance_shape(name, _fOut)
+
+
+
+
 
   # PDF uncertainties
   fpdf = ROOT.TFile("sys/tf_pdf_unc.root")
