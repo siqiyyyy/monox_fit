@@ -87,6 +87,7 @@ for YEAR in 2017 2018; do
             for NUIS in $(grep shape ${CARD} | awk '{print $1}' | grep stat); do
               if [ $(grep -c ${NUIS}Up tmp_histdump) -eq 0 ]; then
                  sed -i "/^${NUIS} .*/d" ${CARD}
+                 echo "Warning: removing nuisance ${NUIS} from ${CARD}, shape not present in ws_monov_nominal_${WP}.root"
               fi
             done
             rm tmp_histdump
