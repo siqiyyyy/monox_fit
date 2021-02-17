@@ -25,7 +25,7 @@ def get_jes_variations(fjes, year, proc='qcd'):
 def get_jes_jer_source_file_for_tf(category):
     '''For the given analysis (monojet, mono-V or VBF), get the JES/JER uncertainty source file for transfer factors.'''
     f_jes_dict = {
-        '(monoj|monov).*' : r.TFile("sys/monojet_jes_jer_tf_uncs.root"),
+        '(monoj|monov).*' : r.TFile("sys/monojet_jes_jer_tf_uncs_not_jer_smeared.root"),
         'vbf.*' : r.TFile("sys/vbf_jes_jer_tf_uncs.root")
     }
     # Determine the relevant JES/JER source file
