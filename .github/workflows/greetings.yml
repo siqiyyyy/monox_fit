@@ -1,0 +1,13 @@
+name: greetings
+
+on: push
+
+jobs:
+    job1:
+        runs-on: ubuntu-latest
+        container: cmssw/cmssw:CMSSW_9_3_2
+        steps:
+            - name: Greeting
+              run: |
+                  echo Hello World!
+                  env
