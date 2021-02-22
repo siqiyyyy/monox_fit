@@ -32,7 +32,7 @@ for YEAR in 2017 2018; do
             fi
             if [ "$WP" == loose ]; then
                 sed -i "s|@VTAGLOOSE|1.10      |g"    ${CARD} 
-                sed -i "s|@VTAGTIGHT|0.99      |g"    ${CARD} 
+                sed -i "s|@VTAGTIGHT|0.94      |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEW|1.02         |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEZ|1.04         |g"    ${CARD} 
                 sed -i "s|@MISTAGLOOSEG|1.03         |g"    ${CARD} 
