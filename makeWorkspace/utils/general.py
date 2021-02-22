@@ -28,3 +28,43 @@ def get_nuisance_name(nuisance, year):
     name = re.sub('Up|Down', '', name)
  
     return name
+
+def extract_year(category):
+    m = re.match(".*(201\d).*", category)
+    assert(m)
+    groups = m.groups()
+    assert(len(groups)==1)
+    return groups[0]
+
+def extract_channel(category):
+    channels = ['monojet','monov','vbf']
+    matches = [c for c in channels if c in category]
+    assert(len(matches)==1)
+    return matches[0]
+
+def is_MC_bkg(name):
+    model_bkg_list = [
+            "signal_zjets",
+            "signal_wjets",
+            "gjets_gjets",
+            "Wen_wjets",
+            "Wmn_wjets",
+            "Zee_zll",
+            "Zmm_zll",
+            "signal_qcd",
+            "gjets_qcd",
+            ]
+    signal_list = [
+            "signal_ggh",
+            "signal_ggzh",
+            "signal_wh",
+            "signal_zh",
+            "signal_vbf",
+            "scalar", "pseudo", "lq", "axial", "vector", "add",
+            ]
+    if name in model_bkg_list:
+        return False
+    if any([x in name for x in signal_list]):
+        return False
+    else:
+        return True

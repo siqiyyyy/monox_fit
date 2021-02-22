@@ -40,7 +40,18 @@ def do_stat_unc(histogram, proc,cid, region, CR, outfile, functype="lognorm"):
     CR.add_nuisance_shape("{CONSTRAINT}_stat_error_{REGION}_bin{BIN}".format(**replacement),outfile, functype=functype)
 
 
-def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False):
+def scale_variation_histogram(histogram, scale):
+  scaled = histogram.Clone(histogram.GetName())
+  for i in range(1,scaled.GetNbinsX()+1):
+    content = scaled.GetBinContent(i)
+    if content > 1:
+      new_content = 1 + (content-1)*scale
+    else:
+      new_content = 1 - (1-content)*scale
+    scaled.SetBinContent(i, new_content)
+  return scaled
+
+def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False, scale=1):
   variation = histogram.Clone(new_name)
   factor = unc_file.Get(unc_name)
 
@@ -48,15 +59,24 @@ def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False
     raise IOError("Could not retrieve histogram '%s' from file '%s'."%(unc_name, unc_file))
 
   if factor.GetNbinsX() == 1:
-    if invert:
-      variation.Scale(1 / factor.GetBinContent(1))
+
+    factor_value = factor.GetBinContent(1)
+    if factor_value > 1:
+      factor_value = 1 + (factor_value-1) * scale
     else:
-      variation.Scale(factor.GetBinContent(1))
+      factor_value = 1 - (1-factor_value) * scale
+
+    if invert:
+      variation.Scale(1 / factor_value)
+    else:
+      variation.Scale(factor_value)
+
   else:
+    scaled_factor = scale_variation_histogram(factor,scale)
     if invert:
-      variation.Divide(factor)
+      assert(variation.Divide(scaled_factor))
     else:
-      variation.Multiply(factor)
+      assert(variation.Multiply(scaled_factor))
   outfile.WriteTObject(variation)
 
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
