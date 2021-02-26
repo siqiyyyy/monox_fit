@@ -361,6 +361,27 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(PhotonScales, fjes, 'znunu_over_gjets{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[0].add_nuisance_shape(var,_fOut)
 
+  # Photon scale
+  fphotonscale = ROOT.TFile("sys/photon_scale_unc.root")
+  var = "photon_scale_%s"%year
+  add_variation(
+                PhotonScales,
+                fphotonscale,
+                'photon_pt_scale_{CHANNEL}_0.02_up'.format(**filler),
+                "photon_weights_%s_%s_Up"%(cid, var),
+                _fOut,
+                invert=True
+                )
+  add_variation(
+                PhotonScales,
+                fphotonscale,
+                'photon_pt_scale_{CHANNEL}_0.02_dn'.format(**filler),
+                "photon_weights_%s_%s_Down"%(cid, var),
+                _fOut,
+                invert=True
+                )
+  CRs[0].add_nuisance_shape(var, _fOut)
+
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course
   return cat
