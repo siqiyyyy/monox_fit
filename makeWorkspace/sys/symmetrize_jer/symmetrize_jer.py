@@ -31,7 +31,7 @@ for input_file_name in files:
         
             # Step 1: decide which direction is "Up"
             # bigger variation gets do win
-            if cont_up-1 > cont_down-1:
+            if cont_up > cont_down:
                 direction = +1
             else:
                 direction = -1
