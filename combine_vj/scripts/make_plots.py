@@ -13,7 +13,6 @@ lumi ={
 regions = ['singlemuon','dimuon','gjets','singleelectron','dielectron','signal']
 procs = ['zmm','zee','w_weights','photon','wen','wmn']
 
-### Years fit separately
 for year in [2017,2018]:
     ws_file = "root/ws_monojet.root"
     fitdiag_file = 'diagnostics/fitDiagnostics_monojet_monov_{year}.root'.format(year=year)
@@ -37,8 +36,38 @@ for year in [2017,2018]:
     dataValidation("dielectron",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
     dataValidation("dimuon",        "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
 
-    # plot_nuis(diffnuis_file, outdir)
+    plot_nuis(diffnuis_file, outdir)
 
+
+    
+    for wp in ['tight','loose']:
+        ws_file="root/ws_monov_nominal_{WP}.root".format(WP=wp)
+        model_file = "root/combined_model_monov_nominal_{WP}.root".format(WP=wp)
+        category='monov{WP}_{YEAR}'.format(WP=wp,YEAR=year)
+        filler = {
+            "year" : year,
+            "category" : category,
+            "WP" : wp,
+        }
+        fitdiag_file = 'diagnostics/fitDiagnostics_monojet_monov_{year}.root'.format(**filler)
+
+        for region in regions:
+            plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
+        for proc in procs:
+            plot_ratio(proc, category, 'root/combined_model_monov_nominal_{WP}.root'.format(year=year,WP=wp), outdir, lumi[year],year)
+
+
+        # Flavor integrated
+        dataValidation("combined",  "gjets",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        dataValidation("combinedW", "gjets",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        dataValidation("combined",  "combinedW",category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        # Split by flavor
+        dataValidation("dimuon",        "singlemuon",    category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        dataValidation("dielectron",    "singleelectron",category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        dataValidation("singleelectron","gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        dataValidation("singlemuon",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        dataValidation("dielectron",    "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
+        dataValidation("dimuon",        "gjets",         category, ws_file, fitdiag_file, outdir,lumi[year],year)
 
 ### Years fit together
 outdir="plots/combined"
@@ -54,7 +83,6 @@ for year in [2017,2018]:
         plotPreFitPostFit(region,     category,ws_file, fitdiag_file, outdir, lumi[year], year)
 
 for wp in ['tight','loose']:
-    ### Years fit separately
     ws_file="root/ws_monov_nominal_{WP}.root".format(WP=wp)
     model_file = "root/combined_model_monov_nominal_{WP}.root".format(WP=wp)
     for year in [2017,2018]:

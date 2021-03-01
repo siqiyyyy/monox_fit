@@ -19,6 +19,11 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
   f_data = TFile(ws_file,"READ")
 
   f_data.cd("category_"+category)
+  # if region=="signal":
+  #   h_data = f_mlfit.Get("shapes_fit_b/"+category+"_signal/total_background")
+  #   for i in range(1,h_data.GetNbinsX()+1):
+  #     h_data.SetBinContent(i,h_data.GetBinContent(i)*h_data.GetBinWidth(i))
+  # else:
   h_data = gDirectory.Get(datalab[region]+"_data")
 
   h_postfit_sig = f_mlfit.Get("shapes_fit_b/"+category+"_"+category+"_signal/total_background")
@@ -40,15 +45,15 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
         'zll',
         'gjets',
         'top',
-        'diboson',
+        # 'diboson',
         'ewk',
-        'wjets',
-        'zjets',
         'ww',
         'wz',
         'zz',
+        'wjets',
+        'zjets',
         'wgamma',
-        'zgamma'
+        'zgamma',
     ]
   else:
     mainbkgs = {
@@ -106,7 +111,6 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
   # Pre-Fit
   h_prefit = {}
   h_prefit['total'] = f_mlfit.Get("shapes_prefit/"+channel[region]+"/total")
-  print "shapes_prefit/"+channel[region]+"/total"
   for i in range(1,h_prefit['total'].GetNbinsX()+2):
     binLowE.append(h_prefit['total'].GetBinLowEdge(i))
 
@@ -130,10 +134,9 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
       h_other_prefit.Add(h_prefit[process])
     h_stack_prefit.Add(h_prefit[process])
 
-
   # Post-Fit
   h_postfit = {}
-  h_postfit['totalsig'] = f_mlfit.Get("shapes_fit_s/"+channel[region]+"/total")
+  h_postfit['totalsig'] = f_mlfit.Get("shapes_fit_b/"+channel[region]+"/total")
   h_postfit['total'] = f_mlfit.Get("shapes_fit_b/"+channel[region]+"/total")
   h_all_postfit = TH1F("h_all_postfit","h_all_postfit",len(binLowE)-1,array('d',binLowE))
   h_other_postfit = TH1F("h_other_postfit","h_other_postfit",len(binLowE)-1,array('d',binLowE))
@@ -147,7 +150,6 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
     content = h_postfit['totalv2'].GetBinContent(i)
 
   for process in processes:
-    print "\n\n",process
     h_postfit[process] = f_mlfit.Get("shapes_fit_b/"+channel[region]+"/"+process)
     if (not h_postfit[process]): continue
     if (str(h_postfit[process].Integral())=="nan"): continue
@@ -271,9 +273,9 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
     if 'mono' in category:
       legend.AddEntry(h_postfit['zjets'], "Z(#nu#nu)+jets", "f")
       legend.AddEntry(h_postfit['wjets'], "W(l#nu)+jets", "f")
-      legend.AddEntry(h_postfit['diboson'], "WW/ZZ/WZ", "f")
+      legend.AddEntry(h_postfit['zz'], "WW/ZZ/WZ", "f")
       legend.AddEntry(h_postfit['top'], "Top quark", "f")
-      legend.AddEntry(h_postfit['gjets'], "Z(ll)+jets, #gamma+jets", "f")
+      # legend.AddEntry(h_postfit['gjets'], "Z(ll)+jets, #gamma+jets", "f")
       legend.AddEntry(h_postfit['qcd'], "QCD", "f")
     else:
       # pass
@@ -305,7 +307,7 @@ def plotPreFitPostFit(region,category,ws_file, fitdiag_file,outdir,lumi,year,sb=
   latex2.SetTextSize(0.6*c.GetTopMargin())
   latex2.SetTextFont(42)
   latex2.SetTextAlign(31) # align right
-  latex2.DrawLatex(0.94, 0.95,"{LUMI:.1f} fb^{{-1}} (13 TeV)".format(LUMI=lumi))
+  latex2.DrawLatex(0.94, 0.95,"{LUMI:.1f} fb^{{-1}} (13 TeV)".format(LUMI=lumi if region!='signal' else lumi/5))
   latex2.SetTextSize(0.6*c.GetTopMargin())
   latex2.SetTextFont(62)
   latex2.SetTextAlign(11) # align right
