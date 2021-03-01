@@ -7,7 +7,7 @@ for YEAR in 2017 2018; do
     ### INDIVIDUAL CARDS FOR DEEPAK8 WPS
     for WP in loose tight; do
         for TAGGER in nominal; do
-            CARD=cards/card_${TAGGER}_monov${WP}_${YEAR}.txt
+            CARD=$PWD/cards/card_${TAGGER}_monov${WP}_${YEAR}.txt
             cp ../../templates/card_template.txt ${CARD}
             sed -i "s/@WP/${WP}/g" ${CARD}
             sed -i "s|@YEAR|${YEAR}|g" ${CARD}
@@ -92,9 +92,10 @@ for YEAR in 2017 2018; do
             done
             rm tmp_histdump
 
-
+            pushd cards
             text2workspace.py ${CARD} --channel-masks
-            python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > cards/systematics_${TAGGER}_monov${WP}_${YEAR}.html
+            python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/systematicsAnalyzer.py --all -f html ${CARD} > systematics_${TAGGER}_monov${WP}_${YEAR}.html
+            popd
         done
     done
 

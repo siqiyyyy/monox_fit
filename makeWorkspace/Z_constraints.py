@@ -323,11 +323,11 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
 
   fphotonid = r.TFile.Open("sys/photon_id_unc.root")
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Up"%(cid, year), _fOut)
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Down"%(cid, year), _fOut)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Up"%(cid, year), _fOut, invert=True)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Down"%(cid, year), _fOut, invert=True)
   CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho".format(**filler),_fOut)
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Up"%(cid, year), _fOut)
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Up"%(cid, year), _fOut, invert=True)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut, invert=True)
   CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho_extrap".format(**filler),_fOut)
 
   felectronid = r.TFile.Open("sys/ele_id_unc.root")
@@ -360,6 +360,27 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     add_variation(PhotonScales, fjes, 'znunu_over_gjets{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Up"%(cid, var), _fOut)
     add_variation(PhotonScales, fjes, 'znunu_over_gjets{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "photon_weights_%s_%s_Down"%(cid, var), _fOut)
     CRs[0].add_nuisance_shape(var,_fOut)
+
+  # Photon scale
+  fphotonscale = ROOT.TFile("sys/photon_scale_unc.root")
+  var = "photon_scale_%s"%year
+  add_variation(
+                PhotonScales,
+                fphotonscale,
+                'photon_pt_scale_{CHANNEL}_0.02_up'.format(**filler),
+                "photon_weights_%s_%s_Up"%(cid, var),
+                _fOut,
+                invert=True
+                )
+  add_variation(
+                PhotonScales,
+                fphotonscale,
+                'photon_pt_scale_{CHANNEL}_0.02_dn'.format(**filler),
+                "photon_weights_%s_%s_Down"%(cid, var),
+                _fOut,
+                invert=True
+                )
+  CRs[0].add_nuisance_shape(var, _fOut)
 
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course

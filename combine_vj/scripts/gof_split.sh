@@ -23,7 +23,7 @@ function gof() {
             -t 25 \
             -s -1 \
             --toysFreq \
-            --sub-opts '+MaxRuntime=3600' \
+            --sub-opts '+MaxRuntime=7200' \
             -n _CRonly_toys_${YEAR}_${IJOB} \
             -m 125.0 &
         sleep 10
@@ -38,20 +38,33 @@ function gof() {
 }
 
 
-# gof "2017" "rgx{mask_.*_signal}=1" "nominal" 150
-gof "2018" "rgx{mask_.*_signal}=1" "nominal" 150
-gof "combined" "rgx{mask_.*_signal}=1" "nominal" 150
+# gof "2017" "" "nominal" 60
+# gof "2018" "" "nominal" 60
+# gof "combined" "" "nominal" 60
 
-NJOBS=50
+NJOBS=60
 
-for YEAR in 2017 2018; do
-    # gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*_singleel}=1,rgx{mask_.*_singlemu}=1" "no_w"    "${NJOBS}"
-    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*tight.*}=1"                           "notight" "${NJOBS}"
-    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*loose.*}=1"                           "noloose" "${NJOBS}"
-    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*monojet.*}=1"                         "monov"   "${NJOBS}"
-    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*loose.*}=1,rgx{mask_.*tight.*}=1"     "monojet" "${NJOBS}"
-    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*monojet.*}=1,rgx{mask_.*tight.*}=1"   "loose"   "${NJOBS}"
-    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*monojet.*}=1,rgx{mask_.*loose.*}=1"   "tight"   "${NJOBS}"
+# gof "combined" "rgx{mask_.*monojet.*}=1" "monov" "${NJOBS}" &
+
+for YEAR in 2017 2018 combined; do
+    gof "${YEAR}" "rgx{mask_.*_signal}=0" "nominal_unblind" "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*_signal}=0,rgx{mask_.*loose.*}=1,rgx{mask_.*tight.*}=1"     "monojet_unblind" "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*monojet.*}=1"                         "monov_unblind"   "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*monojet.*}=1,rgx{mask_.*tight.*}=1"   "loose_unblind"   "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*monojet.*}=1,rgx{mask_.*loose.*}=1"   "tight_unblind"   "${NJOBS}" &
+
+    gof "${YEAR}" "rgx{mask_.*_signal}=1" "nominal" "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*loose.*}=1,rgx{mask_.*tight.*}=1"     "monojet" "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*monojet.*}=1"                         "monov"   "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*monojet.*}=1,rgx{mask_.*tight.*}=1"   "loose"   "${NJOBS}" &
+    gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*monojet.*}=1,rgx{mask_.*loose.*}=1"   "tight"   "${NJOBS}" &
+
+#     # gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*photon}=1" "no_photon"    "${NJOBS}"
+#     # gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*_dielec}=1,rgx{mask_.*_dimuon}=1" "no_z"    "${NJOBS}"
+#     # gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*_singleel}=1,rgx{mask_.*_singlemu}=1" "no_w"    "${NJOBS}" &
+
+#     # gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*tight.*}=1"                           "notight" "${NJOBS}" &
+#     # gof "${YEAR}" "rgx{mask_.*_signal}=1,rgx{mask_.*loose.*}=1"                           "noloose" "${NJOBS}" &
 done
 # gof "2018" "rgx{mask_.*_signal}=1,rgx{mask_.*tight.*}=1"                         "notight" "${NJOBS}"
 # gof "2018" "rgx{mask_.*_signal}=1,rgx{mask_.*loose.*}=1"                         "noloose" "${NJOBS}"

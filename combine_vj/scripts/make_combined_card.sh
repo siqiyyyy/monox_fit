@@ -1,6 +1,7 @@
-TAG=2020-11-30_monov_no_tight_mistag_sf
-SUBTAG=signalunc
-SUBSUBTAG=signalunc
+TAG=${1}
+SUBTAG=${2}
+SUBSUBTAG=default
+cd /afs/cern.ch/work/a/aalbert/public/2020-03-09_limit/monox_fit/combine_vj/
 JDIR=$(readlink -e ../monojet/${TAG}/${SUBTAG}/)
 VDIR=$(readlink -e ../monov/${TAG}/${SUBTAG}/)
 
@@ -25,17 +26,17 @@ for YEAR in 2017 2018 combined; do
     sed -i '/combined_model_/ s|[^ ]*\(combined_model_.*.root\)|root/\1|g' ${COMBINED}
     sed -i '/_qcd_ws/ s|[^ ]*\(mono[^ ]*_qcd_ws.root\)|root/\1|g' ${COMBINED}
 
-    text2workspace.py ${COMBINED} --channel-masks
+    text2workspace.py ${COMBINED} --channel-masks & 
 
-    ### DEBUG
-    # individual channels
-    INDIVIDUAL="./cards/card_monojet_${YEAR}.txt"
-    combineCards.py ${COMBINED} --xc 'monov.*' > ${INDIVIDUAL}
-    sed -i 's/ch\(1\|2\)_/    /g' ${INDIVIDUAL}
-    sed -i 's/^bin    /bin/g' ${INDIVIDUAL}
-    sed -i '/combined_model_/ s|[^ ]*\(combined_model_.*.root\)|root/\1|g' ${INDIVIDUAL}
-    sed -i '/_qcd_ws/ s|[^ ]*\(mono[^ ]*_qcd_ws.root\)|root/\1|g' ${INDIVIDUAL}
-    text2workspace.py ${INDIVIDUAL} --channel-masks
+    # ### DEBUG
+    # # individual channels
+    # INDIVIDUAL="./cards/card_monojet_${YEAR}.txt"
+    # combineCards.py ${COMBINED} --xc 'monov.*' > ${INDIVIDUAL}
+    # sed -i 's/ch\(1\|2\)_/    /g' ${INDIVIDUAL}
+    # sed -i 's/^bin    /bin/g' ${INDIVIDUAL}
+    # sed -i '/combined_model_/ s|[^ ]*\(combined_model_.*.root\)|root/\1|g' ${INDIVIDUAL}
+    # sed -i '/_qcd_ws/ s|[^ ]*\(mono[^ ]*_qcd_ws.root\)|root/\1|g' ${INDIVIDUAL}
+    # text2workspace.py ${INDIVIDUAL} --channel-masks &
 done
 popd
 ln -fs $(readlink -e scripts/Makefile) ${WDIR}/Makefile

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-08-26_nano_v7_v2
-TAG='default'
+INDIR=${1}
+TAG="${2}"
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monojet/$(basename $INDIR)/${TAG}/root"
