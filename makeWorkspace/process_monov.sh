@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INDIR=../input/2020-10-04_03Sep20v7
-TAG='monovloose'
+INDIR=${1}
+TAG="${2}"
 INDIR="$(readlink -e $INDIR)"
 
 OUTDIR="../monov/$(basename $INDIR)/${TAG}/root"
