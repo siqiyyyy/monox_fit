@@ -382,6 +382,26 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                 )
   CRs[0].add_nuisance_shape(var, _fOut)
 
+  # Photon low recoil
+  fphotonscale = ROOT.TFile("sys/photon_lowrecoil_syst.root")
+  var = "photon_lowrecoil_%s"%year
+  add_variation(
+                PhotonScales,
+                fphotonscale,
+                'photon_lowrecoil_{CHANNEL}_up'.format(**filler),
+                "photon_weights_%s_%s_Up"%(cid, var),
+                _fOut,
+                invert=True
+                )
+  add_variation(
+                PhotonScales,
+                fphotonscale,
+                'photon_lowrecoil_{CHANNEL}_up'.format(**filler),
+                "photon_weights_%s_%s_Down"%(cid, var),
+                _fOut
+                )
+  CRs[0].add_nuisance_shape(var, _fOut)
+
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course
   return cat
