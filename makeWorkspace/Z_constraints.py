@@ -387,41 +387,52 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     nominal=PhotonScales,
     factor_value=1./1.05,
     new_name="photon_weights_%s_%s_Up"%(cid, var),
+    outfile=_fOut,
     xrange=(250,400)
   )
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1.05,
-    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    new_name="photon_weights_%s_%s_Down"%(cid, var),
+    outfile=_fOut,
     xrange=(250,400)
   )
+  CRs[0].add_nuisance_shape(var, _fOut)
+
 
   var = "photon_stitch_400to650"
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1./1.05,
     new_name="photon_weights_%s_%s_Up"%(cid, var),
+    outfile=_fOut,
     xrange=(400,650)
   )
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1.05,
-    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    new_name="photon_weights_%s_%s_Down"%(cid, var),
+    outfile=_fOut,
     xrange=(400,650)
   )
+  CRs[0].add_nuisance_shape(var, _fOut)
+
   var = "photon_stitch_650toInf"
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1./1.05,
     new_name="photon_weights_%s_%s_Up"%(cid, var),
+    outfile=_fOut,
     xrange=(650,1e9)
   )
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1.05,
-    new_name="photon_weights_%s_%s_Up"%(cid, var),
-    xrange=(250,1e9)
+    new_name="photon_weights_%s_%s_Down"%(cid, var),
+    outfile=_fOut,
+    xrange=(650,1e9)
   )
+  CRs[0].add_nuisance_shape(var, _fOut)
 
 
 

@@ -93,9 +93,10 @@ def add_variation_flat_localized(nominal, factor_value, new_name, outfile, xrang
 
   for ibin in range(factor.GetNbinsX()+1):
     center = factor.GetBinCenter(ibin)
-    if not (xrange[0] <= center < xrange[1]):
-      continue
-    factor.SetBinContent(factor_value)
+    new_content = 1
+    if xrange[0] <= center < xrange[1]:
+      new_content = factor_value
+    factor.SetBinContent(ibin,new_content)
 
   add_variation_from_histogram(
                               nominal=nominal,
