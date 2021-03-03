@@ -382,27 +382,6 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                 )
   CRs[0].add_nuisance_shape(var, _fOut)
 
-  # Photon low recoil
-  fphotonscale = ROOT.TFile("sys/photon_lowrecoil_syst.root")
-  var = "photon_lowrecoil_%s"%year
-  add_variation(
-                PhotonScales,
-                fphotonscale,
-                'photon_lowrecoil_{CHANNEL}_up'.format(**filler),
-                "photon_weights_%s_%s_Up"%(cid, var),
-                _fOut,
-                invert=True
-                )
-  add_variation(
-                PhotonScales,
-                fphotonscale,
-                'photon_lowrecoil_{CHANNEL}_up'.format(**filler),
-                "photon_weights_%s_%s_Down"%(cid, var),
-                _fOut
-                )
-  CRs[0].add_nuisance_shape(var, _fOut)
-
-
   var = "photon_stitch_250to400"
   add_variation_flat_localized(
     nominal=PhotonScales,

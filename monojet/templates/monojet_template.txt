@@ -427,7 +427,6 @@ CMS_eff@YEAR_vmistag_g_stat_loose_1 param 0.0 1
 LUMISCALE rateParam *signal* * 0.2
 nuisance edit freeze LUMISCALE
 photon_scale_@YEAR param 0.0 1
-photon_lowrecoil_@YEAR param 0.0 1
 photon_stitch_250to400 param 0.0 1
 photon_stitch_400to650 param 0.0 1
 photon_stitch_650toInf param 0.0 1
