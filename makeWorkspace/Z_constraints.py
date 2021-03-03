@@ -1,6 +1,6 @@
 import ROOT
 from counting_experiment import *
-from W_constraints import do_stat_unc, add_variation
+from W_constraints import do_stat_unc, add_variation, add_variation_flat_localized
 from utils.jes_utils import get_jes_variations, get_jes_jer_source_file_for_tf
 from utils.mistag import determine_region_wp,mistag_scale_and_flip
 import re
@@ -401,6 +401,50 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                 _fOut
                 )
   CRs[0].add_nuisance_shape(var, _fOut)
+
+
+  var = "photon_stitch_250to400"
+  add_variation_flat_localized(
+    nominal=PhotonScales,
+    factor_value=1./1.05,
+    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    xrange=(250,400)
+  )
+  add_variation_flat_localized(
+    nominal=PhotonScales,
+    factor_value=1.05,
+    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    xrange=(250,400)
+  )
+
+  var = "photon_stitch_400to650"
+  add_variation_flat_localized(
+    nominal=PhotonScales,
+    factor_value=1./1.05,
+    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    xrange=(400,650)
+  )
+  add_variation_flat_localized(
+    nominal=PhotonScales,
+    factor_value=1.05,
+    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    xrange=(400,650)
+  )
+  var = "photon_stitch_650toInf"
+  add_variation_flat_localized(
+    nominal=PhotonScales,
+    factor_value=1./1.05,
+    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    xrange=(650,1e9)
+  )
+  add_variation_flat_localized(
+    nominal=PhotonScales,
+    factor_value=1.05,
+    new_name="photon_weights_%s_%s_Up"%(cid, var),
+    xrange=(250,1e9)
+  )
+
+
 
   cat = Category(model,cid,nam,_fin,_fOut,_wspace,out_ws,_bins,metname,target.GetName(),CRs,diag)
   # Return of course

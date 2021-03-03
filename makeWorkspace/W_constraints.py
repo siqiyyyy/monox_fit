@@ -51,13 +51,9 @@ def scale_variation_histogram(histogram, scale):
     scaled.SetBinContent(i, new_content)
   return scaled
 
-def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False, scale=1):
-  variation = histogram.Clone(new_name)
-  factor = unc_file.Get(unc_name)
 
-  if not factor:
-    raise IOError("Could not retrieve histogram '%s' from file '%s'."%(unc_name, unc_file))
-
+def add_variation_from_histogram(nominal, factor, new_name, outfile, invert=False, scale=1):
+  variation = nominal.Clone(new_name)
   if factor.GetNbinsX() == 1:
 
     factor_value = factor.GetBinContent(1)
@@ -78,6 +74,36 @@ def add_variation(histogram, unc_file, unc_name, new_name, outfile, invert=False
     else:
       assert(variation.Multiply(scaled_factor))
   outfile.WriteTObject(variation)
+
+def add_variation(nominal, unc_file, unc_name, new_name, outfile, invert=False, scale=1):
+  factor = unc_file.Get(unc_name)
+  add_variation_from_histogram(
+                               nominal=nominal,
+                               factor=factor,
+                               new_name=new_name,
+                               outfile=outfile,
+                               invert=invert,
+                               scale=scale
+                               )
+
+
+def add_variation_flat_localized(nominal, factor_value, new_name, outfile, xrange=(-1,1e4)):
+  factor = nominal.Clone(new_name + "_factor")
+  factor.Reset()
+
+  for ibin in range(factor.GetNbinsX()+1):
+    center = factor.GetBinCenter(ibin)
+    if not (xrange[0] <= center < xrange[1]):
+      continue
+    factor.SetBinContent(factor_value)
+
+  add_variation_from_histogram(
+                              nominal=nominal,
+                              factor=factor,
+                              new_name=new_name,
+                              outfile=outfile,
+                              )
+
 
 # Define how a control region(s) transfer is made by defining cmodel provide, the calling pattern must be unchanged!
 # First define simple string which will be used for the datacard
