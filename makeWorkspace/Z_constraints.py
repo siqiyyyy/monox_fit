@@ -382,7 +382,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                 )
   CRs[0].add_nuisance_shape(var, _fOut)
 
-  var = "photon_stitch_250to400"
+  var = "photon_stitch_250to400_%s"%year
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1./1.05,
@@ -400,7 +400,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   CRs[0].add_nuisance_shape(var, _fOut)
 
 
-  var = "photon_stitch_400to650"
+  var = "photon_stitch_400to650_%s"%year
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1./1.05,
@@ -417,7 +417,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   )
   CRs[0].add_nuisance_shape(var, _fOut)
 
-  var = "photon_stitch_650toInf"
+  var = "photon_stitch_650toInf_%s"%year
   add_variation_flat_localized(
     nominal=PhotonScales,
     factor_value=1./1.05,
