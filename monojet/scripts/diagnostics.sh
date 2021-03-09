@@ -1,6 +1,10 @@
 #!/bin/bash
 mkdir -p diagnostics
 pushd diagnostics
+
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 # Individual years
 for YEAR in 2017 2018 combined; do
     combine -M FitDiagnostics \

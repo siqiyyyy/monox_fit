@@ -1,5 +1,9 @@
 mkdir -p limit
 pushd limit
+
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 for file in ../cards/*.root; do
 
     TAG=$(basename $file | sed 's/card_//g;s/.root//g');

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 ### Asimov limit
 mkdir -p limit
 pushd limit

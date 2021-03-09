@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 mkdir -p cards
 
 for YEAR in 2017 2018; do

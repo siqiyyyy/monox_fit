@@ -5,6 +5,9 @@ cd /afs/cern.ch/work/a/aalbert/public/2020-03-09_limit/monox_fit/combine_vj/
 JDIR=$(readlink -e ../monojet/${TAG}/${SUBTAG}/)
 VDIR=$(readlink -e ../monov/${TAG}/${SUBTAG}/)
 
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 WDIR=./${TAG}/${SUBTAG}_${SUBSUBTAG}/
 mkdir -p $WDIR
 pushd $WDIR
