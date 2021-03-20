@@ -323,16 +323,16 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
 
 
   fphotonid = r.TFile.Open("sys/photon_id_unc.root")
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Up"%(cid, year), _fOut, invert=True)
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Down"%(cid, year), _fOut, invert=True)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Up"%(cid, year), _fOut, invert=True, scale=2.0)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_Down"%(cid, year), _fOut, invert=True, scale=2.0)
   CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho".format(**filler),_fOut)
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Up"%(cid, year), _fOut, invert=True)
-  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut, invert=True)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_up".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Up"%(cid, year), _fOut, invert=True, scale=2.0)
+  add_variation(PhotonScales, fphotonid, "{CHANNEL}_{YEAR}_photon_id_extrap_dn".format(**filler), "photon_weights_%s_CMS_eff%s_pho_extrap_Down"%(cid, year), _fOut, invert=True, scale=2.0)
   CRs[0].add_nuisance_shape("CMS_eff{YEAR}_pho_extrap".format(**filler),_fOut)
 
   felectronid = r.TFile.Open("sys/ele_id_unc.root")
-  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_id_up".format(**filler), "zee_weights_%s_CMS_eff%s_e_Up"%(cid, year), _fOut, invert=True)
-  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_id_dn".format(**filler), "zee_weights_%s_CMS_eff%s_e_Down"%(cid, year), _fOut, invert=True)
+  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_id_up".format(**filler), "zee_weights_%s_CMS_eff%s_e_Up"%(cid, year), _fOut, invert=True, scale=2.0)
+  add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_id_dn".format(**filler), "zee_weights_%s_CMS_eff%s_e_Down"%(cid, year), _fOut, invert=True, scale=2.0)
   CRs[2].add_nuisance_shape("CMS_eff{YEAR}_e".format(**filler),_fOut)
   add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_reco_up".format(**filler), "zee_weights_%s_CMS_eff%s_e_reco_Up"%(cid, year), _fOut, invert=True)
   add_variation(ZeeScales, felectronid, "{CHANNEL}_{YEAR}_2e_reco_dn".format(**filler), "zee_weights_%s_CMS_eff%s_e_reco_Down"%(cid, year), _fOut, invert=True)
@@ -370,7 +370,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                 'photon_pt_scale_{CHANNEL}_0.02_up'.format(**filler),
                 "photon_weights_%s_%s_Up"%(cid, var),
                 _fOut,
-                invert=True
+                invert=True,
+                scale=0.5
                 )
   add_variation(
                 PhotonScales,
@@ -378,21 +379,22 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
                 'photon_pt_scale_{CHANNEL}_0.02_dn'.format(**filler),
                 "photon_weights_%s_%s_Down"%(cid, var),
                 _fOut,
-                invert=True
+                invert=True,
+                scale=0.5
                 )
   CRs[0].add_nuisance_shape(var, _fOut)
 
   var = "photon_stitch_250to400_%s"%year
   add_variation_flat_localized(
     nominal=PhotonScales,
-    factor_value=1./1.05,
+    factor_value=1./1.02,
     new_name="photon_weights_%s_%s_Up"%(cid, var),
     outfile=_fOut,
     xrange=(250,400)
   )
   add_variation_flat_localized(
     nominal=PhotonScales,
-    factor_value=1.05,
+    factor_value=1.02,
     new_name="photon_weights_%s_%s_Down"%(cid, var),
     outfile=_fOut,
     xrange=(250,400)
@@ -403,14 +405,14 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   var = "photon_stitch_400to650_%s"%year
   add_variation_flat_localized(
     nominal=PhotonScales,
-    factor_value=1./1.05,
+    factor_value=1./1.02,
     new_name="photon_weights_%s_%s_Up"%(cid, var),
     outfile=_fOut,
     xrange=(400,650)
   )
   add_variation_flat_localized(
     nominal=PhotonScales,
-    factor_value=1.05,
+    factor_value=1.02,
     new_name="photon_weights_%s_%s_Down"%(cid, var),
     outfile=_fOut,
     xrange=(400,650)
@@ -420,14 +422,14 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   var = "photon_stitch_650toInf_%s"%year
   add_variation_flat_localized(
     nominal=PhotonScales,
-    factor_value=1./1.05,
+    factor_value=1./1.02,
     new_name="photon_weights_%s_%s_Up"%(cid, var),
     outfile=_fOut,
     xrange=(650,1e9)
   )
   add_variation_flat_localized(
     nominal=PhotonScales,
-    factor_value=1.05,
+    factor_value=1.02,
     new_name="photon_weights_%s_%s_Down"%(cid, var),
     outfile=_fOut,
     xrange=(650,1e9)
