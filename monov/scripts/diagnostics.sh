@@ -2,6 +2,9 @@
 mkdir -p diagnostics
 pushd diagnostics
 
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 # Year by year
 for YEAR in 2017 2018; do
     for TAGGER in nominal; do

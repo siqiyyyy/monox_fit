@@ -3,6 +3,9 @@
 TAGGER="nominal"
 WP="tight"
 
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 ### Impacts
 
 # Separately by year

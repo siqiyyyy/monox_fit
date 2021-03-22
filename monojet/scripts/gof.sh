@@ -1,6 +1,9 @@
 mkdir -p gof
 pushd gof
 
+#remove limit on stack size to prevent related segfault
+ulimit -s unlimited
+
 function gof() {
     YEAR=$1
     MASK=$2
