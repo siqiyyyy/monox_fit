@@ -148,20 +148,44 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                 uncFile.ZG_PDF_met,
                 ]
             uncFile_photon = TFile(os.path.join(DIR,'../makeWorkspace/sys/photon_id_unc.root'))
+            uncFile_photon_scale = TFile(os.path.join(DIR,'../makeWorkspace/sys/photon_scale_unc.root'))
             if 'monojet' in category:
                 if year == 2017:
-                    uncertainties.append(uncFile_photon.monojet_2017_photon_id_extrap_up)
-                    uncertainties.append(uncFile_photon.monojet_2017_photon_id_up)
+                    h = uncFile_photon.monojet_2017_photon_id_extrap_up
+                    h.Scale(2)
+                    uncertainties.append(h)
+                    h = uncFile_photon.monojet_2017_photon_id_up
+                    h.Scale(2)
+                    uncertainties.append(h)
                 elif year == 2018:
-                    uncertainties.append(uncFile_photon.monojet_2018_photon_id_extrap_up)
-                    uncertainties.append(uncFile_photon.monojet_2018_photon_id_up)
+                    h = uncFile_photon.monojet_2018_photon_id_extrap_up
+                    h.Scale(2)
+                    uncertainties.append(h)
+                    h = uncFile_photon.monojet_2018_photon_id_up
+                    h.Scale(2)
+                    uncertainties.append(h)
+
+                h = uncFile_photon_scale.Get("photon_pt_scale_monojet_0.02_up")
+                h.Scale(0.5)
+                uncertainties.append(h)
+
             elif 'monov' in category:
                 if year == 2017:
-                    uncertainties.append(uncFile_photon.monov_2017_photon_id_extrap_up)
-                    uncertainties.append(uncFile_photon.monov_2017_photon_id_up)
+                    h = uncFile_photon.monov_2017_photon_id_extrap_up
+                    h.Scale(2)
+                    uncertainties.append(h)
+
+                    h = uncFile_photon.monov_2017_photon_id_up
+                    h.Scale(2)
+                    uncertainties.append(h)
                 elif year == 2018:
-                    uncertainties.append(uncFile_photon.monov_2018_photon_id_extrap_up)
-                    uncertainties.append(uncFile_photon.monov_2018_photon_id_up)
+                    h = uncFile_photon.monov_2018_photon_id_extrap_up
+                    h.Scale(2)
+                    uncertainties.append(h)
+
+                    h = uncFile_photon.monov_2018_photon_id_up
+                    h.Scale(2)
+                    uncertainties.append(h)
         else:
             uncFile     = TFile(os.path.join(DIR,'../makeWorkspace/sys/theory_unc_ZW.root'))
             uncertainties = [
@@ -219,7 +243,7 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                         flat_uncertainties[year]["eff_e"],
                         flat_uncertainties[year]["eff_e_reco"],
                     )
-                # Uncertainty representing the average uncertainty associated to 
+                # Uncertainty representing the average uncertainty associated to
                 # one additional lepton for combined regions
                 one_lepton_unc = 1/sqrt(2) * quadsum(
                     one_muon_unc,
@@ -271,9 +295,9 @@ def dataValidation(region1,region2,category,ws_file, fitdiag_file, outdir, lumi,
                         nom_tot = h_prefit[region1].GetBinContent(iBin)
 
                         # Total unc = relative uncertainty * nominal
-                        # factor of 0.5 accounts for symmetrizing up/down                        
+                        # factor of 0.5 accounts for symmetrizing up/down
                         theory_sumw2 += pow( 0.5 * (hist_unc.GetBinContent(findbin)-1) * nom, 2)
-                
+
                 # After QCD and EWK have been summed over, we divide by the denominator
                 theory_sumw2 /= pow(h_prefit[region2].GetBinContent(iBin),2)
 
