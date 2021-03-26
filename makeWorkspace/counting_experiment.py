@@ -464,7 +464,7 @@ class Channel:
                         self.wspace_out.var("%s" % name))
                 )  # this is now relative deviation, SF-SF_0 = func => SF = SF_0*(1+func/SF_0)
 
-                if (coeff_a == 0):
+                if (coeff_a==0 and coeff_b==0):
                     func.setAttribute("temp", True)
             elif functype=="lognorm":
                 n0 = self.scalefactors.GetBinContent(b+1)

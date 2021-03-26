@@ -179,7 +179,7 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   # Trigger single muon
   add_variation(WScales, fztoz_trig, "trig_sys_down"+tag, "wmn_weights_%s_mettrig_%s_Down"%(cid,year), _fOut)
   add_variation(WScales, fztoz_trig, "trig_sys_up"+tag, "wmn_weights_%s_mettrig_%s_Up"%(cid,year), _fOut)
-  CRs[0].add_nuisance_shape("mettrig_%s"%year,_fOut, functype='lognorm')
+  CRs[0].add_nuisance_shape("mettrig_%s"%year,_fOut, functype='quadratic')
 
   ## Veto uncertainties
   ftauveto = r.TFile.Open("sys/tau_veto_unc.root")
@@ -189,53 +189,53 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   ## Wmuon CR
   add_variation(WScales, felveto, "ele_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_eveto_id_%s_Up"%(cid,year), _fOut)
   add_variation(WScales, felveto, "ele_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_eveto_id_%s_Down"%(cid,year), _fOut)
-  CRs[0].add_nuisance_shape("eveto_id_%s"%year,_fOut, functype='lognorm')
+  CRs[0].add_nuisance_shape("eveto_id_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales, felveto, "ele_reco_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_eveto_reco_%s_Up"%(cid,year), _fOut)
   add_variation(WScales, felveto, "ele_reco_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_eveto_reco_%s_Down"%(cid,year), _fOut)
-  CRs[0].add_nuisance_shape("eveto_reco_%s"%year,_fOut, functype='lognorm')
+  CRs[0].add_nuisance_shape("eveto_reco_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut)
   add_variation(WScales, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut)
-  CRs[0].add_nuisance_shape("muveto_id_%s"%year,_fOut, functype='lognorm')
+  CRs[0].add_nuisance_shape("muveto_id_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut)
   add_variation(WScales, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut)
-  CRs[0].add_nuisance_shape("muveto_iso_%s"%year,_fOut, functype='lognorm')
+  CRs[0].add_nuisance_shape("muveto_iso_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Up"%(cid,year), _fOut)
   add_variation(WScales, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wmn_weights_%s_tauveto_%s_Down"%(cid,year), _fOut)
-  CRs[0].add_nuisance_shape("tauveto_%s"%year,_fOut, functype='lognorm')
+  CRs[0].add_nuisance_shape("tauveto_%s"%year,_fOut, functype='quadratic')
 
   ## W electron CR
   add_variation(WScales_e, felveto, "ele_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_eveto_id_%s_Up"%(cid,year), _fOut)
   add_variation(WScales_e, felveto, "ele_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_eveto_id_%s_Down"%(cid,year), _fOut)
-  CRs[1].add_nuisance_shape("eveto_id_%s"%year,_fOut, functype='lognorm')
+  CRs[1].add_nuisance_shape("eveto_id_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales_e, felveto, "ele_reco_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_eveto_reco_%s_Up"%(cid,year), _fOut)
   add_variation(WScales_e, felveto, "ele_reco_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_eveto_reco_%s_Down"%(cid,year), _fOut)
-  CRs[1].add_nuisance_shape("eveto_reco_%s"%year,_fOut, functype='lognorm')
+  CRs[1].add_nuisance_shape("eveto_reco_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Up"%(cid,year), _fOut)
   add_variation(WScales_e, fmuveto, "muon_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_id_%s_Down"%(cid,year), _fOut)
-  CRs[1].add_nuisance_shape("muveto_id_%s"%year,_fOut, functype='lognorm')
+  CRs[1].add_nuisance_shape("muveto_id_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Up"%(cid,year), _fOut)
   add_variation(WScales_e, fmuveto, "muon_iso_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler), "wen_weights_%s_muveto_iso_%s_Down"%(cid,year), _fOut)
-  CRs[1].add_nuisance_shape("muveto_iso_%s"%year,_fOut, functype='lognorm')
+  CRs[1].add_nuisance_shape("muveto_iso_%s"%year,_fOut, functype='quadratic')
 
   add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_up_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Up"%(cid,year), _fOut)
   add_variation(WScales_e, ftauveto, "tau_id_veto_sys_{CHANNEL}_down_{YEAR}".format(**filler),"wen_weights_%s_tauveto_%s_Down"%(cid,year), _fOut)
-  CRs[1].add_nuisance_shape("tauveto_%s"%year,_fOut, functype='lognorm')
+  CRs[1].add_nuisance_shape("tauveto_%s"%year,_fOut, functype='quadratic')
 
 
   felectronid = r.TFile.Open("sys/ele_id_unc.root")
   add_variation(WScales_e, felectronid, "{CHANNEL}_{YEAR}_1e_id_up".format(**filler), "wen_weights_%s_CMS_eff%s_e_Up"%(cid, year), _fOut, invert=True, scale=2.0)
   add_variation(WScales_e, felectronid, "{CHANNEL}_{YEAR}_1e_id_dn".format(**filler), "wen_weights_%s_CMS_eff%s_e_Down"%(cid, year), _fOut, invert=True, scale=2.0)
-  CRs[1].add_nuisance_shape("CMS_eff{YEAR}_e".format(**filler),_fOut, functype='lognorm')
+  CRs[1].add_nuisance_shape("CMS_eff{YEAR}_e".format(**filler),_fOut, functype='quadratic')
   add_variation(WScales_e, felectronid, "{CHANNEL}_{YEAR}_1e_reco_up".format(**filler), "wen_weights_%s_CMS_eff%s_e_reco_Up"%(cid, year), _fOut, invert=True)
   add_variation(WScales_e, felectronid, "{CHANNEL}_{YEAR}_1e_reco_dn".format(**filler), "wen_weights_%s_CMS_eff%s_e_reco_Down"%(cid, year), _fOut, invert=True)
-  CRs[1].add_nuisance_shape("CMS_eff{YEAR}_e_reco".format(**filler),_fOut, functype='lognorm')
+  CRs[1].add_nuisance_shape("CMS_eff{YEAR}_e_reco".format(**filler),_fOut, functype='quadratic')
 
   # Prefiring uncertainty
   # The shape in the input file is just one histogram to be used for up/down
@@ -246,11 +246,11 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
     fpref = r.TFile.Open("sys/pref_unc.root")
     add_variation(WScales, fpref, "{CHANNEL}_pref_unc_w_over_m".format(**filler), "wmn_weights_%s_prefiring_Up"%cid, _fOut)
     add_variation(WScales, fpref, "{CHANNEL}_pref_unc_w_over_m".format(**filler), "wmn_weights_%s_prefiring_Down"%cid, _fOut, invert=True)
-    CRs[0].add_nuisance_shape("prefiring",_fOut, functype='lognorm')
+    CRs[0].add_nuisance_shape("prefiring",_fOut, functype='quadratic')
 
     add_variation(WScales_e, fpref, "{CHANNEL}_pref_unc_w_over_e".format(**filler), "wen_weights_%s_prefiring_Up"%cid, _fOut, invert=True)
     add_variation(WScales_e, fpref, "{CHANNEL}_pref_unc_w_over_e".format(**filler), "wen_weights_%s_prefiring_Down"%cid, _fOut)
-    CRs[1].add_nuisance_shape("prefiring",_fOut, functype='lognorm')
+    CRs[1].add_nuisance_shape("prefiring",_fOut, functype='quadratic')
 
   # JES uncertainties
   fjes = get_jes_jer_source_file_for_tf(category='monojet')
@@ -259,11 +259,11 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
   for var in jet_variations:
     add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Up"%(cid, var), _fOut)
     add_variation(WScales, fjes, 'wlnu_over_wmunu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "wmn_weights_%s_%s_Down"%(cid, var), _fOut)
-    CRs[0].add_nuisance_shape(var,_fOut, functype='lognorm')
+    CRs[0].add_nuisance_shape(var,_fOut, functype='quadratic')
 
     add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Up'.format(YEAR=year-2000, VARIATION=var), "wen_weights_%s_%s_Up"%(cid, var), _fOut)
     add_variation(WScales_e, fjes, 'wlnu_over_wenu{YEAR}_qcd_{VARIATION}Down'.format(YEAR=year-2000, VARIATION=var), "wen_weights_%s_%s_Down"%(cid, var), _fOut)
-    CRs[1].add_nuisance_shape(var,_fOut, functype='lognorm')
+    CRs[1].add_nuisance_shape(var,_fOut, functype='quadratic')
 
   # PDF uncertainties
     fpdf = ROOT.TFile("sys/tf_pdf_unc.root")
@@ -284,8 +284,8 @@ def cmodel(cid,nam,_f,_fOut, out_ws, diag, year):
       _fOut
     )
 
-  CRs[0].add_nuisance_shape("w_over_w_pdf",_fOut, functype='lognorm')
-  CRs[1].add_nuisance_shape("w_over_w_pdf",_fOut, functype='lognorm')
+  CRs[0].add_nuisance_shape("w_over_w_pdf",_fOut, functype='quadratic')
+  CRs[1].add_nuisance_shape("w_over_w_pdf",_fOut, functype='quadratic')
 
   #######################################################################################################
 
