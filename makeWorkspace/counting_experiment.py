@@ -477,12 +477,12 @@ class Channel:
                     sigma = 0.5 * abs(sfmax-sfmin)
 
                     direction = 1 if sfmax > sfmin else -1
-
-
+                
+                
                 func = r.RooFormulaVar(
                     fname,
                     "Systematic Variation",
-                    "({N} * (1+{SIGMA}/{N})**(({DIRECTION}*@0) - {N}) / {N}".format(N=n0, SIGMA=sigma,DIRECTION=direction),
+                    "({N} * (1+{SIGMA}/{N})**({DIRECTION}*@0) - {N}) / {N}".format(N=n0, SIGMA=sigma,DIRECTION=direction),
                     r.RooArgList(self.wspace_out.var("%s" % name))
                 )
                 if sigma == 0:
