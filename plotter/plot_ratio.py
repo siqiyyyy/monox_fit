@@ -99,14 +99,16 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
                 up = f.Get(dirname+"/"+name)
                 diff = up.GetBinContent(b) - ratio.GetBinContent(b)
 
-                if (any([x in name for x in ['stat']])):
+                if (any([x in name for x in ['stat_error']])):
                     unc_dict['stat'][b] = np.hypot(unc_dict['stat'][b], diff)
-                elif (any([x in name for x in ['trig','prefiring','veto','eff']])):
+                elif (any([x in name for x in ['trig','prefiring','veto','eff','jes','jer','photon_scale']])):
                     unc_dict['exp'][b] = np.hypot(unc_dict['exp'][b], diff)
                 elif (any([x in name for x in ['cross', 'pdf', 'qcd']])):
-                    unc_dict['qcd'][b] = np.hypot(unc_dict['ewk'][b], diff)
+                    unc_dict['qcd'][b] = np.hypot(unc_dict['qcd'][b], diff)
                 elif (any([x in name for x in ['ewk', 'sudakov', 'nnlo']])):
                     unc_dict['ewk'][b] = np.hypot(unc_dict['ewk'][b], diff)
+                else:
+                    raise IOError("Unrecognized variation: " + name)
 
         gStyle.SetOptStat(0)
 
@@ -197,7 +199,15 @@ def plot_ratio(process,category, model_file, outdir, lumi, year):
         latex3.SetTextSize(0.5*c.GetTopMargin())
         latex3.SetTextFont(52)
         latex3.SetTextAlign(11)
-        latex3.DrawLatex(0.20, 0.8, "Preliminary");
+
+        if "monojet" in category:
+            latex3.DrawLatex(0.22, 0.8, "Monojet");
+        elif "loose" in category:
+            latex3.DrawLatex(0.22, 0.8, "Mono-V");
+            latex3.DrawLatex(0.22, 0.75, "(low-purity)");
+        elif "tight" in category:
+            latex3.DrawLatex(0.22, 0.8, "Mono-V");
+            latex3.DrawLatex(0.22, 0.75, "(high-purity)");
 
         r.gPad.RedrawAxis()
         if not os.path.exists(outdir):
