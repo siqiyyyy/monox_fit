@@ -470,15 +470,19 @@ class Channel:
                 n0 = self.scalefactors.GetBinContent(b+1)
                 if n0 == 0:
                     sigma = 0
+                    direction = 1
                 else:
                     sfmax = max(0, sysup.GetBinContent(b+1))
                     sfmin = max(0, sysdn.GetBinContent(b+1))
                     sigma = 0.5 * abs(sfmax-sfmin)
-                
+
+                    direction = 1 if sfmax > sfmin else -1
+
+
                 func = r.RooFormulaVar(
                     fname,
                     "Systematic Variation",
-                    "({N} * (1+{SIGMA}/{N})**@0 - {N}) / {N}".format(N=n0, SIGMA=sigma),
+                    "({N} * (1+{SIGMA}/{N})**(({DIRECTION}*@0) - {N}) / {N}".format(N=n0, SIGMA=sigma,DIRECTION=direction),
                     r.RooArgList(self.wspace_out.var("%s" % name))
                 )
                 if sigma == 0:
