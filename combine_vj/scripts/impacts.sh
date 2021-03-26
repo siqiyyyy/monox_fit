@@ -6,7 +6,7 @@ do_impacts(){
     mkdir -p ${YEAR}_${SIGNAL}
     pushd ${YEAR}_${SIGNAL}
     TAG=task
-    COMMON_OPTS="-t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1 --autoRange 5 --squareDistPoiStep"
+    COMMON_OPTS="-t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1 --autoRange 5 --squareDistPoiStep --setParameters LUMISCALE=1 --freezeParameters LUMISCALE"
     combineTool.py -M Impacts \
                    -d ${CARD} \
                    -m 125 \
@@ -14,14 +14,14 @@ do_impacts(){
                    --robustFit 1 \
                    ${COMMON_OPTS}
 
-    Submit the hard work to condor
+    # Submit the hard work to condor
     combineTool.py -M Impacts -d ${CARD} \
                    -m 125 \
                    --robustFit 1 \
                    --doFits \
                    --job-mode condor \
                    --task-name ${TAG} \
-                   --sub-opts '+MaxRuntime=7200' \
+                   --sub-opts '+MaxRuntime=72000' \
                     ${COMMON_OPTS}
 
     # Wait for condor jobs to return
