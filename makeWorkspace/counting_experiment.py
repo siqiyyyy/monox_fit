@@ -467,25 +467,27 @@ class Channel:
                 if (coeff_a==0 and coeff_b==0):
                     func.setAttribute("temp", True)
             elif functype=="lognorm":
-                n0 = self.scalefactors.GetBinContent(b+1)
-                if n0 == 0:
-                    sigma = 0
-                    direction = 1
+                sf = self.scalefactors.GetBinContent(b+1)
+                if sf == 0:
+                    nsf = 1
+                    sigma_up = 0
+                    sigma_dn = 0
                 else:
-                    sfmax = max(0, sysup.GetBinContent(b+1))
-                    sfmin = max(0, sysdn.GetBinContent(b+1))
-                    sigma = 0.5 * abs(sfmax-sfmin)
-
-                    direction = 1 if sfmax > sfmin else -1
+                    # first transform into inverse space
+                    nsf = 1/sf
+                    nsfmax = max(0, 1./sysup.GetBinContent(b+1))
+                    nsfmin = max(0, 1./sysdn.GetBinContent(b+1))
+                    sigma_up = nsfmax-nsf
+                    sigma_dn = nsfmin-nsf
                 
                 
                 func = r.RooFormulaVar(
                     fname,
                     "Systematic Variation",
-                    "({N} * (1+{SIGMA}/{N})**({DIRECTION}*@0) - {N}) / {N}".format(N=n0, SIGMA=sigma,DIRECTION=direction),
+                    "((@0>=0)*(1+{SIGMA_UP}/{N})**(abs(@0)) + (@0<0)*(1+{SIGMA_DN}/{N})**(abs(@0)) - 1) ".format(N=nsf, SIGMA_UP=sigma_up, SIGMA_DN=sigma_dn),
                     r.RooArgList(self.wspace_out.var("%s" % name))
                 )
-                if sigma == 0:
+                if sigma_up == 0 and sigma_dn == 0:
                     func.setAttribute("temp", True)
             self.wspace_out.var("%s" % name).setVal(0)
             if not self.wspace_out.function(func.GetName()):
