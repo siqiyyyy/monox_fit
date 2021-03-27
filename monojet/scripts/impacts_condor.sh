@@ -8,7 +8,7 @@ do_impacts(){
     SIGNAL=${2}
     mkdir -p ${YEAR}_${SIGNAL}
     pushd ${YEAR}_${SIGNAL}
-    COMMON_OPTS="-t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1 --autoRange 5 --squareDistPoiStep"
+    COMMON_OPTS="-t -1 --expectSignal=${SIGNAL} --parallel=4 --rMin=-1 --autoRange 5 --squareDistPoiStep --cminDefaultMinimizerStrategy 0"
     combineTool.py -M Impacts \
                    -d ../../cards/card_monojet_${YEAR}.root \
                    -m 125 \

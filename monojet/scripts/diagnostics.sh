@@ -14,6 +14,7 @@ for YEAR in 2017 2018 combined; do
             --setParameters 'rgx{mask_.*_signal}=1' \
             -n _monojet_${YEAR} \
             ../cards/card_monojet_${YEAR}.root \
+            --cminDefaultMinimizerStrategy 0 \
             | tee diag_${YEAR}.log &&
     python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \
            fitDiagnostics_monojet_${YEAR}.root \
@@ -26,6 +27,7 @@ for YEAR in 2017 2018 combined; do
             --robustFit 1 \
             -n _monojet_unblind_${YEAR} \
             ../cards/card_monojet_${YEAR}.root \
+            --cminDefaultMinimizerStrategy 0 \
             | tee diag_unblind_${YEAR}.log &&
     python ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \
            fitDiagnostics_monojet_unblind_${YEAR}.root \

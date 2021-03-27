@@ -16,6 +16,7 @@ for YEAR in 2017 2018; do
             --saveWithUncertainties \
             --setParameters 'rgx{mask_.*_signal}'=1 \
             -n _${TAGGER}_monov${WP}_${YEAR} \
+            --cminDefaultMinimizerStrategy 0 \
             ../cards/card_${TAGGER}_monov${WP}_${YEAR}.root \
             -v2 \
             > diag_${YEAR}.log &&
@@ -31,6 +32,7 @@ for YEAR in 2017 2018; do
             --saveWithUncertainties \
             --setParameters 'rgx{mask_.*_signal}'=0 \
             -n _${TAGGER}_monov${WP}_unblind_${YEAR} \
+            --cminDefaultMinimizerStrategy 0 \
             ../cards/card_${TAGGER}_monov${WP}_${YEAR}.root \
             -v2 \
             > diag_unblind_${YEAR}.log &&
